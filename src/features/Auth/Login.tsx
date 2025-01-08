@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
+import { Link } from "@tanstack/react-router";
 
 const loginSchema = z.object({
   email: z
@@ -42,8 +43,6 @@ const Login = () => {
     console.log(rememberMe);
     loginFn.mutate({ body: data });
   };
-
-  const handleForgotPassword = () => {};
 
   return (
     <div className="flex flex-col gap-4 py-3">
@@ -107,9 +106,12 @@ const Login = () => {
               </Label>
             </div>
 
-            <Button variant={"link"} onClick={handleForgotPassword}>
+            <Link
+              to="/forgot-password"
+              className="text-sm font-semibold text-primary"
+            >
               Forgot Password
-            </Button>
+            </Link>
           </div>
 
           <Button

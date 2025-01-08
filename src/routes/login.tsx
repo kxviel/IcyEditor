@@ -16,17 +16,17 @@ function RouteComponent() {
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
-      <div className="flex h-full w-[376px] flex-col items-center gap-4 px-2 pt-40">
+      <div className="flex h-full w-[376px] flex-col items-center gap-3 px-2 pt-40">
         <div>
           <img src={Logo} alt="logo" />
         </div>
 
         <p className="text-2xl font-semibold">
           {activeTab === "login"
-            ? "Login to your account"
+            ? "Log in to your account"
             : "Create an Account"}
         </p>
-        <p className="text-lg text-gray-500">
+        <p className="text-gray-500">
           {activeTab === "login"
             ? "Welcome back! Enter your details."
             : "Start your 30-day free trial."}
