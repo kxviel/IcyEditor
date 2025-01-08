@@ -4,13 +4,9 @@ import { toast } from "sonner";
 
 type Props = {
   body: {
-    username: string;
+    name: string;
     email: string;
-    phone: string;
     password: string;
-    city: string;
-    state: string;
-    school: string;
   };
 };
 
