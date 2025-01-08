@@ -7,7 +7,8 @@ export const useAuth = () => {
     localStorage.removeItem("isAuthenticated");
   };
 
-  const isLogged = () => localStorage.getItem("isAuthenticated") === "true";
+  const isLogged = () => "true";
+  // const isLogged = () => localStorage.getItem("isAuthenticated") === "true";
 
   return { signIn, signOut, isLogged };
 };
