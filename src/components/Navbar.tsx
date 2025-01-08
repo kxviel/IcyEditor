@@ -1,40 +1,34 @@
-import { Link } from "@tanstack/react-router";
 import { Button } from "./ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import Logo from "@/assets/Logo.svg";
+import { Bell, Settings } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useNavigate } from "@tanstack/react-router";
 
 const Navbar = () => {
-  const auth = useAuth();
+  const navigate = useNavigate();
+
   return (
-    <header>
-      <nav className="flex h-[70px] gap-2 bg-slate-600 px-6 py-2 text-lg">
-        <Link
-          to="/"
-          activeProps={{
-            className: "font-bold",
-          }}
-          activeOptions={{ exact: true }}
+    <header className="w-full border border-b border-gray-200">
+      <nav className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-8">
+        <div
+          className="hover:cursor-pointer"
+          onClick={() => navigate({ to: "/" })}
         >
-          Home
-        </Link>{" "}
-        <Link
-          to="/builder"
-          activeProps={{
-            className: "font-bold",
-          }}
-        >
-          Builder
-        </Link>
-        {!auth.isLogged() && (
-          <Link
-            to="/login"
-            activeProps={{
-              className: "font-bold",
-            }}
-          >
-            LOGIN PAGE
-          </Link>
-        )}
-        {auth.isLogged() && <Button onClick={auth.signOut}>Logout</Button>}
+          <img src={Logo} alt="logo" />
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <Button variant="ghost" className="px-3">
+            <Settings />
+          </Button>
+          <Button variant="ghost" className="px-3">
+            <Bell />
+          </Button>
+          <Avatar className="hover:cursor-pointer">
+            <AvatarImage src="https://github.com/kxviel.png" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+        </div>
       </nav>
     </header>
   );

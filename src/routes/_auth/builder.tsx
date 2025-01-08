@@ -13,12 +13,11 @@ export const Route = createFileRoute("/_auth/builder")({
 
 function RouteComponent() {
   return (
-    <div className="flex h-[calc(100vh-70px)] w-full bg-green-300">
-      <QuestionList />
-      <PaperView />
-      {/* <div className="h-full w-1/2 bg-blue-300">
-    <div></div>
-  </div> */}
+    <div className="w-full">
+      <div className="mx-auto flex h-[calc(100vh-72px)] max-w-7xl items-center justify-center">
+        <QuestionList />
+        <PaperView />
+      </div>
     </div>
   );
 }
