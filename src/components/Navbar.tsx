@@ -1,11 +1,14 @@
 import { Button } from "./ui/button";
 import Logo from "@/assets/Logo.svg";
-import { Bell, Settings } from "lucide-react";
+import { Bell, Settings, Printer, Save } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useLocation } from "@tanstack/react-router";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const pathname = useLocation({
+    select: (l) => l.pathname,
+  });
 
   return (
     <header className="w-full border border-b border-gray-200">
@@ -17,18 +20,29 @@ const Navbar = () => {
           <img src={Logo} alt="logo" />
         </div>
 
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" className="px-3">
-            <Settings />
-          </Button>
-          <Button variant="ghost" className="px-3">
-            <Bell />
-          </Button>
-          <Avatar className="hover:cursor-pointer">
-            <AvatarImage src="https://github.com/kxviel.png" />
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-        </div>
+        {pathname === "/builder" ? (
+          <div className="flex items-center space-x-4">
+            <Button variant="outline">
+              <Save /> Save Paper
+            </Button>
+            <Button>
+              Print & Save <Printer />
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" className="px-3">
+              <Settings />
+            </Button>
+            <Button variant="ghost" className="px-3">
+              <Bell />
+            </Button>
+            <Avatar className="hover:cursor-pointer">
+              <AvatarImage src="https://github.com/kxviel.png" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+          </div>
+        )}
       </nav>
     </header>
   );
