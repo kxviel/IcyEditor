@@ -7,7 +7,6 @@ import {
   Search,
   SortAsc,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -18,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import AddPaperModal from "./AddPaperModal";
+import { IconInput } from "@/components/ui/IconInput";
 
 const examCards = Array(6).fill({
   lastEdited: "8th Jan 2025",
@@ -49,7 +49,11 @@ const Home = () => {
 
       {/* Search */}
       <div className="flex w-full items-center justify-between space-x-4">
-        <Input placeholder="Search" className="w-[320px]" startIcon={Search} />
+        <IconInput
+          placeholder="Search"
+          className="w-[320px]"
+          startIcon={Search}
+        />
 
         <div className="flex space-x-4">
           <Button variant={"outline"}>

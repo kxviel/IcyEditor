@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Link } from "@tanstack/react-router";
+import { IconInput } from "@/components/ui/IconInput";
 
 const loginSchema = z.object({
   email: z
@@ -77,7 +78,7 @@ const Login = () => {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input
+                  <IconInput
                     type="password"
                     placeholder="Enter your password"
                     {...field}
