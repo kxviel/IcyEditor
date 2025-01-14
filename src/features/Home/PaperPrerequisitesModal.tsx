@@ -16,16 +16,22 @@ import {
 } from "@/components/ui/select";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { publicationList } from "@/lib/utils";
+import { useGetSubject } from "./api/getSubject";
+import { useGetClass } from "./api/getClass";
+import { useGetSeries } from "./api/getSeries";
 
-const FormSchema = z.object({
-  email: z
-    .string({
-      required_error: "Please select an email to display.",
-    })
-    .email(),
+const formSchema = z.object({
+  publication: z.string(),
+  series: z.string(),
+  class: z.string(),
+  subject: z.string(),
 });
+
+type FormTypes = z.infer<typeof formSchema>;
+
 type Props = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,11 +39,24 @@ type Props = {
 
 const PaperPrerequisitesModal = ({ isOpen, setIsOpen }: Props) => {
   const navigate = useNavigate();
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<FormTypes>({
+    resolver: zodResolver(formSchema),
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  // Series
+  const { data: seriesList, isPending: isSeriesPending } = useGetSeries({
+    parentValue: form.watch("publication"),
+  });
+  // Class
+  const { data: classList, isPending: isClassPending } = useGetClass({
+    parentValue: form.watch("subject"),
+  });
+  // Subject
+  const { data: subjectList, isPending: isSubjectPending } = useGetSubject({
+    parentValue: form.watch("class"),
+  });
+
+  function onSubmit(data: FormTypes) {
     console.log(data);
 
     navigate({ to: "/builder" });
@@ -56,39 +75,51 @@ const PaperPrerequisitesModal = ({ isOpen, setIsOpen }: Props) => {
             >
               <ControlledSelect
                 form={form}
-                label="Subject"
-                options={[
-                  { value: "option1", label: "Option 1" },
-                  { value: "option2", label: "Option 2" },
-                  { value: "option3", label: "Option 3" },
-                ]}
+                label="Publication"
+                options={publicationList.map((option) => ({
+                  value: option.parentValue,
+                  label: option.name,
+                }))}
+                isDisabled={false}
+              />
+              <ControlledSelect
+                form={form}
+                label="Series"
+                options={
+                  seriesList
+                    ? seriesList.map(({ id, NAME }) => ({
+                        value: id.toString(),
+                        label: NAME,
+                      }))
+                    : []
+                }
+                isDisabled={isSeriesPending || !form.watch("publication")}
               />
               <ControlledSelect
                 form={form}
                 label="Subject"
-                options={[
-                  { value: "option1", label: "Option 1" },
-                  { value: "option2", label: "Option 2" },
-                  { value: "option3", label: "Option 3" },
-                ]}
+                options={
+                  classList
+                    ? classList.map(({ id, NAME }) => ({
+                        value: id.toString(),
+                        label: NAME,
+                      }))
+                    : []
+                }
+                isDisabled={isClassPending || !form.watch("series")}
               />
               <ControlledSelect
                 form={form}
                 label="Subject"
-                options={[
-                  { value: "option1", label: "Option 1" },
-                  { value: "option2", label: "Option 2" },
-                  { value: "option3", label: "Option 3" },
-                ]}
-              />
-              <ControlledSelect
-                form={form}
-                label="Subject"
-                options={[
-                  { value: "option1", label: "Option 1" },
-                  { value: "option2", label: "Option 2" },
-                  { value: "option3", label: "Option 3" },
-                ]}
+                options={
+                  subjectList
+                    ? subjectList.map(({ id, NAME }) => ({
+                        value: id.toString(),
+                        label: NAME,
+                      }))
+                    : []
+                }
+                isDisabled={isSubjectPending || !form.watch("class")}
               />
 
               <Button variant={"outline"} className="w-full">
@@ -108,23 +139,39 @@ const PaperPrerequisitesModal = ({ isOpen, setIsOpen }: Props) => {
 export default PaperPrerequisitesModal;
 
 type ControlledSelectProps = {
-  form: any;
+  form: UseFormReturn<FormTypes, any, undefined>;
   label: string;
+  isDisabled: boolean;
   options: { value: string; label: string }[];
 };
 
-const ControlledSelect = ({ form, label, options }: ControlledSelectProps) => {
+const ControlledSelect = ({
+  form,
+  label,
+  options,
+  isDisabled,
+}: ControlledSelectProps) => {
   return (
     <FormField
       control={form.control}
-      name="email"
+      name={
+        label.toLowerCase() as "publication" | "series" | "class" | "subject"
+      }
       render={({ field }) => (
         <FormItem>
           <FormLabel>{label}</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <Select
+            onValueChange={field.onChange}
+            defaultValue={field.value}
+            disabled={isDisabled}
+          >
             <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a verified email to display" />
+              <SelectTrigger
+                className={
+                  form.formState.errors[field.name] ? "border-red-100" : ""
+                }
+              >
+                <SelectValue placeholder={`Select ${label}`} />
               </SelectTrigger>
             </FormControl>
             <SelectContent>

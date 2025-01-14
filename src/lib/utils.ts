@@ -21,14 +21,37 @@ export const series = [
   "Jumbo-Combo",
 ];
 
-export const publication = [
-  "Blackberry Publication",
-  "Blueray Publication",
-  "Monopoly Publication",
-  "Eduplan Learning",
-  "Keylinks",
-  "Vista Edu Hub",
-  "Splendid Educational Books",
-  "Happigo",
-  "SMILEY",
+export const publicationList = [
+  {
+    name: "Blueray Publication",
+    parentValue: "1",
+  },
+  {
+    name: "Monopoly Publication",
+    parentValue: "2",
+  },
+  {
+    name: "Blackberry Publication",
+    parentValue: "3",
+  },
+  {
+    name: "Splendid Educational Books",
+    parentValue: "4",
+  },
+  {
+    name: "Vista Edu Hub",
+    parentValue: "5",
+  },
+  {
+    name: "Eduplan Learning",
+    parentValue: "6",
+  },
+  {
+    name: "Happigo",
+    parentValue: "7",
+  },
+  {
+    name: "SMILEY",
+    parentValue: "8",
+  },
 ];
