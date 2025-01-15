@@ -59,7 +59,9 @@ const PaperPrerequisitesModal = ({ isOpen, setIsOpen }: Props) => {
   function onSubmit(data: FormTypes) {
     console.log(data);
 
-    navigate({ to: "/builder" });
+    if (data.publication && data.series && data.class && data.subject) {
+      setIsOpen(false);
+    }
   }
 
   return (
@@ -122,7 +124,14 @@ const PaperPrerequisitesModal = ({ isOpen, setIsOpen }: Props) => {
                 isDisabled={isSubjectPending || !form.watch("class")}
               />
 
-              <Button variant={"outline"} className="w-full">
+              <Button
+                variant={"outline"}
+                className="w-full"
+                onClick={() => {
+                  navigate({ to: "/" });
+                  setIsOpen(false);
+                }}
+              >
                 Cancel
               </Button>
               <Button type="submit" className="w-full">

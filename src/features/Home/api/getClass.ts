@@ -5,8 +5,8 @@ import { AxiosResponse } from "axios";
 export type Class = {
   id: number;
   STATUS: string;
+  CLASS_ID: number;
   NAME: string;
-  SERIES_ID: number;
 };
 
 type Props = {
