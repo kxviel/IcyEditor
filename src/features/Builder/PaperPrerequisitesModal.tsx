@@ -19,9 +19,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { publicationList } from "@/lib/utils";
-import { useGetSubject } from "./api/getSubject";
-import { useGetClass } from "./api/getClass";
-import { useGetSeries } from "./api/getSeries";
+import { useGetSubject } from "../Home/api/getSubject";
+import { useGetClass } from "../Home/api/getClass";
+import { useGetSeries } from "../Home/api/getSeries";
 
 const formSchema = z.object({
   publication: z.string(),

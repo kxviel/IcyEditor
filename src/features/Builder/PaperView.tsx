@@ -1,149 +1,29 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useHeaderStore } from "@/store/useHeaderStore";
+import PaperHeader from "./PaperHeader";
+import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
+import { useNavigate } from "@tanstack/react-router";
 
 const PaperView = () => {
-  const fields = useHeaderStore((state) => state.fields);
-  const setValue = useHeaderStore((state) => state.setValue);
-  const setIsEditing = useHeaderStore((state) => state.setIsEditing);
+  const fields = useQuestionBuilderStore((state) => state.fields);
+  const navigate = useNavigate();
 
   return (
     <div className="flex h-full w-1/2 flex-col items-center space-y-4 p-4">
       <div className="flex items-center gap-2">
         <Button>Font Size</Button>
         <Button>Page Size</Button>
+        <Button onClick={() => navigate({ to: "/preview" })}>Preview</Button>
       </div>
 
-      <div className="h-full w-full space-y-4 overflow-y-auto">
-        <div className="flex h-full w-full flex-col items-center bg-white p-4">
-          {!fields.institutionName.isEditing ? (
-            <p
-              className="text-xl font-semibold"
-              onClick={() => setIsEditing("institutionName", true)}
-            >
-              {fields.institutionName.value}
-            </p>
-          ) : (
-            <Input
-              className="w-full text-xl font-semibold"
-              placeholder="Enter Institution Name"
-              value={fields.institutionName.value}
-              onBlur={() => setIsEditing("institutionName", false)}
-              onChange={(e) => setValue("institutionName", e.target.value)}
-            />
-          )}
+      <div className="h-full w-full overflow-y-auto bg-white p-4">
+        <PaperHeader />
 
-          {!fields.examName.isEditing ? (
-            <p
-              className="mt-1 font-medium"
-              onClick={() => setIsEditing("examName", true)}
-            >
-              {fields.examName.value}
-            </p>
-          ) : (
-            <Input
-              className="mt-1 w-full font-medium"
-              placeholder="Enter Exam/Session Name"
-              value={fields.examName.value}
-              onBlur={() => setIsEditing("examName", false)}
-              onChange={(e) => setValue("examName", e.target.value)}
-            />
-          )}
-
-          <div className="mt-3 flex w-full items-center justify-between">
-            {!fields.courseName.isEditing ? (
-              <p
-                className="text-[13px]"
-                onClick={() => setIsEditing("courseName", true)}
-              >
-                Course Name: {fields.courseName.value}
-              </p>
-            ) : (
-              <Input
-                className="w-[200px] text-[13px]"
-                placeholder="Enter Class Name"
-                value={fields.courseName.value}
-                onBlur={() => setIsEditing("courseName", false)}
-                onChange={(e) => setValue("courseName", e.target.value)}
-              />
-            )}
-
-            {!fields.duration.isEditing ? (
-              <p
-                className="text-[13px]"
-                onClick={() => setIsEditing("duration", true)}
-              >
-                Duration: {fields.duration.value}
-              </p>
-            ) : (
-              <Input
-                className="w-[200px] text-[13px]"
-                placeholder="Enter Duration"
-                value={fields.duration.value}
-                onBlur={() => setIsEditing("duration", false)}
-                onChange={(e) => setValue("duration", e.target.value)}
-              />
-            )}
-          </div>
-
-          <div className="mt-1 flex w-full items-center justify-between">
-            {!fields.date.isEditing ? (
-              <p
-                className="text-[13px]"
-                onClick={() => setIsEditing("date", true)}
-              >
-                Duration: {fields.date.value}
-              </p>
-            ) : (
-              <Input
-                className="w-[200px] text-[13px]"
-                placeholder="Enter Date"
-                value={fields.duration.value}
-                onBlur={() => setIsEditing("date", false)}
-                onChange={(e) => setValue("date", e.target.value)}
-              />
-            )}
-            {!fields.totalMarks.isEditing ? (
-              <p
-                className="text-[13px]"
-                onClick={() => setIsEditing("totalMarks", true)}
-              >
-                Duration: {fields.totalMarks.value}
-              </p>
-            ) : (
-              <Input
-                className="w-[200px] text-[13px]"
-                placeholder="Enter Total Marks"
-                value={fields.duration.value}
-                onBlur={() => setIsEditing("totalMarks", false)}
-                onChange={(e) => setValue("totalMarks", e.target.value)}
-              />
-            )}
-          </div>
-
-          <div className="w-full">
-            <p className="mt-4 font-semibold">Instructions: </p>
-            {!fields.instructions.isEditing ? (
-              <div
-                className="whitespace-pre-wrap text-xs"
-                onClick={() => setIsEditing("instructions", true)}
-              >
-                {fields.instructions.value}
-              </div>
-            ) : (
-              <Textarea
-                className="w-full rounded border bg-white p-2 text-xs text-black"
-                placeholder="Enter Instructions"
-                value={fields.instructions.value}
-                onBlur={() => setIsEditing("instructions", false)}
-                onChange={(e) => setValue("instructions", e.target.value)}
-                rows={4}
-              />
-            )}
-          </div>
-
-          <div className="my-6 h-[1px] w-full bg-black" />
+        <div className="flex w-full flex-col gap-3">
+          {fields.map((question) => (
+            <div className="h-10 w-full bg-slate-200" key={question.id}>
+              <p>{question.value}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>

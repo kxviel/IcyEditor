@@ -15,6 +15,7 @@ import { Route as LoginImport } from './routes/login'
 import { Route as ForgotPasswordImport } from './routes/forgot-password'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as AuthIndexImport } from './routes/_auth/index'
+import { Route as AuthPreviewImport } from './routes/_auth/preview'
 import { Route as AuthBuilderImport } from './routes/_auth/builder'
 
 // Create/Update Routes
@@ -39,6 +40,12 @@ const AuthRoute = AuthImport.update({
 const AuthIndexRoute = AuthIndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthPreviewRoute = AuthPreviewImport.update({
+  id: '/preview',
+  path: '/preview',
   getParentRoute: () => AuthRoute,
 } as any)
 
@@ -80,6 +87,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthBuilderImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/preview': {
+      id: '/_auth/preview'
+      path: '/preview'
+      fullPath: '/preview'
+      preLoaderRoute: typeof AuthPreviewImport
+      parentRoute: typeof AuthImport
+    }
     '/_auth/': {
       id: '/_auth/'
       path: '/'
@@ -94,11 +108,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthBuilderRoute: typeof AuthBuilderRoute
+  AuthPreviewRoute: typeof AuthPreviewRoute
   AuthIndexRoute: typeof AuthIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthBuilderRoute: AuthBuilderRoute,
+  AuthPreviewRoute: AuthPreviewRoute,
   AuthIndexRoute: AuthIndexRoute,
 }
 
@@ -109,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/builder': typeof AuthBuilderRoute
+  '/preview': typeof AuthPreviewRoute
   '/': typeof AuthIndexRoute
 }
 
@@ -116,6 +133,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/builder': typeof AuthBuilderRoute
+  '/preview': typeof AuthPreviewRoute
   '/': typeof AuthIndexRoute
 }
 
@@ -125,20 +143,22 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/_auth/builder': typeof AuthBuilderRoute
+  '/_auth/preview': typeof AuthPreviewRoute
   '/_auth/': typeof AuthIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/forgot-password' | '/login' | '/builder' | '/'
+  fullPaths: '' | '/forgot-password' | '/login' | '/builder' | '/preview' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/forgot-password' | '/login' | '/builder' | '/'
+  to: '/forgot-password' | '/login' | '/builder' | '/preview' | '/'
   id:
     | '__root__'
     | '/_auth'
     | '/forgot-password'
     | '/login'
     | '/_auth/builder'
+    | '/_auth/preview'
     | '/_auth/'
   fileRoutesById: FileRoutesById
 }
@@ -174,6 +194,7 @@ export const routeTree = rootRoute
       "filePath": "_auth.tsx",
       "children": [
         "/_auth/builder",
+        "/_auth/preview",
         "/_auth/"
       ]
     },
@@ -185,6 +206,10 @@ export const routeTree = rootRoute
     },
     "/_auth/builder": {
       "filePath": "_auth/builder.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/preview": {
+      "filePath": "_auth/preview.tsx",
       "parent": "/_auth"
     },
     "/_auth/": {

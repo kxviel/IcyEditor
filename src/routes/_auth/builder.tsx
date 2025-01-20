@@ -1,6 +1,6 @@
 import PaperView from "@/features/Builder/PaperView";
 import QuestionList from "@/features/Builder/QuestionList";
-import PaperPrerequisitesModal from "@/features/Home/PaperPrerequisitesModal";
+import PaperPrerequisitesModal from "@/features/Builder/PaperPrerequisitesModal";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_auth/builder")({
 });
 
 function RouteComponent() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="w-full bg-[#F9F5FF]">
@@ -21,7 +21,7 @@ function RouteComponent() {
       )}
 
       {/* Modal */}
-      <PaperPrerequisitesModal isOpen={isOpen} setIsOpen={setIsOpen} />
+      {/* <PaperPrerequisitesModal isOpen={isOpen} setIsOpen={setIsOpen} /> */}
     </div>
   );
 }
