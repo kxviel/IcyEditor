@@ -19,25 +19,30 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { publicationList } from "@/lib/utils";
-import { useGetSubject } from "../Home/api/getSubject";
-import { useGetClass } from "../Home/api/getClass";
-import { useGetSeries } from "../Home/api/getSeries";
+import { useGetSubject } from "./api/getSubject";
+import { useGetClass } from "./api/getClass";
+import { useGetSeries } from "./api/getSeries";
 
 const formSchema = z.object({
-  publication: z.string(),
-  series: z.string(),
-  class: z.string(),
-  subject: z.string(),
+  publicationId: z.string(),
+  seriesId: z.string(),
+  classId: z.string(),
+  subjectId: z.string(),
 });
 
 type FormTypes = z.infer<typeof formSchema>;
 
 type Props = {
   isOpen: boolean;
+  setSubjectId: React.Dispatch<React.SetStateAction<number>>;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const PaperPrerequisitesModal = ({ isOpen, setIsOpen }: Props) => {
+const PaperPrerequisitesModal = ({
+  isOpen,
+  setIsOpen,
+  setSubjectId,
+}: Props) => {
   const navigate = useNavigate();
   const form = useForm<FormTypes>({
     resolver: zodResolver(formSchema),
@@ -45,22 +50,23 @@ const PaperPrerequisitesModal = ({ isOpen, setIsOpen }: Props) => {
 
   // Series
   const { data: seriesList, isPending: isSeriesPending } = useGetSeries({
-    parentValue: form.watch("publication"),
+    parentValue: form.watch("publicationId"),
   });
   // Class
   const { data: classList, isPending: isClassPending } = useGetClass({
-    parentValue: form.watch("subject"),
+    parentValue: form.watch("seriesId"),
   });
   // Subject
   const { data: subjectList, isPending: isSubjectPending } = useGetSubject({
-    parentValue: form.watch("class"),
+    parentValue: form.watch("classId"),
   });
 
   function onSubmit(data: FormTypes) {
     console.log(data);
 
-    if (data.publication && data.series && data.class && data.subject) {
+    if (data.publicationId && data.seriesId && data.classId && data.subjectId) {
       setIsOpen(false);
+      setSubjectId(Number(data.subjectId));
     }
   }
 
@@ -95,7 +101,7 @@ const PaperPrerequisitesModal = ({ isOpen, setIsOpen }: Props) => {
                       }))
                     : []
                 }
-                isDisabled={isSeriesPending || !form.watch("publication")}
+                isDisabled={isSeriesPending || !form.watch("publicationId")}
               />
               <ControlledSelect
                 form={form}
@@ -108,7 +114,7 @@ const PaperPrerequisitesModal = ({ isOpen, setIsOpen }: Props) => {
                       }))
                     : []
                 }
-                isDisabled={isClassPending || !form.watch("series")}
+                isDisabled={isClassPending || !form.watch("seriesId")}
               />
               <ControlledSelect
                 form={form}
@@ -121,7 +127,7 @@ const PaperPrerequisitesModal = ({ isOpen, setIsOpen }: Props) => {
                       }))
                     : []
                 }
-                isDisabled={isSubjectPending || !form.watch("class")}
+                isDisabled={isSubjectPending || !form.watch("classId")}
               />
 
               <Button
@@ -164,7 +170,11 @@ const ControlledSelect = ({
     <FormField
       control={form.control}
       name={
-        label.toLowerCase() as "publication" | "series" | "class" | "subject"
+        label.toLowerCase() as
+          | "publicationId"
+          | "seriesId"
+          | "classId"
+          | "subjectId"
       }
       render={({ field }) => (
         <FormItem>

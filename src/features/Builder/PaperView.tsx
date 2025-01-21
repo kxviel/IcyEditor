@@ -15,13 +15,16 @@ const PaperView = () => {
         <Button onClick={() => navigate({ to: "/preview" })}>Preview</Button>
       </div>
 
-      <div className="h-full w-full overflow-y-auto bg-white p-4">
+      <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white p-4">
         <PaperHeader />
 
         <div className="flex w-full flex-col gap-3">
           {fields.map((question) => (
-            <div className="h-10 w-full bg-slate-200" key={question.id}>
-              <p>{question.value}</p>
+            <div className="w-full bg-slate-200" key={question.id}>
+              <p
+                className="text-sm text-gray-500"
+                dangerouslySetInnerHTML={{ __html: question.value }}
+              />
             </div>
           ))}
         </div>
