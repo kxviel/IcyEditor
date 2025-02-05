@@ -18,6 +18,7 @@ import { useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Link } from "@tanstack/react-router";
 import { IconInput } from "@/components/ui/IconInput";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const loginSchema = z.object({
   email: z
@@ -38,6 +39,12 @@ const Login = () => {
   const loginFn = useLoginFn();
 
   const [rememberMe, setRememberMe] = useState<CheckedState>(false);
+
+  const login = useGoogleLogin({
+    onSuccess: (codeResponse) => console.log(codeResponse),
+    onError: (error) => console.log("Login Failed:", error),
+    // flow: 'auth-code',
+  });
 
   const onSubmit = (data: LoginSchemaTypes) => {
     console.log(data);
@@ -124,6 +131,9 @@ const Login = () => {
           </Button>
         </form>
       </Form>
+      <Button variant={"outline"} onClick={() => login()}>
+        Sign in with Google 🚀
+      </Button>
     </div>
   );
 };

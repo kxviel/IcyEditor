@@ -4,6 +4,7 @@ import Login from "@/features/Auth/Login";
 import Register from "@/features/Auth/Register";
 import { useState } from "react";
 import Logo from "@/assets/Logo.svg";
+import { useGoogleOneTapLogin } from "@react-oauth/google";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
@@ -13,6 +14,15 @@ function RouteComponent() {
   // const auth = useAuth();
 
   const [activeTab, setActiveTab] = useState("login");
+
+  useGoogleOneTapLogin({
+    onSuccess: (credentialResponse) => {
+      console.log(credentialResponse);
+    },
+    onError: () => {
+      console.log("Login Failed");
+    },
+  });
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
