@@ -1,54 +1,54 @@
-import { Button } from "@/components/ui/button";
-import PaperHeader from "@/features/Builder/PaperHeader";
-import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
-import { createFileRoute } from "@tanstack/react-router";
-import { Fragment, useRef, useState } from "react";
+import { Button } from '@/components/ui/button'
+import PaperHeader from '@/features/Builder/PaperHeader'
+import { useQuestionBuilderStore } from '@/store/useQuestionBuilderStore'
+import { createLazyFileRoute } from '@tanstack/react-router'
+import { Fragment, useRef, useState } from 'react'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useFontSizeStore } from "@/store/useFontSizeStore";
+} from '@/components/ui/select'
+import { useFontSizeStore } from '@/store/useFontSizeStore'
 
-export const Route = createFileRoute("/_auth/preview")({
+export const Route = createLazyFileRoute('/_auth/preview')({
   component: RouteComponent,
-});
+})
 
 function RouteComponent() {
-  const pageRef = useRef<HTMLDivElement>(null);
-  const lastElementRef = useRef<HTMLDivElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null)
+  const lastElementRef = useRef<HTMLDivElement>(null)
 
-  const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
-  const setFontSize = useFontSizeStore((state) => state.setFontSize);
+  const currentFontSize = useFontSizeStore((state) => state.currentFontSize)
+  const setFontSize = useFontSizeStore((state) => state.setFontSize)
 
-  const [duplicateCapacity, setDuplicateCapacity] = useState(0);
+  const [duplicateCapacity, setDuplicateCapacity] = useState(0)
 
   const calcFn = () => {
     if (pageRef.current && lastElementRef.current) {
       // Page = EmptySpace + Content
       // therefore if: EmptySpace > Page - Content then: Duplicate Content else: move on
 
-      const totalPageHeight = pageRef.current.getBoundingClientRect().height;
-      const parentTop = pageRef.current.getBoundingClientRect().top;
-      const lastContent = lastElementRef.current.getBoundingClientRect().bottom;
-      const heightToLastContent = lastContent - parentTop;
+      const totalPageHeight = pageRef.current.getBoundingClientRect().height
+      const parentTop = pageRef.current.getBoundingClientRect().top
+      const lastContent = lastElementRef.current.getBoundingClientRect().bottom
+      const heightToLastContent = lastContent - parentTop
 
       console.log(
         totalPageHeight,
         heightToLastContent,
-        "duplicate capacity: ",
+        'duplicate capacity: ',
         Math.round(totalPageHeight / heightToLastContent),
-      );
+      )
 
-      setDuplicateCapacity(Math.round(totalPageHeight / heightToLastContent));
+      setDuplicateCapacity(Math.round(totalPageHeight / heightToLastContent))
     }
-  };
+  }
 
   const calcFontSize = (value: string) => {
-    setFontSize(value);
-  };
+    setFontSize(value)
+  }
 
   return (
     <div className="w-full">
@@ -79,7 +79,7 @@ function RouteComponent() {
         />
       </div>
     </div>
-  );
+  )
 }
 
 const A4Page = ({
@@ -87,12 +87,12 @@ const A4Page = ({
   lastElementRef,
   duplicateCapacity,
 }: {
-  pageRef: React.RefObject<HTMLDivElement>;
-  lastElementRef: React.RefObject<HTMLDivElement>;
-  duplicateCapacity: number;
+  pageRef: React.RefObject<HTMLDivElement>
+  lastElementRef: React.RefObject<HTMLDivElement>
+  duplicateCapacity: number
 }) => {
-  const fields = useQuestionBuilderStore((state) => state.fields);
-  const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
+  const fields = useQuestionBuilderStore((state) => state.fields)
+  const currentFontSize = useFontSizeStore((state) => state.currentFontSize)
 
   return (
     <div
@@ -121,8 +121,8 @@ const A4Page = ({
           </Fragment>
         ))}
     </div>
-  );
-};
+  )
+}
 // const A4Page = () => {
 //   return (
 //     <div className="mx-auto h-[297mm] w-[210mm] border border-gray-300 bg-white p-6 shadow-md">

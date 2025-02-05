@@ -8,27 +8,34 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
-import { Route as ForgotPasswordImport } from './routes/forgot-password'
 import { Route as AuthImport } from './routes/_auth'
-import { Route as AuthIndexImport } from './routes/_auth/index'
-import { Route as AuthPreviewImport } from './routes/_auth/preview'
-import { Route as AuthBuilderImport } from './routes/_auth/builder'
+
+// Create Virtual Routes
+
+const ForgotPasswordLazyImport = createFileRoute('/forgot-password')()
+const AuthIndexLazyImport = createFileRoute('/_auth/')()
+const AuthPreviewLazyImport = createFileRoute('/_auth/preview')()
+const AuthBuilderLazyImport = createFileRoute('/_auth/builder')()
 
 // Create/Update Routes
+
+const ForgotPasswordLazyRoute = ForgotPasswordLazyImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/forgot-password.lazy').then((d) => d.Route),
+)
 
 const LoginRoute = LoginImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const ForgotPasswordRoute = ForgotPasswordImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -37,23 +44,23 @@ const AuthRoute = AuthImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthIndexRoute = AuthIndexImport.update({
+const AuthIndexLazyRoute = AuthIndexLazyImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthRoute,
-} as any)
+} as any).lazy(() => import('./routes/_auth/index.lazy').then((d) => d.Route))
 
-const AuthPreviewRoute = AuthPreviewImport.update({
+const AuthPreviewLazyRoute = AuthPreviewLazyImport.update({
   id: '/preview',
   path: '/preview',
   getParentRoute: () => AuthRoute,
-} as any)
+} as any).lazy(() => import('./routes/_auth/preview.lazy').then((d) => d.Route))
 
-const AuthBuilderRoute = AuthBuilderImport.update({
+const AuthBuilderLazyRoute = AuthBuilderLazyImport.update({
   id: '/builder',
   path: '/builder',
   getParentRoute: () => AuthRoute,
-} as any)
+} as any).lazy(() => import('./routes/_auth/builder.lazy').then((d) => d.Route))
 
 // Populate the FileRoutesByPath interface
 
@@ -66,13 +73,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordImport
-      parentRoute: typeof rootRoute
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -80,25 +80,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/_auth/builder': {
       id: '/_auth/builder'
       path: '/builder'
       fullPath: '/builder'
-      preLoaderRoute: typeof AuthBuilderImport
+      preLoaderRoute: typeof AuthBuilderLazyImport
       parentRoute: typeof AuthImport
     }
     '/_auth/preview': {
       id: '/_auth/preview'
       path: '/preview'
       fullPath: '/preview'
-      preLoaderRoute: typeof AuthPreviewImport
+      preLoaderRoute: typeof AuthPreviewLazyImport
       parentRoute: typeof AuthImport
     }
     '/_auth/': {
       id: '/_auth/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AuthIndexImport
+      preLoaderRoute: typeof AuthIndexLazyImport
       parentRoute: typeof AuthImport
     }
   }
@@ -107,56 +114,56 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthRouteChildren {
-  AuthBuilderRoute: typeof AuthBuilderRoute
-  AuthPreviewRoute: typeof AuthPreviewRoute
-  AuthIndexRoute: typeof AuthIndexRoute
+  AuthBuilderLazyRoute: typeof AuthBuilderLazyRoute
+  AuthPreviewLazyRoute: typeof AuthPreviewLazyRoute
+  AuthIndexLazyRoute: typeof AuthIndexLazyRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthBuilderRoute: AuthBuilderRoute,
-  AuthPreviewRoute: AuthPreviewRoute,
-  AuthIndexRoute: AuthIndexRoute,
+  AuthBuilderLazyRoute: AuthBuilderLazyRoute,
+  AuthPreviewLazyRoute: AuthPreviewLazyRoute,
+  AuthIndexLazyRoute: AuthIndexLazyRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 export interface FileRoutesByFullPath {
   '': typeof AuthRouteWithChildren
-  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/builder': typeof AuthBuilderRoute
-  '/preview': typeof AuthPreviewRoute
-  '/': typeof AuthIndexRoute
+  '/forgot-password': typeof ForgotPasswordLazyRoute
+  '/builder': typeof AuthBuilderLazyRoute
+  '/preview': typeof AuthPreviewLazyRoute
+  '/': typeof AuthIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
-  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/builder': typeof AuthBuilderRoute
-  '/preview': typeof AuthPreviewRoute
-  '/': typeof AuthIndexRoute
+  '/forgot-password': typeof ForgotPasswordLazyRoute
+  '/builder': typeof AuthBuilderLazyRoute
+  '/preview': typeof AuthPreviewLazyRoute
+  '/': typeof AuthIndexLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_auth': typeof AuthRouteWithChildren
-  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
-  '/_auth/builder': typeof AuthBuilderRoute
-  '/_auth/preview': typeof AuthPreviewRoute
-  '/_auth/': typeof AuthIndexRoute
+  '/forgot-password': typeof ForgotPasswordLazyRoute
+  '/_auth/builder': typeof AuthBuilderLazyRoute
+  '/_auth/preview': typeof AuthPreviewLazyRoute
+  '/_auth/': typeof AuthIndexLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/forgot-password' | '/login' | '/builder' | '/preview' | '/'
+  fullPaths: '' | '/login' | '/forgot-password' | '/builder' | '/preview' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/forgot-password' | '/login' | '/builder' | '/preview' | '/'
+  to: '/login' | '/forgot-password' | '/builder' | '/preview' | '/'
   id:
     | '__root__'
     | '/_auth'
-    | '/forgot-password'
     | '/login'
+    | '/forgot-password'
     | '/_auth/builder'
     | '/_auth/preview'
     | '/_auth/'
@@ -165,14 +172,14 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
-  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  ForgotPasswordLazyRoute: typeof ForgotPasswordLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
-  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  ForgotPasswordLazyRoute: ForgotPasswordLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -186,8 +193,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/_auth",
-        "/forgot-password",
-        "/login"
+        "/login",
+        "/forgot-password"
       ]
     },
     "/_auth": {
@@ -198,22 +205,22 @@ export const routeTree = rootRoute
         "/_auth/"
       ]
     },
-    "/forgot-password": {
-      "filePath": "forgot-password.tsx"
-    },
     "/login": {
       "filePath": "login.tsx"
     },
+    "/forgot-password": {
+      "filePath": "forgot-password.lazy.tsx"
+    },
     "/_auth/builder": {
-      "filePath": "_auth/builder.tsx",
+      "filePath": "_auth/builder.lazy.tsx",
       "parent": "/_auth"
     },
     "/_auth/preview": {
-      "filePath": "_auth/preview.tsx",
+      "filePath": "_auth/preview.lazy.tsx",
       "parent": "/_auth"
     },
     "/_auth/": {
-      "filePath": "_auth/index.tsx",
+      "filePath": "_auth/index.lazy.tsx",
       "parent": "/_auth"
     }
   }

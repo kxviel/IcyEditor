@@ -1,17 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
-import Logo from "@/assets/Logo.svg";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { createLazyFileRoute, Link } from '@tanstack/react-router'
+import { ArrowLeft } from 'lucide-react'
+import { useState } from 'react'
+import Logo from '@/assets/Logo.svg'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 
-export const Route = createFileRoute("/forgot-password")({
+export const Route = createLazyFileRoute('/forgot-password')({
   component: RouteComponent,
-});
+})
 
 function RouteComponent() {
-  const [email, setEmail] = useState<string>("");
+  const [email, setEmail] = useState<string>('')
 
   return (
     <div className="flex h-screen w-full items-center justify-center">
@@ -45,5 +45,5 @@ function RouteComponent() {
         </Link>
       </div>
     </div>
-  );
+  )
 }
