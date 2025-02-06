@@ -18,7 +18,6 @@ import { useState } from "react";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { Link } from "@tanstack/react-router";
 import { IconInput } from "@/components/ui/IconInput";
-import { useGoogleLogin } from "@react-oauth/google";
 
 const loginSchema = z.object({
   email: z
@@ -40,12 +39,6 @@ const Login = () => {
 
   const [rememberMe, setRememberMe] = useState<CheckedState>(false);
 
-  const login = useGoogleLogin({
-    onSuccess: (codeResponse) => console.log(codeResponse),
-    onError: (error) => console.log("Login Failed:", error),
-    // flow: 'auth-code',
-  });
-
   const onSubmit = (data: LoginSchemaTypes) => {
     console.log(data);
     console.log(rememberMe);
@@ -53,7 +46,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 py-3">
+    <div className="w-96 py-3">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -70,9 +63,6 @@ const Login = () => {
                     {...field}
                   />
                 </FormControl>
-                {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -91,9 +81,6 @@ const Login = () => {
                     {...field}
                   />
                 </FormControl>
-                {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
@@ -122,18 +109,11 @@ const Login = () => {
             </Link>
           </div>
 
-          <Button
-            className="w-full"
-            type="submit"
-            disabled={!form.formState.isValid}
-          >
+          <Button className="w-96" type="submit">
             Login
           </Button>
         </form>
       </Form>
-      <Button variant={"outline"} onClick={() => login()}>
-        Sign in with Google 🚀
-      </Button>
     </div>
   );
 };

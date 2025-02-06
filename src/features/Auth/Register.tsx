@@ -13,24 +13,49 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useRegisterFn } from "./api/register";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const registerSchema = z.object({
-  name: z.string().trim().min(1, { message: "Name is required" }),
-  email: z
-    .string()
-    .email("Please enter a valid email")
-    .trim()
-    .min(1, { message: "Email is required" }),
-  password: z.string().trim().min(8, { message: "Password is required" }),
-  // phone: z
-  //   .string()
-  //   .trim()
-  //   .min(1, { message: "Phone is required" })
-  //   .regex(/^\d{10}$/, { message: "Phone must be a valid 10-digit number" }),
-  // city: z.string().trim().min(1, { message: "City is required" }),
-  // state: z.string().trim().min(1, { message: "State is required" }),
-  // school: z.string().trim().min(1, { message: "School is required" }),
-});
+const registerSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1, { message: "Name is required" })
+      .min(2, { message: "Name must be at least 2 characters" }),
+    email: z
+      .string()
+      .min(1, { message: "Email is required" })
+      .email("Invalid email format")
+      .trim(),
+    password: z
+      .string()
+      .trim()
+      .min(1, { message: "Password is required" })
+      .min(8, { message: "Password must be at least 8 characters" }),
+    confirmPassword: z
+      .string()
+      .trim()
+      .min(1, { message: "Confirm password is required" })
+      .min(8, { message: "Confirm password must be at least 8 characters" }),
+    phone: z
+      .string()
+      .trim()
+      .min(1, { message: "Phone is required" })
+      .regex(/^\d{10}$/, { message: "Phone must be a valid 10-digit number" }),
+    city: z.string().trim().min(1, { message: "City is required" }),
+    state: z.string().trim().min(1, { message: "State is required" }),
+    school: z.string().trim().min(1, { message: "School is required" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 type RegisterSchemaTypes = z.infer<typeof registerSchema>;
 
@@ -47,72 +72,184 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 py-3">
+    <div className="w-[642px] py-3">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            defaultValue=""
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input type="text" placeholder="Enter your name" {...field} />
-                </FormControl>
-                {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            defaultValue=""
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    {...field}
-                  />
-                </FormControl>
-                {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            defaultValue=""
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Create your password"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>Must be at least 8 characters</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col items-center gap-4"
+        >
+          <div className="flex w-full gap-4">
+            <div className="w-96 space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                defaultValue=""
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>FullName</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Enter your fullname"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                defaultValue=""
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone No.</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="Enter your phone number"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <Button
-            className="w-full"
-            type="submit"
-            disabled={!form.formState.isValid}
-          >
+              <FormField
+                control={form.control}
+                name="state"
+                defaultValue=""
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>State</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a State" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="option1">Option 1</SelectItem>
+                        <SelectItem value="option2">Option 2</SelectItem>
+                        <SelectItem value="option3">Option 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                defaultValue=""
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Create your password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                    <FormDescription>
+                      Password must be at least 8 characters
+                    </FormDescription>
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="w-96 space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                defaultValue=""
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="school"
+                defaultValue=""
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>School Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Enter school name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="city"
+                defaultValue=""
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a City" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="option1">Option 1</SelectItem>
+                        <SelectItem value="option2">Option 2</SelectItem>
+                        <SelectItem value="option3">Option 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                defaultValue=""
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Confirm your password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          <Button className="w-96" type="submit">
             Get Started
           </Button>
         </form>
