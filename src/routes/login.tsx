@@ -4,6 +4,7 @@ import Login from "@/features/Auth/Login";
 import Register from "@/features/Auth/Register";
 import { useState } from "react";
 import Logo from "@/assets/Logo.svg";
+import Grid_Bg from "@/assets/Grid_Bg.svg";
 import { useGoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
 
@@ -33,8 +34,13 @@ function RouteComponent() {
   return (
     <div className="mx-auto h-screen w-full">
       <div className="flex h-full flex-col items-center justify-center gap-3">
-        <div>
+        <div className="relative z-10">
           <img src={Logo} alt="logo" />
+          <img
+            src={Grid_Bg}
+            alt="grid_bg"
+            className="absolute bottom-[-60px] z-[-10]"
+          />
         </div>
 
         <p className="text-2xl font-semibold">
