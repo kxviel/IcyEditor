@@ -31,18 +31,21 @@ const loginSchema = z.object({
 type LoginSchemaTypes = z.infer<typeof loginSchema>;
 
 const Login = () => {
+  const loginFn = useLoginFn();
   const form = useForm<LoginSchemaTypes>({
     resolver: zodResolver(loginSchema),
   });
 
-  const loginFn = useLoginFn();
-
   const [rememberMe, setRememberMe] = useState<CheckedState>(false);
 
   const onSubmit = (data: LoginSchemaTypes) => {
-    console.log(data);
     console.log(rememberMe);
-    loginFn.mutate({ body: data });
+    loginFn.mutate({
+      body: {
+        phoneOrEmail: data.email,
+        password: data.password,
+      },
+    });
   };
 
   return (

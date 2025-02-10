@@ -1,5 +1,6 @@
 import axios from "axios";
 import { env } from "./env";
+import { toast } from "sonner";
 
 const http = axios.create({
   baseURL: env.API_URL,
@@ -18,15 +19,13 @@ http.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response.status === 401) {
-      localStorage.clear();
-      // message.warning("Unauthorized, logging out ...");
-      window.location.href = "/auth";
+      toast.warning("Unauthorized, logging out ...");
+      // localStorage.clear();
+      // window.location.href = "/login";
     } else {
-      console.log(error?.response.data?.error);
-
-      return Promise.reject(error?.response.data?.message[0]);
+      return Promise.reject(error?.response.data?.message);
     }
-  }
+  },
 );
 
 export default http;

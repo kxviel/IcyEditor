@@ -11,7 +11,7 @@ type Props = {
 };
 
 const registerFn = ({ body }: Props) => {
-  return http.post("/register", body);
+  return http.post("/auth/register", body);
 };
 
 export const useRegisterFn = () => {
