@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useGetStates } from "./api/getStates";
+import { useGetCities } from "./api/getCities";
 
 const registerSchema = z
   .object({
@@ -60,11 +62,14 @@ const registerSchema = z
 type RegisterSchemaTypes = z.infer<typeof registerSchema>;
 
 const Register = () => {
+  const registerFn = useRegisterFn();
   const form = useForm<RegisterSchemaTypes>({
     resolver: zodResolver(registerSchema),
   });
 
-  const registerFn = useRegisterFn();
+  // Book
+  const { data: stateList } = useGetStates();
+  const { data: cityList } = useGetCities(form.watch("state"));
 
   const onSubmit = (data: RegisterSchemaTypes) => {
     console.log(data);
@@ -134,9 +139,11 @@ const Register = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="option1">Option 1</SelectItem>
-                        <SelectItem value="option2">Option 2</SelectItem>
-                        <SelectItem value="option3">Option 3</SelectItem>
+                        {stateList?.map((state) => (
+                          <SelectItem value={state.id?.toString()}>
+                            {state.NAME}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -219,9 +226,11 @@ const Register = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="option1">Option 1</SelectItem>
-                        <SelectItem value="option2">Option 2</SelectItem>
-                        <SelectItem value="option3">Option 3</SelectItem>
+                        {cityList?.map((city) => (
+                          <SelectItem value={city.id?.toString()}>
+                            {city.NAME}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
