@@ -77,8 +77,18 @@ const PaperPrerequisitesModal = ({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="md:w-[596px]">
+    <Dialog
+      open={isOpen}
+      onOpenChange={(value) => {
+        setIsOpen(value);
+      }}
+    >
+      <DialogContent
+        className="md:w-[596px]"
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        showClose={false}
+      >
         <div className="flex flex-col space-y-4">
           <p className="text-xl font-semibold">Select Subject and Proceed</p>
 
@@ -144,13 +154,18 @@ const PaperPrerequisitesModal = ({
                 variant={"outline"}
                 className="w-full"
                 onClick={() => {
-                  navigate({ to: "/" });
-                  setIsOpen(false);
+                  navigate({ to: "/" }).finally(() => {
+                    setIsOpen(false);
+                  });
                 }}
               >
                 Cancel
               </Button>
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={!form.formState.isValid}
+              >
                 Submit
               </Button>
             </form>
