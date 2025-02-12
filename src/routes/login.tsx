@@ -5,31 +5,27 @@ import Register from "@/features/Auth/Register";
 import { useState } from "react";
 import Logo from "@/assets/Logo.svg";
 import Grid_Bg from "@/assets/Grid_Bg.svg";
-import { useGoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
+import { GoogleIcon } from "@/assets/Icons/GoogleIcon";
+import { useLoginWithGoogleFn } from "@/features/Auth/api/loginWithGoogle";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
+  // beforeLoad: ({ context }) => {
+  //   const { isLogged } = context.auth;
+
+  //   if (isLogged()) {
+  //     throw redirect({
+  //       to: "/",
+  //     });
+  //   }
+  // },
 });
 
 function RouteComponent() {
-  // const auth = useAuth();
-
   const [activeTab, setActiveTab] = useState("login");
 
-  useGoogleOneTapLogin({
-    onSuccess: (credentialResponse) => {
-      console.log(credentialResponse);
-    },
-    onError: () => {
-      console.log("Login Failed");
-    },
-  });
-
-  const login = useGoogleLogin({
-    onSuccess: (codeResponse) => console.log(codeResponse),
-    onError: (error) => console.log("Login Failed:", error),
-  });
+  const continueWithGoogle = useLoginWithGoogleFn();
 
   return (
     <div className="mx-auto h-screen w-full">
@@ -78,8 +74,12 @@ function RouteComponent() {
           </TabsContent>
 
           {/* Sign in with Google */}
-          <Button variant={"outline"} onClick={() => login()} className="w-96">
-            Sign in with Google 🚀
+          <Button
+            variant={"outline"}
+            onClick={() => continueWithGoogle()}
+            className="w-96"
+          >
+            <GoogleIcon /> Continue with Google
           </Button>
         </Tabs>
       </div>

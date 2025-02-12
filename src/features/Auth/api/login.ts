@@ -1,4 +1,5 @@
 import http from "@/config/https";
+import { useAuth } from "@/hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -16,23 +17,20 @@ const loginFn = ({ body }: Props) => {
 
 export const useLoginFn = () => {
   const navigate = useNavigate();
+  const { signIn, signOut } = useAuth();
 
   return useMutation({
     mutationFn: loginFn,
     onSuccess: ({ data }) => {
       toast.success(data.message);
-
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("user_deets", JSON.stringify(data.data));
-
+      signIn(data.data);
       navigate({
         to: "/",
       });
     },
     onError: (err: string) => {
       toast.error(err);
-
-      localStorage.clear();
+      signOut();
     },
   });
 };

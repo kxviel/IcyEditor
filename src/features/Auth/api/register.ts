@@ -1,12 +1,14 @@
 import http from "@/config/https";
+import { useAuth } from "@/hooks/useAuth";
 import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 type Props = {
   body: {
     name: string;
     email: string;
-    password: string;
+    password?: string;
   };
 };
 
@@ -15,13 +17,21 @@ const registerFn = ({ body }: Props) => {
 };
 
 export const useRegisterFn = () => {
+    const navigate = useNavigate();
+    const { signIn, signOut } = useAuth();
+    
   return useMutation({
     mutationFn: registerFn,
-    onSuccess: () => {
-      toast.success("Heh");
+    onSuccess: ({ data }) => {
+      toast.success(data.message);
+      signIn(data.data);
+      navigate({
+        to: "/",
+      });
     },
-    onError: () => {
-      toast.error("AAAAA");
+    onError: (err: string) => {
+      toast.error(err);
+      signOut();
     },
   });
 };
