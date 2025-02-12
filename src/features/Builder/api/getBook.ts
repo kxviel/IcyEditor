@@ -2,48 +2,29 @@ import http from "@/config/https";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 
-export type Book = {
+interface Root {
+  code: string;
+  message: string;
+  statusCode: number;
+  success: boolean;
+  data: Book[];
+}
+
+export interface Book {
   id: number;
-  STATUS: string | null;
+  STATUS: boolean;
   NAME: string;
   SUBJECT_ID: number;
+}
+
+const getBookFn = (subjectId: string): Promise<AxiosResponse<Root>> => {
+  return http.get(`/services/books/${subjectId}`);
 };
 
-type Props = {
-  parentValue: string;
-};
-const getBookFn = ({ parentValue }: Props): Promise<AxiosResponse<Book[]>> => {
-  const params = {
-    type: "load_book",
-    parent_value: parentValue,
-  };
-
-  return http.get("/get_data", {
-    params,
+export const useGetBook = (subjectId: string) => {
+  return useQuery({
+    queryKey: ["GetBook", subjectId],
+    queryFn: () => getBookFn(subjectId),
+    select: ({ data }) => data.data,
   });
-};
-
-export const useGetBook = ({
-  parentValue,
-}: Props): { isPending: boolean; data: Book[] } => {
-  // return useQuery({
-  //   queryKey: ["GetBook", parentValue],
-  //   queryFn: () => getBookFn({ parentValue }),
-  //   select: ({ data }) => data,
-  // });
-
-  if (parentValue) {
-    return {
-      isPending: false,
-      data: [
-        { id: 171, STATUS: null, NAME: "I Can Do Math-6", SUBJECT_ID: 172 },
-        { id: 172, STATUS: null, NAME: "I Cannot Do Math-6", SUBJECT_ID: 173 },
-      ],
-    };
-  } else {
-    return {
-      isPending: false,
-      data: [],
-    };
-  }
 };

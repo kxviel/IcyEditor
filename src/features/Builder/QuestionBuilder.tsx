@@ -5,13 +5,11 @@ import PaperView from "./PaperView";
 import QuestionList from "./QuestionList";
 
 const QuestionBuilder = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [subjectId, setSubjectId] = useState(0);
 
   // Book
-  const { data: bookList, isPending: isBookPending } = useGetBook({
-    parentValue: subjectId.toString(),
-  });
+  const { data: bookList } = useGetBook(subjectId.toString());
 
   return (
     <div className="w-full bg-[#F9F5FF]">

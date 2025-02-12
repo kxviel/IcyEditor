@@ -7,23 +7,24 @@ interface Root {
   message: string;
   statusCode: number;
   success: boolean;
-  data: Class[];
+  data: Publication[];
 }
 
-export interface Class {
+export interface Publication {
   id: number;
   STATUS: boolean;
+  CODE: string;
   NAME: string;
 }
 
-const getClassFn = (seriesId: string): Promise<AxiosResponse<Root>> => {
-  return http.get(`/services/exam-class/${seriesId}`);
+const getPublicationFn = (): Promise<AxiosResponse<Root>> => {
+  return http.get("/services/publications");
 };
 
-export const useGetClass = (seriesId: string) => {
+export const useGetPublication = () => {
   return useQuery({
-    queryKey: ["GetClass", seriesId],
-    queryFn: () => getClassFn(seriesId),
+    queryKey: ["GetPublication"],
+    queryFn: () => getPublicationFn(),
     select: ({ data }) => data.data,
   });
 };

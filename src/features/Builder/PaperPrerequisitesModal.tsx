@@ -18,10 +18,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { publicationList } from "@/lib/utils";
 import { useGetSubject } from "./api/getSubject";
 import { useGetClass } from "./api/getClass";
 import { useGetSeries } from "./api/getSeries";
+import { useGetPublication } from "./api/getPublication";
 
 const formSchema = z.object({
   publicationId: z.string(),
@@ -48,18 +48,24 @@ const PaperPrerequisitesModal = ({
     resolver: zodResolver(formSchema),
   });
 
+  // Publication
+  const { data: publicationList, isPending: isPublicationPending } =
+    useGetPublication();
+
   // Series
-  const { data: seriesList, isPending: isSeriesPending } = useGetSeries({
-    parentValue: form.watch("publicationId"),
-  });
+  const { data: seriesList, isPending: isSeriesPending } = useGetSeries(
+    form.watch("publicationId"),
+  );
+
   // Class
-  const { data: classList, isPending: isClassPending } = useGetClass({
-    parentValue: form.watch("seriesId"),
-  });
+  const { data: classList, isPending: isClassPending } = useGetClass(
+    form.watch("seriesId"),
+  );
+
   // Subject
-  const { data: subjectList, isPending: isSubjectPending } = useGetSubject({
-    parentValue: form.watch("classId"),
-  });
+  const { data: subjectList, isPending: isSubjectPending } = useGetSubject(
+    form.watch("classId"),
+  );
 
   function onSubmit(data: FormTypes) {
     console.log(data);
@@ -83,16 +89,20 @@ const PaperPrerequisitesModal = ({
             >
               <ControlledSelect
                 form={form}
-                label="Publication"
-                options={publicationList.map((option) => ({
-                  value: option.parentValue,
-                  label: option.name,
-                }))}
-                isDisabled={false}
+                label="publicationId"
+                options={
+                  publicationList
+                    ? publicationList.map((option) => ({
+                        value: option.id?.toString(),
+                        label: option.NAME,
+                      }))
+                    : []
+                }
+                isDisabled={isPublicationPending}
               />
               <ControlledSelect
                 form={form}
-                label="Series"
+                label="seriesId"
                 options={
                   seriesList
                     ? seriesList.map(({ id, NAME }) => ({
@@ -105,7 +115,7 @@ const PaperPrerequisitesModal = ({
               />
               <ControlledSelect
                 form={form}
-                label="Subject"
+                label="classId"
                 options={
                   classList
                     ? classList.map(({ id, NAME }) => ({
@@ -118,7 +128,7 @@ const PaperPrerequisitesModal = ({
               />
               <ControlledSelect
                 form={form}
-                label="Subject"
+                label="subjectId"
                 options={
                   subjectList
                     ? subjectList.map(({ id, NAME }) => ({
@@ -153,9 +163,16 @@ const PaperPrerequisitesModal = ({
 
 export default PaperPrerequisitesModal;
 
+const labels = {
+  publicationId: "Publication",
+  seriesId: "Series",
+  classId: "Class",
+  subjectId: "Subject",
+};
+
 type ControlledSelectProps = {
   form: UseFormReturn<FormTypes, any, undefined>;
-  label: string;
+  label: "publicationId" | "seriesId" | "classId" | "subjectId";
   isDisabled: boolean;
   options: { value: string; label: string }[];
 };
@@ -169,16 +186,10 @@ const ControlledSelect = ({
   return (
     <FormField
       control={form.control}
-      name={
-        label.toLowerCase() as
-          | "publicationId"
-          | "seriesId"
-          | "classId"
-          | "subjectId"
-      }
+      name={label}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel>{labels[label]}</FormLabel>
           <Select
             onValueChange={field.onChange}
             defaultValue={field.value}
@@ -190,7 +201,7 @@ const ControlledSelect = ({
                   form.formState.errors[field.name] ? "border-red-100" : ""
                 }
               >
-                <SelectValue placeholder={`Select ${label}`} />
+                <SelectValue placeholder={`Select ${labels[label]}`} />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
