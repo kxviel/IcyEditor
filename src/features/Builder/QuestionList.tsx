@@ -1,5 +1,4 @@
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
-import { chapters } from "./data";
 import {
   Select,
   SelectContent,
@@ -14,70 +13,78 @@ import { useGetQuestionTitles } from "./api/getQuestionTitles";
 import { useGetChapterDetails } from "./api/getChapterDetails";
 
 type Props = {
-  books: Book[];
+  bookList: Book[] | undefined;
 };
 
-const QuestionList = ({ books }: Props) => {
+const QuestionList = ({ bookList }: Props) => {
   const [bookId, setBookId] = useState("");
-  const [chapterId, setChapterId] = useState("");
   const fields = useQuestionBuilderStore((state) => state.fields);
+  const chapterId = useQuestionBuilderStore((state) => state.chapterId);
   const addQuestion = useQuestionBuilderStore((state) => state.addQuestion);
+  const setChapterId = useQuestionBuilderStore((state) => state.setChapterId);
 
   useEffect(() => {
-    if (books.length > 0) setBookId(books[0].id.toString());
-  }, [books]);
+    if (bookList && bookList.length > 0) setBookId(bookList[0].id.toString());
+  }, [bookList]);
 
   // Book
-  const { data: chapterList, isPending: isChapterPending } = useGetChapter({
-    parentValue: bookId,
-  });
+  const { data: chapterList, isPending: isChapterPending } =
+    useGetChapter(bookId);
 
   //Question Titles
-  const { data: questionTitleList, isPending: isQuestionTitlePending } =
-    useGetQuestionTitles({
-      parentValue: chapterId,
-    });
+  const { data: questionTitleList } = useGetQuestionTitles(
+    chapterId ? chapterId.toString() : "",
+  );
 
   //Questions
-  const { data: questionList, isPending: isQuestionPending } =
-    useGetChapterDetails({
-      parentValue: chapterId,
-      titleIds: questionTitleList?.map((t) => t.id),
-    });
+  const { data: questionList } = useGetChapterDetails({
+    parentValue: chapterId ? chapterId.toString() : "",
+    titleIds: questionTitleList?.map((t) => t.id),
+  });
 
   return (
     <div className="flex h-full w-1/2 flex-col px-6">
+      {/* List Header */}
       <div className="flex items-center justify-center gap-6 bg-white px-4 py-6">
         <Select onValueChange={setBookId} defaultValue={""} value={bookId}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Books" />
           </SelectTrigger>
           <SelectContent>
-            {books.map((book) => (
-              <SelectItem value={book.id.toString()}>{book.NAME}</SelectItem>
-            ))}
+            {bookList
+              ? bookList.map((book) => (
+                  <SelectItem value={book.id.toString()}>
+                    {book.NAME}
+                  </SelectItem>
+                ))
+              : null}
           </SelectContent>
         </Select>
 
         <Select
-          onValueChange={setChapterId}
+          onValueChange={(v) => setChapterId(Number(v))}
           defaultValue={""}
-          value={chapterId}
+          value={chapterId ? chapterId.toString() : ""}
+          disabled={isChapterPending}
         >
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Chapters" />
           </SelectTrigger>
           <SelectContent>
-            {chapterList.map((chapter) => (
-              <SelectItem value={chapter.id.toString()}>
-                {chapter.NAME}
-              </SelectItem>
-            ))}
+            {chapterList
+              ? chapterList.map((chapter) => (
+                  <SelectItem value={chapter.id.toString()}>
+                    {chapter.NAME}
+                  </SelectItem>
+                ))
+              : null}
           </SelectContent>
         </Select>
       </div>
+
+      {/* List */}
       <div className="custom_scrollbar flex flex-col gap-2 overflow-y-scroll">
-        {questionTitleList.map((chapter) => (
+        {questionTitleList?.map((chapter) => (
           <div key={chapter.id} className="">
             <p className="font-semibold">{chapter.category_name}</p>
 
@@ -85,7 +92,7 @@ const QuestionList = ({ books }: Props) => {
               .filter((q) => q.CATEGORY_ID === chapter.id)
               .map((question) => (
                 <div
-                  key={chapter.id}
+                  key={question.id}
                   className="flex items-center gap-2 border-b border-gray-100 bg-white p-4 hover:cursor-pointer hover:bg-white/50"
                   style={
                     fields.some((f) => f.id === question.id)

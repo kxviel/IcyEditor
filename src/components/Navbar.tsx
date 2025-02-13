@@ -1,8 +1,9 @@
 import { Button } from "./ui/button";
 import Logo from "@/assets/Logo.svg";
-import { Bell, Settings, Printer, Save } from "lucide-react";
+import { Bell, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useNavigate, useLocation } from "@tanstack/react-router";
+import SavePaper from "@/features/Builder/SavePaper";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -21,14 +22,7 @@ const Navbar = () => {
         </div>
 
         {pathname === "/builder" ? (
-          <div className="flex items-center space-x-4">
-            <Button variant="outline">
-              <Save /> Save Paper
-            </Button>
-            <Button>
-              Print & Save <Printer />
-            </Button>
-          </div>
+          <SavePaper />
         ) : (
           <div className="flex items-center space-x-4">
             <Button variant="ghost" className="px-3">

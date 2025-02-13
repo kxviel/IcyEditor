@@ -22,9 +22,12 @@ const getChapterFn = (bookId: string): Promise<AxiosResponse<Root>> => {
 };
 
 export const useGetChapter = (bookId: string) => {
+  console.log(bookId);
+
   return useQuery({
     queryKey: ["GetChapter", bookId],
     queryFn: () => getChapterFn(bookId),
     select: ({ data }) => data.data,
+    enabled: !!bookId,
   });
 };

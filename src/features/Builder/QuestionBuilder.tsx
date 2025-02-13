@@ -15,7 +15,7 @@ const QuestionBuilder = () => {
     <div className="w-full bg-[#F9F5FF]">
       {!isOpen && (
         <div className="mx-auto flex h-[calc(100vh-72px)] max-w-7xl items-center justify-center">
-          <QuestionList books={bookList || []} />
+          <QuestionList bookList={bookList} />
           <PaperView />
         </div>
       )}

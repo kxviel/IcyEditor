@@ -2,37 +2,43 @@ import http from "@/config/https";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 
-export type QuestionTitle = {
+interface Root {
+  code: string;
+  message: string;
+  statusCode: number;
+  success: boolean;
+  data: Data;
+}
+
+export interface Data {
+  totalQuestions: number;
+  questions: ChapterTitles[];
+}
+
+export interface ChapterTitles {
   id: number;
   category_name: string;
-};
+}
 
-type Props = {
-  parentValue: string;
-};
+// const getQuestionTitlesFn = (
+//   chapterId: string,
+// ): Promise<AxiosResponse<Root>> => {
+//   return http.get(`/questionbank/chapter/${chapterId}`);
+// };
 
-const getQuestionTitlesFn = ({
-  parentValue,
-}: Props): Promise<AxiosResponse<QuestionTitle[]>> => {
-  const params = {
-    parent_value: parentValue,
-  };
+// export const useGetQuestionTitles = (chapterId: string) => {
+//   return useQuery({
+//     queryKey: ["GetQuestionTitles", chapterId],
+//     queryFn: () => getQuestionTitlesFn(chapterId),
+//     select: ({ data }) => data.data,
+//     enabled: !!chapterId,
+//   });
+// };
 
-  return http.get("/get_category", {
-    params,
-  });
-};
-
-export const useGetQuestionTitles = ({
-  parentValue,
-}: Props): { isPending: boolean; data: QuestionTitle[] } => {
-  // return useQuery({
-  //   queryKey: ["GetQuestionTitles", parentValue],
-  //   queryFn: () => getQuestionTitlesFn({ parentValue }),
-  //   select: ({ data }) => data,
-  // });
-
-  if (parentValue) {
+export const useGetQuestionTitles = (
+  chapterId: string,
+): { isPending: boolean; data: ChapterTitles[] } => {
+  if (chapterId) {
     return {
       isPending: false,
       data: [
