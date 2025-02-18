@@ -12,10 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { CheckedState } from "@radix-ui/react-checkbox";
+
 import { Link } from "@tanstack/react-router";
 import { IconInput } from "@/components/ui/IconInput";
 
@@ -36,10 +33,7 @@ const Login = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const [rememberMe, setRememberMe] = useState<CheckedState>(false);
-
   const onSubmit = (data: LoginSchemaTypes) => {
-    console.log(rememberMe);
     loginFn.mutate({
       body: {
         phoneOrEmail: data.email,
@@ -90,7 +84,7 @@ const Login = () => {
           />
 
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+            {/* <div className="flex items-center space-x-2">
               <Checkbox
                 id="rememberMe"
                 checked={rememberMe}
@@ -102,7 +96,7 @@ const Login = () => {
               >
                 Remember me
               </Label>
-            </div>
+            </div> */}
 
             <Link
               to="/forgot-password"
