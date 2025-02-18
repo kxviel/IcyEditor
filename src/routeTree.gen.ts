@@ -21,6 +21,7 @@ import { Route as AuthImport } from './routes/_auth'
 const ForgotPasswordLazyImport = createFileRoute('/forgot-password')()
 const AuthIndexLazyImport = createFileRoute('/_auth/')()
 const AuthPreviewLazyImport = createFileRoute('/_auth/preview')()
+const AuthExamTypeLazyImport = createFileRoute('/_auth/exam-type')()
 const AuthBuilderLazyImport = createFileRoute('/_auth/builder')()
 
 // Create/Update Routes
@@ -55,6 +56,14 @@ const AuthPreviewLazyRoute = AuthPreviewLazyImport.update({
   path: '/preview',
   getParentRoute: () => AuthRoute,
 } as any).lazy(() => import('./routes/_auth/preview.lazy').then((d) => d.Route))
+
+const AuthExamTypeLazyRoute = AuthExamTypeLazyImport.update({
+  id: '/exam-type',
+  path: '/exam-type',
+  getParentRoute: () => AuthRoute,
+} as any).lazy(() =>
+  import('./routes/_auth/exam-type.lazy').then((d) => d.Route),
+)
 
 const AuthBuilderLazyRoute = AuthBuilderLazyImport.update({
   id: '/builder',
@@ -94,6 +103,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthBuilderLazyImport
       parentRoute: typeof AuthImport
     }
+    '/_auth/exam-type': {
+      id: '/_auth/exam-type'
+      path: '/exam-type'
+      fullPath: '/exam-type'
+      preLoaderRoute: typeof AuthExamTypeLazyImport
+      parentRoute: typeof AuthImport
+    }
     '/_auth/preview': {
       id: '/_auth/preview'
       path: '/preview'
@@ -115,12 +131,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthBuilderLazyRoute: typeof AuthBuilderLazyRoute
+  AuthExamTypeLazyRoute: typeof AuthExamTypeLazyRoute
   AuthPreviewLazyRoute: typeof AuthPreviewLazyRoute
   AuthIndexLazyRoute: typeof AuthIndexLazyRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthBuilderLazyRoute: AuthBuilderLazyRoute,
+  AuthExamTypeLazyRoute: AuthExamTypeLazyRoute,
   AuthPreviewLazyRoute: AuthPreviewLazyRoute,
   AuthIndexLazyRoute: AuthIndexLazyRoute,
 }
@@ -132,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/builder': typeof AuthBuilderLazyRoute
+  '/exam-type': typeof AuthExamTypeLazyRoute
   '/preview': typeof AuthPreviewLazyRoute
   '/': typeof AuthIndexLazyRoute
 }
@@ -140,6 +159,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/builder': typeof AuthBuilderLazyRoute
+  '/exam-type': typeof AuthExamTypeLazyRoute
   '/preview': typeof AuthPreviewLazyRoute
   '/': typeof AuthIndexLazyRoute
 }
@@ -150,21 +170,36 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/_auth/builder': typeof AuthBuilderLazyRoute
+  '/_auth/exam-type': typeof AuthExamTypeLazyRoute
   '/_auth/preview': typeof AuthPreviewLazyRoute
   '/_auth/': typeof AuthIndexLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/login' | '/forgot-password' | '/builder' | '/preview' | '/'
+  fullPaths:
+    | ''
+    | '/login'
+    | '/forgot-password'
+    | '/builder'
+    | '/exam-type'
+    | '/preview'
+    | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/forgot-password' | '/builder' | '/preview' | '/'
+  to:
+    | '/login'
+    | '/forgot-password'
+    | '/builder'
+    | '/exam-type'
+    | '/preview'
+    | '/'
   id:
     | '__root__'
     | '/_auth'
     | '/login'
     | '/forgot-password'
     | '/_auth/builder'
+    | '/_auth/exam-type'
     | '/_auth/preview'
     | '/_auth/'
   fileRoutesById: FileRoutesById
@@ -201,6 +236,7 @@ export const routeTree = rootRoute
       "filePath": "_auth.tsx",
       "children": [
         "/_auth/builder",
+        "/_auth/exam-type",
         "/_auth/preview",
         "/_auth/"
       ]
@@ -213,6 +249,10 @@ export const routeTree = rootRoute
     },
     "/_auth/builder": {
       "filePath": "_auth/builder.lazy.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/exam-type": {
+      "filePath": "_auth/exam-type.lazy.tsx",
       "parent": "/_auth"
     },
     "/_auth/preview": {

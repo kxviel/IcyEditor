@@ -15,9 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import AddPaperModal from "./AddPaperModal";
 import { IconInput } from "@/components/ui/IconInput";
+import { useNavigate } from "@tanstack/react-router";
 
 const examCards = Array(6).fill({
   lastEdited: "8th Jan 2025",
@@ -27,7 +26,8 @@ const examCards = Array(6).fill({
 });
 
 const Home = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
   return (
     <>
       {/* Header */}
@@ -41,7 +41,7 @@ const Home = () => {
           <Button variant={"outline"}>
             <Download /> Export All
           </Button>
-          <Button onClick={() => setIsOpen(true)}>
+          <Button onClick={() => navigate({ to: "/exam-type" })}>
             <Plus /> Add Question Paper
           </Button>
         </div>
@@ -113,9 +113,6 @@ const Home = () => {
           </Card>
         ))}
       </div>
-
-      {/* Modal */}
-      <AddPaperModal isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   );
 };

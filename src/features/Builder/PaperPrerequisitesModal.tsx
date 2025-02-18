@@ -154,7 +154,7 @@ const PaperPrerequisitesModal = ({
                 variant={"outline"}
                 className="w-full"
                 onClick={() => {
-                  navigate({ to: "/" }).finally(() => {
+                  navigate({ to: "/exam-type" }).finally(() => {
                     setIsOpen(false);
                   });
                 }}
