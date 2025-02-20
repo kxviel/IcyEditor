@@ -1,5 +1,6 @@
 import http from "@/config/https";
 import { useAuth } from "@/hooks/useAuth";
+import { useModalStore } from "@/store/useModalStore";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -10,24 +11,30 @@ type Props = {
     email: string;
     password?: string;
   };
+  isGoogleAuth?: boolean;
 };
 
-const registerFn = ({ body }: Props) => {
-  return http.post("/auth/register", body);
+const registerFn = (data: Props) => {
+  return http.post("/auth/register", data.body);
 };
 
 export const useRegisterFn = () => {
-    const navigate = useNavigate();
-    const { signIn, signOut } = useAuth();
-    
+  const navigate = useNavigate();
+  const setModal = useModalStore((state) => state.setModal);
+  const { signIn, signOut } = useAuth();
+
   return useMutation({
     mutationFn: registerFn,
-    onSuccess: ({ data }) => {
+    onSuccess: ({ data }, { isGoogleAuth }) => {
       toast.success(data.message);
       signIn(data.data);
-      navigate({
-        to: "/",
-      });
+      if (isGoogleAuth) {
+        setModal("COMPLETE_PROFILE", data);
+      } else {
+        navigate({
+          to: "/",
+        });
+      }
     },
     onError: (err: string) => {
       toast.error(err);

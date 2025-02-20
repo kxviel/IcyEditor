@@ -2,6 +2,7 @@ import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 
 import { AuthContext } from "@/hooks/useAuth";
+import RootModal from "@/store/RootModal";
 
 interface MyRouterContext {
   auth: AuthContext;
@@ -15,6 +16,7 @@ function RootComponent() {
   return (
     <>
       <Toaster position="top-right" richColors theme="light" />
+      <RootModal />
       <main>
         <Outlet />
       </main>

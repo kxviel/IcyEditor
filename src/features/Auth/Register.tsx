@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { useGetStates } from "./api/getStates";
 import { useGetCities } from "./api/getCities";
+import { useModalStore } from "@/store/useModalStore";
 
 const registerSchema = z
   .object({
@@ -63,6 +64,7 @@ type RegisterSchemaTypes = z.infer<typeof registerSchema>;
 
 const Register = () => {
   const registerFn = useRegisterFn();
+  const setModal = useModalStore((state) => state.setModal);
   const form = useForm<RegisterSchemaTypes>({
     resolver: zodResolver(registerSchema),
   });
@@ -78,6 +80,13 @@ const Register = () => {
 
   return (
     <div className="w-[642px] py-3">
+      <Button
+        onClick={() => {
+          setModal("COMPLETE_PROFILE", { isOpen: true });
+        }}
+      >
+        TEAST
+      </Button>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

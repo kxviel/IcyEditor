@@ -34,7 +34,7 @@ export const useIsExistingUser = () => {
           name: variables.name,
           email: variables.email,
         };
-        register.mutate({ body: registerBody });
+        register.mutate({ body: registerBody, isGoogleAuth: true });
       }
     },
     onError: (err: string) => {
