@@ -39,18 +39,10 @@ const QuestionList = ({ bookList }: Props) => {
     }
   }, [chapterList, setChapterId]);
 
-  //Question Titles
+  //Questions
   const { data: questionList } = useGetQuestionList(
     chapterId ? chapterId.toString() : "",
   );
-
-  console.log(questionList);
-
-  // //Questions
-  // const { data: questionList } = useGetChapterDetails({
-  //   parentValue: chapterId ? chapterId.toString() : "",
-  //   titleIds: questionTitleList?.map((t) => t.id),
-  // });
 
   return (
     <div className="flex h-full w-1/2 flex-col px-6">
@@ -81,7 +73,7 @@ const QuestionList = ({ bookList }: Props) => {
               <SelectContent>
                 {bookList
                   ? bookList.map((book) => (
-                      <SelectItem value={book.id.toString()}>
+                      <SelectItem key={book.id} value={book.id.toString()}>
                         {book.NAME}
                       </SelectItem>
                     ))
@@ -102,7 +94,10 @@ const QuestionList = ({ bookList }: Props) => {
               <SelectContent>
                 {chapterList
                   ? chapterList.map((chapter) => (
-                      <SelectItem value={chapter.id.toString()}>
+                      <SelectItem
+                        key={chapter.id}
+                        value={chapter.id.toString()}
+                      >
                         {chapter.NAME}
                       </SelectItem>
                     ))
@@ -115,35 +110,43 @@ const QuestionList = ({ bookList }: Props) => {
 
       {/* List */}
       <div className="custom_scrollbar flex flex-col gap-2 overflow-y-scroll">
-        {questionList?.categories?.map((category) => (
-          <div key={category.categoryId} className="">
-            <p className="my-2 font-semibold">{category.categoryName}</p>
+        {questionList?.categories?.map(
+          ({ categoryId, categoryName, questions }) => (
+            <div key={categoryId} className="">
+              <p className="my-2 font-semibold">{categoryName}</p>
 
-            {category.questions
-              .filter((q) => q.CATEGORY_ID === category.categoryId)
-              .map((question) => (
-                <div
-                  key={question.id}
-                  className="flex items-center gap-2 border-b border-gray-100 bg-white p-4 hover:cursor-pointer hover:bg-white/50"
-                  onClick={() =>
-                    addQuestion({
-                      id: question.id,
-                      value: question.QUESTION_DATA,
-                    })
-                  }
-                >
-                  <Checkbox
-                    className="border-slate-400"
-                    checked={fields.some((f) => f.id === question.id)}
-                  />
-                  <p
-                    className="text-sm text-gray-500"
-                    dangerouslySetInnerHTML={{ __html: question.QUESTION_DATA }}
-                  />
-                </div>
-              ))}
-          </div>
-        ))}
+              {questions
+                .filter((q) => q.CATEGORY_ID === categoryId)
+                .map((question) => (
+                  <div
+                    key={question.id}
+                    className="flex items-center gap-2 border-b border-gray-100 bg-white p-4 hover:cursor-pointer hover:bg-white/50"
+                    onClick={() =>
+                      addQuestion(categoryId, categoryName, {
+                        questionId: question.id,
+                        questionText: question.QUESTION_DATA,
+                      })
+                    }
+                  >
+                    <Checkbox
+                      className="border-slate-400"
+                      checked={
+                        fields[categoryId]?.questions?.some(
+                          (q) => q.questionId === question.id,
+                        ) || false
+                      }
+                    />
+                    <p
+                      className="text-sm text-gray-500"
+                      dangerouslySetInnerHTML={{
+                        __html: question.QUESTION_DATA,
+                      }}
+                    />
+                  </div>
+                ))}
+            </div>
+          ),
+        )}
       </div>
     </div>
   );

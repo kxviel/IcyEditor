@@ -2,10 +2,15 @@ import { Button } from "@/components/ui/button";
 import PaperHeader from "./PaperHeader";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 const PaperView = () => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(fields);
+  }, [fields]);
 
   return (
     <div className="flex h-full w-1/2 flex-col items-center space-y-4 p-4">
@@ -19,12 +24,19 @@ const PaperView = () => {
         <PaperHeader />
 
         <div className="flex w-full flex-col gap-3">
-          {fields.map((question) => (
-            <div className="w-full bg-slate-200" key={question.id}>
-              <p
-                className="text-sm text-gray-500"
-                dangerouslySetInnerHTML={{ __html: question.value }}
-              />
+          {Object.values(fields).map((field) => (
+            <div className="w-full" key={field.categoryId}>
+              <p className="font-semibold text-gray-800">
+                {field.categoryName}
+              </p>
+
+              {field.questions.map((question) => (
+                <p
+                  className="text-sm text-gray-500"
+                  key={question.questionId}
+                  dangerouslySetInnerHTML={{ __html: question.questionText }}
+                />
+              ))}
             </div>
           ))}
         </div>
