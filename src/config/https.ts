@@ -8,7 +8,9 @@ const http = axios.create({
 
 // Request Interceptor
 http.interceptors.request.use((req) => {
-  const token = document.cookie.split("=")[1];
+  const user = localStorage.getItem("user");
+  const token = user ? JSON.parse(user).token : "";
+
   req.headers.Authorization = token ? `Bearer ${token}` : "";
 
   return req;
@@ -20,8 +22,8 @@ http.interceptors.response.use(
   (error) => {
     if (error.response.status === 401) {
       toast.warning("Unauthorized, logging out ...");
-      // localStorage.clear();
-      // window.location.href = "/login";
+      localStorage.clear();
+      window.location.href = "/login";
     } else {
       return Promise.reject(error?.response.data?.message);
     }

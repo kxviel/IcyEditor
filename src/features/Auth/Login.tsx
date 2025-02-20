@@ -12,8 +12,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import { Link } from "@tanstack/react-router";
 import { IconInput } from "@/components/ui/IconInput";
 
 const loginSchema = z.object({
@@ -83,8 +81,8 @@ const Login = () => {
             )}
           />
 
-          <div className="flex items-center justify-between">
-            {/* <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
               <Checkbox
                 id="rememberMe"
                 checked={rememberMe}
@@ -96,7 +94,7 @@ const Login = () => {
               >
                 Remember me
               </Label>
-            </div> */}
+            </div>
 
             <Link
               to="/forgot-password"
@@ -104,7 +102,7 @@ const Login = () => {
             >
               Forgot Password
             </Link>
-          </div>
+          </div> */}
 
           <Button className="w-96" type="submit">
             Login
