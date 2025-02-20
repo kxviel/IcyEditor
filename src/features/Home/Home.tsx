@@ -14,9 +14,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { IconInput } from "@/components/ui/IconInput";
 import { useNavigate } from "@tanstack/react-router";
+import { useGetPapers } from "./api/getPapers";
+import { useState } from "react";
+
+const PAGE_SIZE = 10;
+const TOTAL_PAGES = 7;
 
 const examCards = Array(6).fill({
   lastEdited: "8th Jan 2025",
@@ -27,6 +41,17 @@ const examCards = Array(6).fill({
 
 const Home = () => {
   const navigate = useNavigate();
+
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+
+  const { data } = useGetPapers({ page, search });
+
+  const handlePageChange = (page: number) => {
+    if (TOTAL_PAGES && page >= 1 && page <= TOTAL_PAGES) {
+      setPage(page);
+    }
+  };
 
   return (
     <>
@@ -113,6 +138,45 @@ const Home = () => {
           </Card>
         ))}
       </div>
+
+      {/* {data?.total && ( */}
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href="#"
+              onClick={() => handlePageChange(page - 1)}
+              className={page === 1 ? "pointer-events-none opacity-50" : ""}
+            />
+          </PaginationItem>
+          {[...Array(TOTAL_PAGES)].map((_, index) => (
+            <PaginationItem key={index}>
+              <PaginationLink
+                href="#"
+                onClick={() => handlePageChange(index + 1)}
+                className={page === index + 1 ? "font-bold" : ""}
+              >
+                {index + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          {TOTAL_PAGES > 5 && (
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              onClick={() => handlePageChange(page + 1)}
+              className={
+                page === TOTAL_PAGES ? "pointer-events-none opacity-50" : ""
+              }
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+      {/* )} */}
     </>
   );
 };

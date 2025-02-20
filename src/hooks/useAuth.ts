@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 export type User = {
   id: number;
   EMAIL: string;
@@ -12,7 +10,10 @@ export type User = {
 };
 
 export const useAuth = () => {
-  const [userData, setUserData] = useState<User>();
+  const getUser = (): User => {
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  };
 
   const signInWithGoogle = (user?: any) => {
     console.log(user);
@@ -25,7 +26,6 @@ export const useAuth = () => {
     const tempDataWithoutPassword = user;
     delete tempDataWithoutPassword.PASSWORD;
 
-    setUserData(tempDataWithoutPassword);
     localStorage.setItem("isAuthenticated", "true");
     localStorage.setItem("user", JSON.stringify(tempDataWithoutPassword));
   };
@@ -37,7 +37,7 @@ export const useAuth = () => {
 
   const isLogged = () => localStorage.getItem("isAuthenticated") === "true";
 
-  return { signIn, signOut, isLogged, userData, signInWithGoogle };
+  return { signIn, signOut, isLogged, getUser, signInWithGoogle };
 };
 
 export type AuthContext = ReturnType<typeof useAuth>;
