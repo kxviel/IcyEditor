@@ -137,7 +137,7 @@ const QuestionList = ({ bookList }: Props) => {
                       }
                     />
                     <p
-                      className="text-sm text-gray-500"
+                      className="text-sm"
                       dangerouslySetInnerHTML={{
                         __html: question.QUESTION_DATA,
                       }}

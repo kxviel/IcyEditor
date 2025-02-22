@@ -24,18 +24,33 @@ const PaperView = () => {
           <PaperHeader />
 
           <div className="flex w-full flex-col gap-3">
-            {Object.values(fields).map((field) => (
+            {Object.values(fields).map((field, fieldIndex) => (
               <div className="w-full" key={field.categoryId}>
-                <p className="font-semibold text-gray-800">
-                  {field.categoryName}
-                </p>
+                <div className="my-3 flex gap-2">
+                  <p className="font-semibold text-gray-800">
+                    Q{fieldIndex + 1}.
+                  </p>
+                  <p className="font-semibold text-gray-800">
+                    {field.categoryName}
+                  </p>
 
-                {field.questions.map((question) => (
-                  <p
-                    className="text-sm text-gray-500"
-                    key={question.questionId}
-                    dangerouslySetInnerHTML={{ __html: question.questionText }}
-                  />
+                  <p className="ml-auto text-sm">
+                    (1 x {field.questions.length}) = 5
+                  </p>
+                </div>
+
+                {field.questions.map((question, index) => (
+                  <div key={question.questionId} className="my-3 flex gap-2">
+                    <p className="text-sm font-semibold text-gray-800">
+                      {index + 1}.
+                    </p>
+                    <p
+                      className="text-sm text-gray-700"
+                      dangerouslySetInnerHTML={{
+                        __html: question.questionText,
+                      }}
+                    />
+                  </div>
                 ))}
               </div>
             ))}

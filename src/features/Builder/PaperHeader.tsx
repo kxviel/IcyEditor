@@ -151,7 +151,7 @@ const PaperHeader = () => {
         )}
       </div>
 
-      <div className="my-6 h-[1px] w-full bg-black" />
+      <div className="mb-3 mt-6 h-[1px] w-full bg-black" />
     </div>
   );
 };
