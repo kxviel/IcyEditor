@@ -22,8 +22,8 @@ http.interceptors.response.use(
   (error) => {
     if (error.response.status === 401) {
       toast.warning("Unauthorized, logging out ...");
-      // localStorage.clear();
-      // window.location.href = "/login";
+      localStorage.clear();
+      window.location.href = "/login";
     } else {
       return Promise.reject(error?.response.data?.message);
     }
