@@ -25,5 +25,6 @@ export const useGetClass = (seriesId: string) => {
     queryKey: ["GetClass", seriesId],
     queryFn: () => getClassFn(seriesId),
     select: ({ data }) => data.data,
+    enabled: !!seriesId,
   });
 };

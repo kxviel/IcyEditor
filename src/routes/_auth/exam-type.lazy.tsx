@@ -1,5 +1,4 @@
-import { createLazyFileRoute, useLocation } from "@tanstack/react-router";
-
+import { createLazyFileRoute } from "@tanstack/react-router";
 import { Contact } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "@tanstack/react-router";
@@ -15,19 +14,12 @@ export const Route = createLazyFileRoute("/_auth/exam-type")({
   ),
 });
 
-const stepperDict: Record<string, number> = {
-  "/exam-type": 0,
-  "/builder": 1,
-  "/preview": 2,
-};
-
 function ExamType() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-6">
-      <Stepper currentStep={stepperDict[pathname]} steps={3} />
+      <Stepper />
 
       <div className="flex flex-col items-center gap-4">
         <p className="text-2xl font-semibold">How do you want to proceed</p>

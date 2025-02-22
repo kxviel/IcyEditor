@@ -9,7 +9,7 @@ const QuestionBuilder = () => {
   const [subjectId, setSubjectId] = useState(0);
 
   // Book
-  const { data: bookList } = useGetBook(subjectId.toString());
+  const { data: bookList } = useGetBook(subjectId ? subjectId.toString() : "");
 
   return (
     <div className="h-full w-full">

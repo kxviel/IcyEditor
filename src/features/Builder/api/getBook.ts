@@ -26,5 +26,6 @@ export const useGetBook = (subjectId: string) => {
     queryKey: ["GetBook", subjectId],
     queryFn: () => getBookFn(subjectId),
     select: ({ data }) => data.data,
+    enabled: !!subjectId,
   });
 };

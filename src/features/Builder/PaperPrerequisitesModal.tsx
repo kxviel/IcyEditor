@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "@tanstack/react-router";
 import {
   Form,
@@ -68,8 +68,6 @@ const PaperPrerequisitesModal = ({
   );
 
   function onSubmit(data: FormTypes) {
-    console.log(data);
-
     if (data.publicationId && data.seriesId && data.classId && data.subjectId) {
       setIsOpen(false);
       setSubjectId(Number(data.subjectId));
@@ -89,88 +87,94 @@ const PaperPrerequisitesModal = ({
         onPointerDownOutside={(e) => e.preventDefault()}
         showClose={false}
       >
-        <div className="flex flex-col space-y-4">
-          <p className="text-xl font-semibold">Select Subject and Proceed</p>
+        {isPublicationPending ? (
+          <div className="flex items-center justify-center">
+            <p>Loading...</p>
+          </div>
+        ) : (
+          <div className="flex flex-col space-y-4">
+            <DialogTitle>Select Subject and Proceed</DialogTitle>
 
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="grid w-full grid-cols-2 gap-4"
-            >
-              <ControlledSelect
-                form={form}
-                label="publicationId"
-                options={
-                  publicationList
-                    ? publicationList.map((option) => ({
-                        value: option.id?.toString(),
-                        label: option.NAME,
-                      }))
-                    : []
-                }
-                isDisabled={isPublicationPending}
-              />
-              <ControlledSelect
-                form={form}
-                label="seriesId"
-                options={
-                  seriesList
-                    ? seriesList.map(({ id, NAME }) => ({
-                        value: id.toString(),
-                        label: NAME,
-                      }))
-                    : []
-                }
-                isDisabled={isSeriesPending || !form.watch("publicationId")}
-              />
-              <ControlledSelect
-                form={form}
-                label="classId"
-                options={
-                  classList
-                    ? classList.map(({ id, NAME }) => ({
-                        value: id.toString(),
-                        label: NAME,
-                      }))
-                    : []
-                }
-                isDisabled={isClassPending || !form.watch("seriesId")}
-              />
-              <ControlledSelect
-                form={form}
-                label="subjectId"
-                options={
-                  subjectList
-                    ? subjectList.map(({ id, NAME }) => ({
-                        value: id.toString(),
-                        label: NAME,
-                      }))
-                    : []
-                }
-                isDisabled={isSubjectPending || !form.watch("classId")}
-              />
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="grid w-full grid-cols-2 gap-4"
+              >
+                <ControlledSelect
+                  form={form}
+                  label="publicationId"
+                  options={
+                    publicationList
+                      ? publicationList.map((option) => ({
+                          value: option.id?.toString(),
+                          label: option.NAME,
+                        }))
+                      : []
+                  }
+                  isDisabled={isPublicationPending}
+                />
+                <ControlledSelect
+                  form={form}
+                  label="seriesId"
+                  options={
+                    seriesList
+                      ? seriesList.map(({ id, NAME }) => ({
+                          value: id.toString(),
+                          label: NAME,
+                        }))
+                      : []
+                  }
+                  isDisabled={isSeriesPending || !form.watch("publicationId")}
+                />
+                <ControlledSelect
+                  form={form}
+                  label="classId"
+                  options={
+                    classList
+                      ? classList.map(({ id, NAME }) => ({
+                          value: id.toString(),
+                          label: NAME,
+                        }))
+                      : []
+                  }
+                  isDisabled={isClassPending || !form.watch("seriesId")}
+                />
+                <ControlledSelect
+                  form={form}
+                  label="subjectId"
+                  options={
+                    subjectList
+                      ? subjectList.map(({ id, NAME }) => ({
+                          value: id.toString(),
+                          label: NAME,
+                        }))
+                      : []
+                  }
+                  isDisabled={isSubjectPending || !form.watch("classId")}
+                />
 
-              <Button
-                variant={"outline"}
-                className="w-full"
-                onClick={() => {
-                  navigate({ to: "/exam-type" }).finally(() => {
-                    setIsOpen(false);
-                  });
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={!form.formState.isValid}
-              >
-                Submit
-              </Button>
-            </form>
-          </Form>
-        </div>
+                <Button
+                  variant={"outline"}
+                  className="w-full"
+                  onClick={() => {
+                    navigate({ to: "/exam-type" }).finally(() => {
+                      setIsOpen(false);
+                    });
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={!form.formState.isValid}
+                >
+                  Submit
+                </Button>
+              </form>
+            </Form>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

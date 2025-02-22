@@ -26,5 +26,6 @@ export const useGetSeries = (publicationId: string) => {
     queryKey: ["GetSeries", publicationId],
     queryFn: () => getSeriesFn(publicationId),
     select: ({ data }) => data.data,
+    enabled: !!publicationId,
   });
 };

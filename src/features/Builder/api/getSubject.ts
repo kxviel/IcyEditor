@@ -26,5 +26,6 @@ export const useGetSubject = (classId: string) => {
     queryKey: ["GetSubject", classId],
     queryFn: () => getSubjectFn(classId),
     select: ({ data }) => data.data,
+    enabled: !!classId,
   });
 };

@@ -45,9 +45,9 @@ const QuestionList = ({ bookList }: Props) => {
   );
 
   return (
-    <div className="flex h-full w-1/2 flex-col px-6">
-      {/* List Header */}
-      <div className="justify-centr flex flex-col gap-6 bg-white px-4 py-6">
+    <div className="flex h-full w-1/2 flex-col">
+      {/* Header */}
+      <div className="justify-centr flex flex-col gap-6 bg-white px-8 py-6">
         <div className="grid w-full grid-cols-2 gap-4">
           <div>
             <Label>Publication</Label>
@@ -113,14 +113,14 @@ const QuestionList = ({ bookList }: Props) => {
         {questionList?.categories?.map(
           ({ categoryId, categoryName, questions }) => (
             <div key={categoryId} className="">
-              <p className="my-2 font-semibold">{categoryName}</p>
+              <p className="my-3 px-8 font-semibold">{categoryName}</p>
 
               {questions
                 .filter((q) => q.CATEGORY_ID === categoryId)
                 .map((question) => (
                   <div
                     key={question.id}
-                    className="flex items-center gap-2 border-b border-gray-100 bg-white p-4 hover:cursor-pointer hover:bg-white/50"
+                    className="flex items-center gap-4 border-b border-gray-100 bg-white p-4 hover:cursor-pointer hover:bg-white/50"
                     onClick={() =>
                       addQuestion(categoryId, categoryName, {
                         questionId: question.id,

@@ -12,13 +12,12 @@ import {
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import SavePaper from "@/features/Builder/SavePaper";
 import { useAuth } from "@/hooks/useAuth";
+import Stepper from "./ui/stepper";
 
 const Navbar = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  const pathname = useLocation({
-    select: (l) => l.pathname,
-  });
+  const { pathname } = useLocation();
 
   return (
     <header className="h-[72px] w-full border border-b border-gray-200">
@@ -29,10 +28,7 @@ const Navbar = () => {
         >
           <img src={Logo} alt="logo" />
         </div>
-
-        {pathname === "/builder" ? (
-          <SavePaper />
-        ) : (
+        {!["/builder", "/preview"].includes(pathname) && (
           <div className="flex items-center space-x-4">
             <Button variant="ghost" className="px-3">
               <Settings />
@@ -56,6 +52,14 @@ const Navbar = () => {
             </DropdownMenu>
           </div>
         )}
+
+        {pathname === "/builder" && (
+          <div className="flex flex-1 justify-center">
+            <Stepper />
+          </div>
+        )}
+
+        {pathname === "/preview" && <SavePaper />}
       </nav>
     </header>
   );
