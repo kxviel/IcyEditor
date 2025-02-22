@@ -5,7 +5,6 @@ import {
   MoreVertical,
   Plus,
   Search,
-  SortAsc,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
@@ -28,8 +27,13 @@ import { IconInput } from "@/components/ui/IconInput";
 import { useNavigate } from "@tanstack/react-router";
 import { useGetPapers } from "./api/getPapers";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import useDebounce from "@/hooks/useDebounce";
+import SortAscIcon from "@/assets/Icons/SortAscIcon";
+import SortDescIcon from "@/assets/Icons/SortDescIcon";
+import { DatePickerWithRange } from "@/components/DatePickerWithRange";
+import { DateRange } from "react-day-picker";
 
-const PAGE_SIZE = 10;
 const TOTAL_PAGES = 7;
 
 const examCards = Array(6).fill({
@@ -41,14 +45,34 @@ const examCards = Array(6).fill({
 
 const Home = () => {
   const navigate = useNavigate();
+  const { getUser } = useAuth();
 
+  const userData = getUser();
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
+  const [order, setOrder] = useState<"asc" | "desc">("asc");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const { data } = useGetPapers({ page, search });
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: new Date(2025, 0, 20),
+    to: new Date(2026, 0, 20),
+  });
+
+  const debouncedSearch = useDebounce(searchTerm, 300);
+
+  const { data, isPending } = useGetPapers({
+    page,
+    order,
+    userId: userData?.id,
+    searchTerm: debouncedSearch,
+    date,
+  });
+
+  const handleSort = () => {
+    setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+  };
 
   const handlePageChange = (page: number) => {
-    if (TOTAL_PAGES && page >= 1 && page <= TOTAL_PAGES) {
+    if (data?.total && page >= 1 && page <= data.total) {
       setPage(page);
     }
   };
@@ -78,66 +102,71 @@ const Home = () => {
           placeholder="Search"
           className="w-[320px]"
           startIcon={Search}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
 
         <div className="flex space-x-4">
-          <Button variant={"outline"}>
-            <Download /> Jan 1, 2023 - Jan 31, 2025
-          </Button>
-          <Button variant={"outline"}>
-            <SortAsc /> Sort By
+          <DatePickerWithRange date={date} setDate={setDate} />
+
+          <Button variant={"outline"} onClick={handleSort}>
+            {order === "asc" ? <SortAscIcon /> : <SortDescIcon />} Sort By
           </Button>
         </div>
       </div>
 
       {/* Cards */}
-      <div className="grid gap-6 px-8 md:grid-cols-2 lg:grid-cols-3">
-        {examCards.map((card, i) => (
-          <Card key={i} className="group p-5">
-            <div className="mb-4 flex items-start justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Last edited on {card.lastEdited}
-                </p>
+      {isPending ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="grid gap-6 px-8 md:grid-cols-2 lg:grid-cols-3">
+          {examCards.map((card, i) => (
+            <Card key={i} className="group p-5">
+              <div className="mb-4 flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Last edited on {card.lastEdited}
+                  </p>
 
-                <h2 className="mb-4 text-xl font-semibold">{card.title}</h2>
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Edit</DropdownMenuItem>
-                  <DropdownMenuItem>Delete</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex gap-2">
-                <Badge
-                  variant="secondary"
-                  className="bg-purple-50 text-purple-500 hover:bg-purple-50"
-                >
-                  {card.class}
-                </Badge>
-                <Badge
-                  variant="secondary"
-                  className="bg-pink-50 text-pink-500 hover:bg-pink-50"
-                >
-                  {card.subject}
-                </Badge>
+                  <h2 className="mb-4 text-xl font-semibold">{card.title}</h2>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                    <DropdownMenuItem>Delete</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
-              <Button variant="ghost">
-                <ArrowUpRight />
-              </Button>
-            </div>
-          </Card>
-        ))}
-      </div>
+              <div className="flex items-center justify-between">
+                <div className="flex gap-2">
+                  <Badge
+                    variant="secondary"
+                    className="bg-purple-50 text-purple-500 hover:bg-purple-50"
+                  >
+                    {card.class}
+                  </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="bg-pink-50 text-pink-500 hover:bg-pink-50"
+                  >
+                    {card.subject}
+                  </Badge>
+                </div>
+
+                <Button variant="ghost">
+                  <ArrowUpRight />
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {!!data?.total && (
         <Pagination>

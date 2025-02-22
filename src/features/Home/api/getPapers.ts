@@ -1,17 +1,17 @@
 import http from "@/config/https";
-import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
+import { DateRange } from "react-day-picker";
 
 export interface Root {
   code: string;
   message: string;
   statusCode: number;
   success: boolean;
-  data: Data;
+  data: PaperData;
 }
 
-export interface Data {
+interface PaperData {
   examData: any[];
   total: number;
   page: string;
@@ -19,38 +19,39 @@ export interface Data {
 }
 
 type Props = {
-  page?: number;
-  search?: string;
-  userId?: number;
+  page: number;
+  userId: number;
+  order?: string;
+  searchTerm?: string;
+  date?: DateRange | undefined;
 };
 
 export const getPapersFn = (props: Props): Promise<AxiosResponse<Root>> => {
   const params: any = {
-    size: 10,
+    pageSize: 10,
+    sortBy: "EXAM_NAME",
   };
 
-  const { page, search, userId } = props;
+  const { page, userId, order, searchTerm, date } = props;
 
   if (page) params.page = page;
-  if (search) params.search = search;
-
-  if (!userId) {
-    throw new Error("User ID is required");
+  if (order) params.order = order;
+  if (searchTerm) params.searchTerm = searchTerm;
+  if (date && date.from && date.to) {
+    params.fromDate = date.from.toISOString();
+    params.toDate = date.to.toISOString();
   }
 
-  return http.get(`/questionbank/exam/${userId}`, {
+  return http.get(`/questionbank/getUserExamPaperDetails/${userId}`, {
     params,
   });
 };
 
 export const useGetPapers = (props: Props) => {
-  const { getUser } = useAuth();
-  const userData = getUser();
-
   return useQuery({
-    queryKey: ["GetPapers", props, userData?.id],
-    queryFn: () => getPapersFn({ ...props, userId: userData?.id }),
+    queryKey: ["GetPapers", props],
+    queryFn: () => getPapersFn(props),
     select: ({ data }) => data.data,
-    enabled: !!props?.page && !!userData?.id,
+    enabled: !!props?.page && !!props?.userId,
   });
 };

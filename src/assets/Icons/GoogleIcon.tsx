@@ -1,4 +1,4 @@
-export const GoogleIcon = ({
+const GoogleIcon = ({
   height = "24",
   width = "24",
 }: {
@@ -37,3 +37,5 @@ export const GoogleIcon = ({
     </defs>
   </svg>
 );
+
+export default GoogleIcon;

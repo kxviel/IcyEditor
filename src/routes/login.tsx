@@ -6,7 +6,7 @@ import { useState } from "react";
 import Logo from "@/assets/Logo.svg";
 import Grid_Bg from "@/assets/Grid_Bg.svg";
 import { Button } from "@/components/ui/button";
-import { GoogleIcon } from "@/assets/Icons/GoogleIcon";
+import GoogleIcon from "@/assets/Icons/GoogleIcon";
 import { useLoginWithGoogleFn } from "@/features/Auth/api/loginWithGoogle";
 
 export const Route = createFileRoute("/login")({
