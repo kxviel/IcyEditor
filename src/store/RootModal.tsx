@@ -2,12 +2,12 @@ import CompleteProfileModal from "@/features/Auth/CompleteProfileModal";
 import { ModalType, useModalStore } from "./useModalStore";
 
 type ModalComponent = {
-  [key in ModalType]: (props: any) => JSX.Element;
+  [key in ModalType]: (props: any) => JSX.Element | null;
 };
 
 const MODAL_COMPONENTS: ModalComponent = {
   COMPLETE_PROFILE: CompleteProfileModal,
-  "": () => <></>, // Handle empty modal type safely
+  "": () => null, // Handle empty modal type safely
 };
 
 const RootModal = () => {

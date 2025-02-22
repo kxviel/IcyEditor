@@ -16,11 +16,9 @@ export const Route = createFileRoute("/_auth")({
 
 function AuthComponent() {
   return (
-    <>
+    <main>
       <Navbar />
-      <main>
-        <Outlet />
-      </main>
-    </>
+      <Outlet />
+    </main>
   );
 }

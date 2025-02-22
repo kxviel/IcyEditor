@@ -21,8 +21,8 @@ const Navbar = () => {
   });
 
   return (
-    <header className="w-full border border-b border-gray-200">
-      <nav className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-8">
+    <header className="h-[72px] w-full border border-b border-gray-200">
+      <nav className="mx-auto flex h-full max-w-screen-xl items-center justify-between px-8">
         <div
           className="hover:cursor-pointer"
           onClick={() => navigate({ to: "/" })}

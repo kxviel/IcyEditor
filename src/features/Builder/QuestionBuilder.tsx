@@ -12,9 +12,9 @@ const QuestionBuilder = () => {
   const { data: bookList } = useGetBook(subjectId.toString());
 
   return (
-    <div className="w-full bg-[#F9F5FF]">
+    <div className="h-full w-full">
       {!isOpen && (
-        <div className="mx-auto flex h-[calc(100vh-72px)] max-w-7xl items-center justify-center">
+        <div className="flex h-full items-center justify-center">
           <QuestionList bookList={bookList} />
           <PaperView />
         </div>
