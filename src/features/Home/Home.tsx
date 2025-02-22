@@ -34,8 +34,6 @@ import SortDescIcon from "@/assets/Icons/SortDescIcon";
 import { DatePickerWithRange } from "@/components/DatePickerWithRange";
 import { DateRange } from "react-day-picker";
 
-const TOTAL_PAGES = 7;
-
 const examCards = Array(6).fill({
   lastEdited: "8th Jan 2025",
   title: "End Semester Examination",
@@ -53,8 +51,8 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(2025, 0, 20),
-    to: new Date(2026, 0, 20),
+    from: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+    to: new Date(), // today
   });
 
   const debouncedSearch = useDebounce(searchTerm, 300);
@@ -178,7 +176,7 @@ const Home = () => {
                 className={page === 1 ? "pointer-events-none opacity-50" : ""}
               />
             </PaginationItem>
-            {[...Array(TOTAL_PAGES)].map((_, index) => (
+            {[...Array(data.total)].map((_, index) => (
               <PaginationItem key={index}>
                 <PaginationLink
                   href="#"
@@ -189,7 +187,7 @@ const Home = () => {
                 </PaginationLink>
               </PaginationItem>
             ))}
-            {TOTAL_PAGES > 5 && (
+            {data.total > 5 && (
               <PaginationItem>
                 <PaginationEllipsis />
               </PaginationItem>
@@ -199,7 +197,7 @@ const Home = () => {
                 href="#"
                 onClick={() => handlePageChange(page + 1)}
                 className={
-                  page === TOTAL_PAGES ? "pointer-events-none opacity-50" : ""
+                  page === data.total ? "pointer-events-none opacity-50" : ""
                 }
               />
             </PaginationItem>
