@@ -16,8 +16,8 @@ export interface State {
   NAME: string;
 }
 
-const getStatesFn = (): Promise<AxiosResponse<Root>> => {
-  return http.get("/services/cities");
+export const getStatesFn = (): Promise<AxiosResponse<Root>> => {
+  return http.get("/services/states");
 };
 
 export const useGetStates = () => {

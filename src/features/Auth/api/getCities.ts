@@ -25,5 +25,6 @@ export const useGetCities = (stateId: string) => {
     queryKey: ["GetCities", stateId],
     queryFn: () => getCitiesFn(stateId),
     select: ({ data }) => data.data,
+    enabled: !!stateId,
   });
 };

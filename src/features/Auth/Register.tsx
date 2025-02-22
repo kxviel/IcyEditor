@@ -69,7 +69,6 @@ const Register = () => {
     resolver: zodResolver(registerSchema),
   });
 
-  // Book
   const { data: stateList } = useGetStates();
   const { data: cityList } = useGetCities(form.watch("state"));
 

@@ -1,9 +1,9 @@
-import { createLazyFileRoute } from '@tanstack/react-router'
-import Home from '@/features/Home/Home'
+import { createLazyFileRoute } from "@tanstack/react-router";
+import Home from "@/features/Home/Home";
 
-export const Route = createLazyFileRoute('/_auth/')({
+export const Route = createLazyFileRoute("/_auth/")({
   component: HomeComponent,
-})
+});
 
 function HomeComponent() {
   return (
@@ -12,5 +12,5 @@ function HomeComponent() {
         <Home />
       </div>
     </div>
-  )
+  );
 }

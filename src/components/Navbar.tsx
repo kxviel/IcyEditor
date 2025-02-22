@@ -1,11 +1,20 @@
 import { Button } from "./ui/button";
 import Logo from "@/assets/Logo.svg";
+import AvatarImg from "@/assets/avatarImg.svg";
 import { Bell, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import SavePaper from "@/features/Builder/SavePaper";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navbar = () => {
+  const { signOut } = useAuth();
   const navigate = useNavigate();
   const pathname = useLocation({
     select: (l) => l.pathname,
@@ -31,10 +40,20 @@ const Navbar = () => {
             <Button variant="ghost" className="px-3">
               <Bell />
             </Button>
-            <Avatar className="hover:cursor-pointer">
-              <AvatarImage src="https://github.com/kxviel.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className="h-9 w-9 hover:cursor-pointer">
+                  <AvatarImage src={AvatarImg} />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem onClick={signOut}>Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
       </nav>

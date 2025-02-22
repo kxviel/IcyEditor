@@ -31,8 +31,8 @@ export const useAuth = () => {
   };
 
   const signOut = () => {
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("user");
+    localStorage.clear();
+    window.location.href = "/login";
   };
 
   const isLogged = () => localStorage.getItem("isAuthenticated") === "true";

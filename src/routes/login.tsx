@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Login from "@/features/Auth/Login";
 import Register from "@/features/Auth/Register";
@@ -11,15 +11,15 @@ import { useLoginWithGoogleFn } from "@/features/Auth/api/loginWithGoogle";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
-  // beforeLoad: ({ context }) => {
-  //   const { isLogged } = context.auth;
+  beforeLoad: ({ context }) => {
+    const { isLogged } = context.auth;
 
-  //   if (isLogged()) {
-  //     throw redirect({
-  //       to: "/",
-  //     });
-  //   }
-  // },
+    if (isLogged()) {
+      throw redirect({
+        to: "/",
+      });
+    }
+  },
 });
 
 function RouteComponent() {
