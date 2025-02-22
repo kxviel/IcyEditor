@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PaperHeader from "@/features/Builder/PaperHeader";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { createLazyFileRoute } from "@tanstack/react-router";
@@ -30,6 +30,7 @@ function Preview() {
   const setFontSize = useFontSizeStore((state) => state.setFontSize);
 
   const [duplicateCapacity, setDuplicateCapacity] = useState(0);
+  const [activeTab, setActiveTab] = useState("1");
 
   const calcFn = () => {
     if (pageRef.current && lastElementRef.current) {
@@ -57,11 +58,50 @@ function Preview() {
   };
 
   return (
-    <div className="space-y-3 overflow-y-auto bg-slate-100 p-6">
-      <div className="flex items-center gap-2">
-        <Button onClick={calcFn}>Calculate</Button>
+    <div className="flex h-full flex-col items-center justify-center gap-6 py-6">
+      <Tabs
+        defaultValue="login"
+        value={activeTab}
+        onValueChange={(value) => {
+          setActiveTab(value);
+          calcFn();
+        }}
+        className="flex flex-col items-center justify-center"
+      >
+        <TabsList className="w-[632px]">
+          <TabsTrigger value="1" className="w-full">
+            Layout 1
+          </TabsTrigger>
+          <TabsTrigger value="2" className="w-full">
+            Layout 2
+          </TabsTrigger>
+          <TabsTrigger value="3" className="w-full">
+            Layout 3
+          </TabsTrigger>
+        </TabsList>
+
+        {/* <TabsContent value="register">
+            <Register />
+          </TabsContent>
+          <TabsContent value="login">
+            <Login />
+          </TabsContent> */}
+      </Tabs>
+
+      <div className="flex items-center justify-center gap-3">
+        <Select>
+          <SelectTrigger className="w-[180px] bg-white">
+            <SelectValue placeholder="Paper Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">A4</SelectItem>
+            <SelectItem value="2">A3</SelectItem>
+            <SelectItem value="3">A2</SelectItem>
+          </SelectContent>
+        </Select>
+
         <Select value={currentFontSize} onValueChange={calcFontSize}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] bg-white">
             <SelectValue placeholder="Font Size" />
           </SelectTrigger>
           <SelectContent>
@@ -77,11 +117,14 @@ function Preview() {
           </SelectContent>
         </Select>
       </div>
-      <A4Page
-        pageRef={pageRef}
-        lastElementRef={lastElementRef}
-        duplicateCapacity={duplicateCapacity}
-      />
+
+      <div className="custom_scrollbar w-fit overflow-y-auto">
+        <A4Page
+          pageRef={pageRef}
+          lastElementRef={lastElementRef}
+          duplicateCapacity={duplicateCapacity}
+        />
+      </div>
     </div>
   );
 }
@@ -100,7 +143,7 @@ const A4Page = ({
 
   return (
     <div
-      className="mx-auto h-[297mm] w-[210mm] border border-gray-300 bg-white p-4 shadow-md"
+      className="mx-auto h-[297mm] w-[210mm] border border-gray-300 bg-white p-6 shadow-md"
       ref={pageRef}
     >
       {Array(duplicateCapacity === 0 ? 1 : duplicateCapacity)
@@ -110,18 +153,72 @@ const A4Page = ({
             <PaperHeader />
 
             <div className="flex w-full flex-col gap-3">
-              {/* {fields.map((question, i) => (
+              {Object.values(fields).map((field, fieldIndex) => (
+                <div
+                  className="w-full"
+                  key={field.categoryId}
+                  ref={
+                    i === Object.values(fields).length - 1
+                      ? lastElementRef
+                      : null
+                  }
+                >
+                  <div className="my-3 flex gap-2">
+                    <p
+                      className="font-semibold text-gray-800"
+                      style={{ fontSize: 16 + Number(currentFontSize) }}
+                    >
+                      Q{fieldIndex + 1}.
+                    </p>
+                    <p
+                      className="font-semibold text-gray-800"
+                      style={{ fontSize: 16 + Number(currentFontSize) }}
+                    >
+                      {field.categoryName}
+                    </p>
+
+                    <p
+                      className="ml-auto"
+                      style={{ fontSize: 14 + Number(currentFontSize) }}
+                    >
+                      (1 x {field.questions.length}) = 5
+                    </p>
+                  </div>
+
+                  {field.questions.map((question, index) => (
+                    <div key={question.questionId} className="my-3 flex gap-2">
+                      <p
+                        className="font-semibold text-gray-800"
+                        style={{ fontSize: 14 + Number(currentFontSize) }}
+                      >
+                        {index + 1}.
+                      </p>
+                      <p
+                        className="text-gray-700"
+                        style={{ fontSize: 14 + Number(currentFontSize) }}
+                        dangerouslySetInnerHTML={{
+                          __html: question.questionText,
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* <div className="flex w-full flex-col gap-3">
+              {fields.map((question, i) => (
                 <div
                   className="h-10 w-full bg-slate-200"
                   key={question.id}
-                  ref={i === fields.length - 1 ? lastElementRef : null}
+                 
                 >
                   <p style={{ fontSize: 16 + Number(currentFontSize) }}>
                     {question.value}
                   </p>
                 </div>
-              ))} */}
-            </div>
+              ))}
+            </div> */}
           </Fragment>
         ))}
     </div>

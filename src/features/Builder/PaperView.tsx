@@ -20,8 +20,8 @@ const PaperView = () => {
           font size, etc., on the next page.
         </p>
 
-        <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white p-4 shadow-md">
-          <PaperHeader />
+        <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white p-6 shadow-md">
+          <PaperHeader isPreview={true} />
 
           <div className="flex w-full flex-col gap-3">
             {Object.values(fields).map((field, fieldIndex) => (

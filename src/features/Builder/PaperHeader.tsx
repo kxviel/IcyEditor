@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useFontSizeStore } from "@/store/useFontSizeStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
 
-const PaperHeader = () => {
+const PaperHeader = ({ isPreview }: { isPreview?: boolean }) => {
   const fields = useHeaderStore((state) => state.fields);
   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
   const setValue = useHeaderStore((state) => state.setValue);
