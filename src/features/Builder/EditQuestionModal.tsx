@@ -20,7 +20,7 @@ export function EditQuestionModal({ isOpen, content }: Props) {
   const hideModal = useModalStore((state) => state.hideModal);
   return (
     <Dialog open={isOpen} onOpenChange={hideModal}>
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-w-[678px]">
         <DialogHeader>
           <DialogTitle>Edit Question</DialogTitle>
           <DialogDescription>
