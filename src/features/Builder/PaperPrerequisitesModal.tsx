@@ -36,12 +36,21 @@ type Props = {
   isOpen: boolean;
   setSubjectId: React.Dispatch<React.SetStateAction<number>>;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setFieldNames: React.Dispatch<
+    React.SetStateAction<{
+      publicationName: string;
+      seriesName: string;
+      className: string;
+      subjectName: string;
+    }>
+  >;
 };
 
 const PaperPrerequisitesModal = ({
   isOpen,
   setIsOpen,
   setSubjectId,
+  setFieldNames,
 }: Props) => {
   const navigate = useNavigate();
   const form = useForm<FormTypes>({
@@ -69,8 +78,41 @@ const PaperPrerequisitesModal = ({
 
   function onSubmit(data: FormTypes) {
     if (data.publicationId && data.seriesId && data.classId && data.subjectId) {
-      setIsOpen(false);
-      setSubjectId(Number(data.subjectId));
+      const fieldNames = {
+        publicationName: "",
+        seriesName: "",
+        className: "",
+        subjectName: "",
+      };
+
+      try {
+        publicationList!.forEach((item) => {
+          if (item.id === Number(data.publicationId)) {
+            fieldNames.publicationName = item.NAME;
+          }
+        });
+        seriesList!.forEach((item) => {
+          if (item.id === Number(data.seriesId)) {
+            fieldNames.seriesName = item.NAME;
+          }
+        });
+        classList!.forEach((item) => {
+          if (item.id === Number(data.classId)) {
+            fieldNames.className = item.NAME;
+          }
+        });
+        subjectList!.forEach((item) => {
+          if (item.id === Number(data.subjectId)) {
+            fieldNames.subjectName = item.NAME;
+          }
+        });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setFieldNames(fieldNames);
+        setSubjectId(Number(data.subjectId));
+        setIsOpen(false);
+      }
     }
   }
 
@@ -210,7 +252,9 @@ const ControlledSelect = ({
         <FormItem>
           <FormLabel>{labels[label]}</FormLabel>
           <Select
-            onValueChange={field.onChange}
+            onValueChange={(value) => {
+              field.onChange(value);
+            }}
             defaultValue={field.value}
             disabled={isDisabled}
           >
