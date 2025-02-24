@@ -1,5 +1,6 @@
 import CompleteProfileModal from "@/features/Auth/CompleteProfileModal";
-import { ModalType, useModalStore } from "./useModalStore";
+import { ModalType, useModalStore } from "../store/useModalStore";
+import { EditQuestionModal } from "@/features/Builder/EditQuestionModal";
 
 type ModalComponent = {
   [key in ModalType]: (props: any) => JSX.Element | null;
@@ -7,6 +8,7 @@ type ModalComponent = {
 
 const MODAL_COMPONENTS: ModalComponent = {
   COMPLETE_PROFILE: CompleteProfileModal,
+  EDIT_QUESTION: EditQuestionModal,
   "": () => null, // Handle empty modal type safely
 };
 

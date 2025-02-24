@@ -2,15 +2,22 @@ import { Button } from "@/components/ui/button";
 import PaperHeader from "./PaperHeader";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useModalStore } from "@/store/useModalStore";
+import { isObjectEmpty } from "@/lib/utils";
+import { toast } from "sonner";
 
 const PaperView = () => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const navigate = useNavigate();
+  const setModal = useModalStore((state) => state.setModal);
 
-  useEffect(() => {
-    console.log(fields);
-  }, [fields]);
+  const handleNext = () => {
+    if (!isObjectEmpty(fields)) {
+      navigate({ to: "/preview" });
+    } else {
+      toast.warning("Please add at least one question");
+    }
+  };
 
   return (
     <div className="relative h-full w-1/2">
@@ -40,7 +47,16 @@ const PaperView = () => {
                 </div>
 
                 {field.questions.map((question, index) => (
-                  <div key={question.questionId} className="my-3 flex gap-2">
+                  <div
+                    key={question.questionId}
+                    className="my-3 flex gap-2 py-1 hover:cursor-pointer hover:bg-gray-50"
+                    onClick={() => {
+                      setModal("EDIT_QUESTION", {
+                        isOpen: true,
+                        content: question.questionText,
+                      });
+                    }}
+                  >
                     <p className="text-sm font-semibold text-gray-800">
                       {index + 1}.
                     </p>
@@ -67,7 +83,7 @@ const PaperView = () => {
           Back
         </Button>
 
-        <Button className="w-full" onClick={() => navigate({ to: "/preview" })}>
+        <Button className="w-full" onClick={handleNext}>
           Next
         </Button>
       </div>

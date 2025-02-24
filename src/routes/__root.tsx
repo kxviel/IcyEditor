@@ -2,7 +2,7 @@ import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 
 import { AuthContext } from "@/hooks/useAuth";
-import RootModal from "@/store/RootModal";
+import RootModal from "@/components/RootModal";
 
 interface MyRouterContext {
   auth: AuthContext;

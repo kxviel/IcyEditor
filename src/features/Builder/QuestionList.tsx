@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { useGetQuestionList } from "./api/getQuestionTitles";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 type Props = {
   bookList: Book[] | undefined;
@@ -113,37 +114,43 @@ const QuestionList = ({ bookList }: Props) => {
         {questionList?.categories?.map(
           ({ categoryId, categoryName, questions }) => (
             <div key={categoryId} className="">
-              <p className="my-3 px-8 font-semibold">{categoryName}</p>
+              <div className="my-3 flex items-center gap-4 px-8">
+                <p className="font-semibold">{categoryName}</p>
+                <Badge
+                  variant="outline"
+                  className="whitespace-nowrap border border-[#E9D7FE] text-[#6941C6]"
+                >
+                  {questions.length} Questions
+                </Badge>
+              </div>
 
-              {questions
-                .filter((q) => q.CATEGORY_ID === categoryId)
-                .map((question) => (
-                  <div
-                    key={question.id}
-                    className="flex items-center gap-4 border-b border-gray-100 bg-white p-4 hover:cursor-pointer hover:bg-white/50"
-                    onClick={() =>
-                      addQuestion(categoryId, categoryName, {
-                        questionId: question.id,
-                        questionText: question.QUESTION_DATA,
-                      })
+              {questions.map((question) => (
+                <div
+                  key={question.id}
+                  className="flex items-center gap-4 border-b border-gray-100 bg-white p-4 hover:cursor-pointer hover:bg-white/50"
+                  onClick={() =>
+                    addQuestion(categoryId, categoryName, {
+                      questionId: question.id,
+                      questionText: question.QUESTION_DATA,
+                    })
+                  }
+                >
+                  <Checkbox
+                    className="border-slate-400"
+                    checked={
+                      fields[categoryId]?.questions?.some(
+                        (q) => q.questionId === question.id,
+                      ) || false
                     }
-                  >
-                    <Checkbox
-                      className="border-slate-400"
-                      checked={
-                        fields[categoryId]?.questions?.some(
-                          (q) => q.questionId === question.id,
-                        ) || false
-                      }
-                    />
-                    <p
-                      className="text-sm"
-                      dangerouslySetInnerHTML={{
-                        __html: question.QUESTION_DATA,
-                      }}
-                    />
-                  </div>
-                ))}
+                  />
+                  <p
+                    className="text-sm"
+                    dangerouslySetInnerHTML={{
+                      __html: question.QUESTION_DATA,
+                    }}
+                  />
+                </div>
+              ))}
             </div>
           ),
         )}
