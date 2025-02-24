@@ -1,4 +1,4 @@
-export const CodeBlockIcon = () => {
+export const UndoIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -12,7 +12,7 @@ export const CodeBlockIcon = () => {
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        d="M14.25 9.75 16.5 12l-2.25 2.25m-4.5 0L7.5 12l2.25-2.25M6 20.25h12A2.25 2.25 0 0 0 20.25 18V6A2.25 2.25 0 0 0 18 3.75H6A2.25 2.25 0 0 0 3.75 6v12A2.25 2.25 0 0 0 6 20.25Z"
+        d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
       />
     </svg>
   );

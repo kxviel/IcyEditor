@@ -48,6 +48,7 @@ const Login = () => {
             control={form.control}
             name="email"
             defaultValue=""
+            disabled={loginFn.isPending}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
@@ -66,6 +67,7 @@ const Login = () => {
             control={form.control}
             name="password"
             defaultValue=""
+            disabled={loginFn.isPending}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
@@ -104,8 +106,8 @@ const Login = () => {
             </Link>
           </div> */}
 
-          <Button className="w-96" type="submit">
-            Login
+          <Button className="w-96" type="submit" disabled={loginFn.isPending}>
+            {loginFn.isPending ? "Logging in..." : "Login"}
           </Button>
         </form>
       </Form>

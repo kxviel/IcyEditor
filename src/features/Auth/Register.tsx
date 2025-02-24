@@ -97,6 +97,7 @@ const Register = () => {
                 control={form.control}
                 name="name"
                 defaultValue=""
+                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>FullName</FormLabel>
@@ -115,6 +116,7 @@ const Register = () => {
                 control={form.control}
                 name="phone"
                 defaultValue=""
+                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone No.</FormLabel>
@@ -134,6 +136,7 @@ const Register = () => {
                 control={form.control}
                 name="state"
                 defaultValue=""
+                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>State</FormLabel>
@@ -162,6 +165,7 @@ const Register = () => {
                 control={form.control}
                 name="password"
                 defaultValue=""
+                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
@@ -185,6 +189,7 @@ const Register = () => {
                 control={form.control}
                 name="email"
                 defaultValue=""
+                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
@@ -203,6 +208,7 @@ const Register = () => {
                 control={form.control}
                 name="school"
                 defaultValue=""
+                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>School Name</FormLabel>
@@ -221,6 +227,7 @@ const Register = () => {
                 control={form.control}
                 name="city"
                 defaultValue=""
+                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>City</FormLabel>
@@ -249,6 +256,7 @@ const Register = () => {
                 control={form.control}
                 name="confirmPassword"
                 defaultValue=""
+                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
@@ -266,8 +274,12 @@ const Register = () => {
             </div>
           </div>
 
-          <Button className="w-96" type="submit">
-            Get Started
+          <Button
+            className="w-96"
+            type="submit"
+            disabled={registerFn.isPending}
+          >
+            {registerFn.isPending ? "Registering..." : "Get Started"}
           </Button>
         </form>
       </Form>

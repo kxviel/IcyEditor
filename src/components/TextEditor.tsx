@@ -7,7 +7,6 @@ import TextStyle, { TextStyleOptions } from "@tiptap/extension-text-style";
 import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import {
-  BoldIcon,
   CodeIcon,
   Heading1Icon,
   Heading2Icon,
@@ -15,11 +14,14 @@ import {
   Heading4Icon,
   Heading5Icon,
   Heading6Icon,
-  ItalicIcon,
-  ListIcon,
-  PilcrowIcon,
+  RedoIcon,
 } from "lucide-react";
 import { NumberedListIcon } from "@/assets/Icons/NumberedListIcon";
+import { ListIcon } from "@/assets/Icons/ListIcon";
+import { ParagraphIcon } from "@/assets/Icons/ParagraphIcon";
+import { ItalicIcon } from "@/assets/Icons/ItalicIcon";
+import { BoldIcon } from "@/assets/Icons/BoldIcon";
+import { UndoIcon } from "@/assets/Icons/UndoIcon";
 
 const MenuBar = () => {
   const { editor } = useCurrentEditor();
@@ -35,14 +37,14 @@ const MenuBar = () => {
         disabled={!editor.can().chain().focus().toggleBold().run()}
         className={editor.isActive("bold") ? "is-active" : ""}
       >
-        <BoldIcon className="h-4 w-4" />
+        <BoldIcon />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
         className={editor.isActive("italic") ? "is-active" : ""}
       >
-        <ItalicIcon className="h-4 w-4" />
+        <ItalicIcon />
       </button>
       {/* <button
         onClick={() => editor.chain().focus().toggleStrike().run()}
@@ -58,17 +60,17 @@ const MenuBar = () => {
       >
         <CodeIcon className="h-4 w-4" />
       </button>
-      <button onClick={() => editor.chain().focus().unsetAllMarks().run()}>
+      {/* <button onClick={() => editor.chain().focus().unsetAllMarks().run()}>
         Clear marks
       </button>
       <button onClick={() => editor.chain().focus().clearNodes().run()}>
         Clear nodes
-      </button>
+      </button> */}
       <button
         onClick={() => editor.chain().focus().setParagraph().run()}
         className={editor.isActive("paragraph") ? "is-active" : ""}
       >
-        <PilcrowIcon className="h-4 w-4" />
+        <ParagraphIcon />
       </button>
       <button
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -124,38 +126,38 @@ const MenuBar = () => {
       >
         <CodeBlockIcon />
       </button>
-      <button
+      {/* <button
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         className={editor.isActive("blockquote") ? "is-active" : ""}
       >
         Blockquote
-      </button>
-      <button onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+      </button> */}
+      {/* <button onClick={() => editor.chain().focus().setHorizontalRule().run()}>
         Horizontal rule
       </button>
       <button onClick={() => editor.chain().focus().setHardBreak().run()}>
         Hard break
-      </button>
+      </button> */}
       <button
         onClick={() => editor.chain().focus().undo().run()}
         disabled={!editor.can().chain().focus().undo().run()}
       >
-        Undo
+        <UndoIcon />
       </button>
       <button
         onClick={() => editor.chain().focus().redo().run()}
         disabled={!editor.can().chain().focus().redo().run()}
       >
-        Redo
+        <RedoIcon />
       </button>
-      <button
+      {/* <button
         onClick={() => editor.chain().focus().setColor("#958DF1").run()}
         className={
           editor.isActive("textStyle", { color: "#958DF1" }) ? "is-active" : ""
         }
       >
         Purple
-      </button>
+      </button> */}
     </div>
   );
 };
