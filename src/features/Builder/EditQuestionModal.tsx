@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { useModalStore } from "@/store/useModalStore";
 import TextEditor from "@/components/TextEditor";
-import { useSaveNewQuestion } from "./api/SaveNewQuestion";
+import { useSaveNewQuestion } from "./api/saveNewQuestion";
 
 type Props = {
   isOpen: boolean;
