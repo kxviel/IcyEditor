@@ -15,7 +15,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 function RootComponent() {
   return (
     <>
-      <Toaster position="top-right" richColors theme="light" />
+      <Toaster position="top-right" richColors theme="light" closeButton />
       <RootModal />
       <main>
         <Outlet />

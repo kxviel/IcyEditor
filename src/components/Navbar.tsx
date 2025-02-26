@@ -1,18 +1,20 @@
-import { Button } from "./ui/button";
-import Logo from "@/assets/Logo.svg";
-import AvatarImg from "@/assets/avatarImg.svg";
-import { Bell, Settings } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import Logo from "@/assets/Logo.svg";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import SavePaper from "@/features/Builder/SavePaper";
 import { useAuth } from "@/hooks/useAuth";
 import Stepper from "./ui/stepper";
+import { LogoutIcon } from "@/assets/Icons/LogoutIcon";
 
 const Navbar = () => {
   const { signOut } = useAuth();
@@ -30,26 +32,28 @@ const Navbar = () => {
         </div>
         {!["/builder", "/preview"].includes(pathname) && (
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" className="px-3">
-              <Settings />
-            </Button>
-            <Button variant="ghost" className="px-3">
-              <Bell />
+            <Button variant="outline" className="px-3">
+              View Users
             </Button>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Avatar className="h-9 w-9 hover:cursor-pointer">
-                  <AvatarImage src={AvatarImg} />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem onClick={signOut}>Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="ghost" className="px-3">
+                  <LogoutIcon />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Do you want to logout?</AlertDialogTitle>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={signOut}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         )}
 
