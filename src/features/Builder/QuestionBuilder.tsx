@@ -46,10 +46,6 @@ type Props = {
 };
 
 const QuestionBuilder = ({ examId }: Props) => {
-  // const setChapterId = useQuestionBuilderStore((state) => state.setChapterId);
-  // const chapterId = useQuestionBuilderStore((state) => state.chapterId);
-
-  // const [bookId, setBookId] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(
     ["manual", "auto"].includes(examId),
   );
@@ -70,34 +66,12 @@ const QuestionBuilder = ({ examId }: Props) => {
     resolver: zodResolver(prequisitesFormSchema),
   });
 
-  // Publication
   const publication = useGetPublication();
-
-  // Series
   const series = useGetSeries(form.watch("publicationId"));
-
-  // Class
   const classes = useGetClass(form.watch("seriesId"));
-
-  // Subject
   const subjects = useGetSubject(form.watch("classId"));
-
-  // Book
   const books = useGetBook(form.watch("subjectId"));
-
-  // Chapters
   const chapters = useGetChapter(form.watch("bookId"));
-
-  // useEffect(() => {
-  //   if (books.data && books.data.length > 0)
-  //     setBookId(books.data[0].id.toString());
-  // }, [books.data]);
-
-  // useEffect(() => {
-  //   if (chapters.data && chapters.data.length > 0) {
-  //     setChapterId(chapters.data[0].id);
-  //   }
-  // }, [chapters.data, setChapterId]);
 
   const onPrequisitesSubmit = (data: PrerequisitesForm) => {
     console.log(data);

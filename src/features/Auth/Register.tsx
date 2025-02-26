@@ -23,6 +23,8 @@ import {
 import { useGetStates } from "./api/getStates";
 import { useGetCities } from "./api/getCities";
 import { useModalStore } from "@/store/useModalStore";
+import { useGetPublication } from "@/features/Builder/api/getPublication";
+import { useGetSeries } from "@/features/Builder/api/getSeries";
 
 const registerSchema = z
   .object({
@@ -54,6 +56,8 @@ const registerSchema = z
     city: z.string().trim().min(1, { message: "City is required" }),
     state: z.string().trim().min(1, { message: "State is required" }),
     school: z.string().trim().min(1, { message: "School is required" }),
+    publicationId: z.string().min(1, { message: "Publication is required" }),
+    seriesId: z.string().min(1, { message: "Series is required" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -71,6 +75,8 @@ const Register = () => {
 
   const { data: stateList } = useGetStates();
   const { data: cityList } = useGetCities(form.watch("state"));
+  const publication = useGetPublication();
+  const series = useGetSeries(form.watch("publicationId"));
 
   const onSubmit = (data: RegisterSchemaTypes) => {
     console.log(data);
@@ -183,6 +189,35 @@ const Register = () => {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="publicationId"
+                defaultValue=""
+                disabled={registerFn.isPending}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Publication</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a Publication" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {publication.data?.map((p) => (
+                          <SelectItem value={p.id?.toString()}>
+                            {p.NAME}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             <div className="w-96 space-y-4">
               <FormField
@@ -267,6 +302,35 @@ const Register = () => {
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="seriesId"
+                defaultValue=""
+                disabled={registerFn.isPending}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Series</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a Series" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {series.data?.map((s) => (
+                          <SelectItem value={s.id?.toString()}>
+                            {s.NAME}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
