@@ -79,13 +79,6 @@ function Preview() {
             Layout 3
           </TabsTrigger>
         </TabsList>
-
-        {/* <TabsContent value="register">
-            <Register />
-          </TabsContent>
-          <TabsContent value="login">
-            <Login />
-          </TabsContent> */}
       </Tabs>
 
       <div className="flex items-center justify-center gap-3">

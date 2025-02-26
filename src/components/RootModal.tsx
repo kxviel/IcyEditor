@@ -9,7 +9,7 @@ type ModalComponent = {
 const MODAL_COMPONENTS: ModalComponent = {
   COMPLETE_PROFILE: CompleteProfileModal,
   EDIT_QUESTION: EditQuestionModal,
-  "": () => null, // Handle empty modal type safely
+  "": () => null,
 };
 
 const RootModal = () => {
