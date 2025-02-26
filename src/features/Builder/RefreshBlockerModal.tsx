@@ -20,7 +20,7 @@ const RefreshBlockerModal = ({ isBlockerOpen, reset, proceed }: Props) => {
     <AlertDialog open={isBlockerOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Reload Page?</AlertDialogTitle>
+          <AlertDialogTitle>Leave Page?</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to continue? All progress will be lost.
           </AlertDialogDescription>

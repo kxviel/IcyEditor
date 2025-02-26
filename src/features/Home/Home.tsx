@@ -119,7 +119,13 @@ const Home = () => {
       ) : (
         <div className="grid gap-6 px-8 md:grid-cols-2 lg:grid-cols-3">
           {examCards.map((card, i) => (
-            <Card key={i} className="group p-5">
+            <Card
+              key={i}
+              className="group p-5"
+              onClick={() =>
+                navigate({ to: "/builder/$examId", params: { examId: "123" } })
+              }
+            >
               <div className="mb-4 flex items-start justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">

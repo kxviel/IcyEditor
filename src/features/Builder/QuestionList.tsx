@@ -3,9 +3,12 @@ import { useGetQuestionList } from "./api/getQuestionTitles";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 
-const QuestionList = () => {
+type Props = {
+  chapterId: string;
+};
+
+const QuestionList = ({ chapterId }: Props) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
-  const chapterId = useQuestionBuilderStore((state) => state.chapterId);
   const addQuestion = useQuestionBuilderStore((state) => state.addQuestion);
 
   //Questions

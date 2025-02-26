@@ -14,113 +14,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { useGetSubject } from "./api/getSubject";
-import { useGetClass } from "./api/getClass";
-import { useGetSeries } from "./api/getSeries";
-import { useGetPublication } from "./api/getPublication";
-
-const formSchema = z.object({
-  publicationId: z.string(),
-  seriesId: z.string(),
-  classId: z.string(),
-  subjectId: z.string(),
-});
-
-type FormTypes = z.infer<typeof formSchema>;
+import { Subject } from "./api/getSubject";
+import { Class } from "./api/getClass";
+import { Series } from "./api/getSeries";
+import { Publication } from "./api/getPublication";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { UseQueryResult } from "@tanstack/react-query";
+import { PrerequisitesForm } from "./QuestionBuilder";
+import { Book } from "./api/getBook";
+import { Chapter } from "./api/getChapter";
 
 type Props = {
-  isOpen: boolean;
-  setSubjectId: React.Dispatch<React.SetStateAction<number>>;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setFieldNames: React.Dispatch<
-    React.SetStateAction<{
-      publicationName: string;
-      seriesName: string;
-      className: string;
-      subjectName: string;
-    }>
-  >;
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  publication: UseQueryResult<Publication[], Error>;
+  series: UseQueryResult<Series[], Error>;
+  classes: UseQueryResult<Class[], Error>;
+  subjects: UseQueryResult<Subject[], Error>;
+  books: UseQueryResult<Book[], Error>;
+  chapters: UseQueryResult<Chapter[], Error>;
+  form: UseFormReturn<PrerequisitesForm, any, undefined>;
+  onPrequisitesSubmit: (data: PrerequisitesForm) => void;
 };
 
 const PaperPrerequisitesModal = ({
-  isOpen,
-  setIsOpen,
-  setSubjectId,
-  setFieldNames,
+  isModalOpen,
+  setIsModalOpen,
+  publication,
+  series,
+  classes,
+  subjects,
+  books,
+  chapters,
+  form,
+  onPrequisitesSubmit,
 }: Props) => {
   const navigate = useNavigate();
-  const form = useForm<FormTypes>({
-    resolver: zodResolver(formSchema),
-  });
-
-  // Publication
-  const { data: publicationList, isPending: isPublicationPending } =
-    useGetPublication();
-
-  // Series
-  const { data: seriesList, isPending: isSeriesPending } = useGetSeries(
-    form.watch("publicationId"),
-  );
-
-  // Class
-  const { data: classList, isPending: isClassPending } = useGetClass(
-    form.watch("seriesId"),
-  );
-
-  // Subject
-  const { data: subjectList, isPending: isSubjectPending } = useGetSubject(
-    form.watch("classId"),
-  );
-
-  function onSubmit(data: FormTypes) {
-    if (data.publicationId && data.seriesId && data.classId && data.subjectId) {
-      const fieldNames = {
-        publicationName: "",
-        seriesName: "",
-        className: "",
-        subjectName: "",
-      };
-
-      try {
-        publicationList!.forEach((item) => {
-          if (item.id === Number(data.publicationId)) {
-            fieldNames.publicationName = item.NAME;
-          }
-        });
-        seriesList!.forEach((item) => {
-          if (item.id === Number(data.seriesId)) {
-            fieldNames.seriesName = item.NAME;
-          }
-        });
-        classList!.forEach((item) => {
-          if (item.id === Number(data.classId)) {
-            fieldNames.className = item.NAME;
-          }
-        });
-        subjectList!.forEach((item) => {
-          if (item.id === Number(data.subjectId)) {
-            fieldNames.subjectName = item.NAME;
-          }
-        });
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setFieldNames(fieldNames);
-        setSubjectId(Number(data.subjectId));
-        setIsOpen(false);
-      }
-    }
-  }
 
   return (
     <Dialog
-      open={isOpen}
+      open={isModalOpen}
       onOpenChange={(value) => {
-        setIsOpen(value);
+        setIsModalOpen(value);
       }}
     >
       <DialogContent
@@ -129,8 +66,11 @@ const PaperPrerequisitesModal = ({
         onPointerDownOutside={(e) => e.preventDefault()}
         showClose={false}
       >
-        {isPublicationPending ? (
+        {publication.isPending ? (
           <div className="flex items-center justify-center">
+            <VisuallyHidden>
+              <DialogTitle>Select Subject and Proceed</DialogTitle>
+            </VisuallyHidden>
             <p>Loading...</p>
           </div>
         ) : (
@@ -139,60 +79,86 @@ const PaperPrerequisitesModal = ({
 
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(onPrequisitesSubmit)}
                 className="grid w-full grid-cols-2 gap-4"
               >
                 <ControlledSelect
                   form={form}
                   label="publicationId"
                   options={
-                    publicationList
-                      ? publicationList.map((option) => ({
+                    publication.data
+                      ? publication.data.map((option) => ({
                           value: option.id?.toString(),
                           label: option.NAME,
                         }))
                       : []
                   }
-                  isDisabled={isPublicationPending}
+                  isDisabled={publication.isPending}
                 />
                 <ControlledSelect
                   form={form}
                   label="seriesId"
                   options={
-                    seriesList
-                      ? seriesList.map(({ id, NAME }) => ({
+                    series.data
+                      ? series.data.map(({ id, NAME }) => ({
                           value: id.toString(),
                           label: NAME,
                         }))
                       : []
                   }
-                  isDisabled={isSeriesPending || !form.watch("publicationId")}
+                  isDisabled={series.isPending || !form.watch("publicationId")}
                 />
                 <ControlledSelect
                   form={form}
                   label="classId"
                   options={
-                    classList
-                      ? classList.map(({ id, NAME }) => ({
+                    classes.data
+                      ? classes.data.map(({ id, NAME }) => ({
                           value: id.toString(),
                           label: NAME,
                         }))
                       : []
                   }
-                  isDisabled={isClassPending || !form.watch("seriesId")}
+                  isDisabled={classes.isPending || !form.watch("seriesId")}
                 />
                 <ControlledSelect
                   form={form}
                   label="subjectId"
                   options={
-                    subjectList
-                      ? subjectList.map(({ id, NAME }) => ({
+                    subjects.data
+                      ? subjects.data.map(({ id, NAME }) => ({
                           value: id.toString(),
                           label: NAME,
                         }))
                       : []
                   }
-                  isDisabled={isSubjectPending || !form.watch("classId")}
+                  isDisabled={subjects.isPending || !form.watch("classId")}
+                />
+                <ControlledSelect
+                  form={form}
+                  label="bookId"
+                  options={
+                    books.data
+                      ? books.data.map(({ id, NAME }) => ({
+                          value: id.toString(),
+                          label: NAME,
+                        }))
+                      : []
+                  }
+                  isDisabled={books.isPending || !form.watch("classId")}
+                />
+                <ControlledSelect
+                  form={form}
+                  label="chapterId"
+                  options={
+                    chapters.data
+                      ? chapters.data.map(({ id, NAME }) => ({
+                          value: id.toString(),
+                          label: NAME,
+                        }))
+                      : []
+                  }
+                  isDisabled={chapters.isPending || !form.watch("classId")}
                 />
 
                 <Button
@@ -200,7 +166,7 @@ const PaperPrerequisitesModal = ({
                   className="w-full"
                   onClick={() => {
                     navigate({ to: "/exam-type" }).finally(() => {
-                      setIsOpen(false);
+                      setIsModalOpen(false);
                     });
                   }}
                 >
@@ -229,11 +195,19 @@ const labels = {
   seriesId: "Series",
   classId: "Class",
   subjectId: "Subject",
+  bookId: "Book",
+  chapterId: "Chapter",
 };
 
 type ControlledSelectProps = {
-  form: UseFormReturn<FormTypes, any, undefined>;
-  label: "publicationId" | "seriesId" | "classId" | "subjectId";
+  form: UseFormReturn<PrerequisitesForm, any, undefined>;
+  label:
+    | "publicationId"
+    | "seriesId"
+    | "classId"
+    | "subjectId"
+    | "bookId"
+    | "chapterId";
   isDisabled: boolean;
   options: { value: string; label: string }[];
 };
@@ -252,9 +226,7 @@ const ControlledSelect = ({
         <FormItem>
           <FormLabel>{labels[label]}</FormLabel>
           <Select
-            onValueChange={(value) => {
-              field.onChange(value);
-            }}
+            onValueChange={field.onChange}
             defaultValue={field.value}
             disabled={isDisabled}
           >
