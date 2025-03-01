@@ -1,158 +1,53 @@
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useFontSizeStore } from "@/store/useFontSizeStore";
-import { useHeaderStore } from "@/store/useHeaderStore";
+import EditableField from "./EditableField";
 
-const PaperHeaderOne = ({ isPreview }: { isPreview?: boolean }) => {
-  const fields = useHeaderStore((state) => state.fields);
-  const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
-  const setValue = useHeaderStore((state) => state.setValue);
-  const setIsEditing = useHeaderStore((state) => state.setIsEditing);
+const PaperHeaderTwo = ({ isPreview = false }: { isPreview?: boolean }) => {
   return (
-    <div className="flex w-full flex-col items-center">
-      {!fields.institutionName.isEditing ? (
-        <p
-          className="font-semibold"
-          // className="text-xl font-semibold"
-          style={{ fontSize: 20 + Number(currentFontSize) }}
-          onClick={() => setIsEditing("institutionName", true)}
-        >
-          {fields.institutionName.value}
-        </p>
-      ) : (
-        <Input
-          className="w-full text-xl font-semibold"
-          placeholder="Enter Institution Name"
-          value={fields.institutionName.value}
-          onBlur={() => setIsEditing("institutionName", false)}
-          onChange={(e) => setValue("institutionName", e.target.value)}
+    <div className="mb-3 flex w-full flex-col items-center gap-4 border-[3px] border-black p-4">
+      <EditableField
+        headerId="institutionName"
+        fontSize={30}
+        fontWeight={700}
+        isPreview={isPreview}
+      />
+      <EditableField
+        headerId="examName"
+        fontSize={16}
+        fontWeight={500}
+        isPreview={isPreview}
+      />
+
+      <div className="relative flex w-full items-center justify-between">
+        <EditableField
+          headerId="duration"
+          prefix="Duration: "
+          fontSize={14}
+          fontWeight={400}
+          isPreview={isPreview}
         />
-      )}
-
-      {!fields.examName.isEditing ? (
-        <p
-          className="mt-1 font-medium"
-          style={{ fontSize: 16 + Number(currentFontSize) }}
-          onClick={() => setIsEditing("examName", true)}
-        >
-          {fields.examName.value}
-        </p>
-      ) : (
-        <Input
-          className="mt-1 w-full font-medium"
-          placeholder="Enter Exam/Session Name"
-          value={fields.examName.value}
-          onBlur={() => setIsEditing("examName", false)}
-          onChange={(e) => setValue("examName", e.target.value)}
+        <EditableField
+          headerId="subjectName"
+          fontSize={16}
+          fontWeight={500}
+          inputClassName="w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          textClassName="w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          isPreview={isPreview}
         />
-      )}
-
-      <div className="mt-3 flex w-full items-center justify-between">
-        {!fields.subjectName.isEditing ? (
-          <p
-            // className="text-[13px]"
-            style={{ fontSize: 13 + Number(currentFontSize) }}
-            onClick={() => setIsEditing("subjectName", true)}
-          >
-            Course Name: {fields.subjectName.value}
-          </p>
-        ) : (
-          <Input
-            className="w-[200px] text-[13px]"
-            placeholder="Enter Class Name"
-            value={fields.subjectName.value}
-            onBlur={() => setIsEditing("subjectName", false)}
-            onChange={(e) => setValue("subjectName", e.target.value)}
-          />
-        )}
-
-        {!fields.duration.isEditing ? (
-          <p
-            // className="text-[13px]"
-            style={{ fontSize: 13 + Number(currentFontSize) }}
-            onClick={() => setIsEditing("duration", true)}
-          >
-            Duration: {fields.duration.value}
-          </p>
-        ) : (
-          <Input
-            className="w-[200px] text-[13px]"
-            placeholder="Enter Duration"
-            value={fields.duration.value}
-            onBlur={() => setIsEditing("duration", false)}
-            onChange={(e) => setValue("duration", e.target.value)}
-          />
-        )}
+        <EditableField
+          headerId="totalMarks"
+          prefix="Marks: "
+          fontSize={14}
+          fontWeight={400}
+          isPreview={isPreview}
+        />
       </div>
 
-      <div className="mt-1 flex w-full items-center justify-between">
-        {!fields.date.isEditing ? (
-          <p
-            // className="text-[13px]"
-            style={{ fontSize: 13 + Number(currentFontSize) }}
-            onClick={() => setIsEditing("date", true)}
-          >
-            Duration: {fields.date.value}
-          </p>
-        ) : (
-          <Input
-            className="w-[200px] text-[13px]"
-            placeholder="Enter Date"
-            value={fields.duration.value}
-            onBlur={() => setIsEditing("date", false)}
-            onChange={(e) => setValue("date", e.target.value)}
-          />
-        )}
-        {!fields.totalMarks.isEditing ? (
-          <p
-            // className="text-[13px]"
-            style={{ fontSize: 13 + Number(currentFontSize) }}
-            onClick={() => setIsEditing("totalMarks", true)}
-          >
-            Duration: {fields.totalMarks.value}
-          </p>
-        ) : (
-          <Input
-            className="w-[200px] text-[13px]"
-            placeholder="Enter Total Marks"
-            value={fields.duration.value}
-            onBlur={() => setIsEditing("totalMarks", false)}
-            onChange={(e) => setValue("totalMarks", e.target.value)}
-          />
-        )}
+      <div className="flex w-full items-center justify-between border-t-[3px] border-black px-2 pb-0 pt-3">
+        <p>Name: ____________________</p>
+        <p>Class: ____________________</p>
+        <p>Roll No.: ____________________</p>
       </div>
-
-      <div className="w-full">
-        <p
-          className="mt-4 font-semibold"
-          style={{ fontSize: 16 + Number(currentFontSize) }}
-        >
-          Instructions:{" "}
-        </p>
-        {!fields.instructions.isEditing ? (
-          <div
-            className="whitespace-pre-wrap"
-            // className="whitespace-pre-wrap text-xs"
-            style={{ fontSize: 12 + Number(currentFontSize) }}
-            onClick={() => setIsEditing("instructions", true)}
-          >
-            {fields.instructions.value}
-          </div>
-        ) : (
-          <Textarea
-            className="w-full rounded border bg-white p-2 text-xs text-black"
-            placeholder="Enter Instructions"
-            value={fields.instructions.value}
-            onBlur={() => setIsEditing("instructions", false)}
-            onChange={(e) => setValue("instructions", e.target.value)}
-            rows={4}
-          />
-        )}
-      </div>
-
-      <div className="mb-3 mt-6 h-[1px] w-full bg-black" />
     </div>
   );
 };
 
-export default PaperHeaderOne;
+export default PaperHeaderTwo;
