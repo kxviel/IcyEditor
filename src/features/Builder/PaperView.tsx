@@ -6,6 +6,7 @@ import { isObjectEmpty } from "@/lib/utils";
 import { toast } from "sonner";
 
 import PaperHeaderTwo from "./PaperHeaders/PaperHeaderTwo";
+import PaperHeaderThree from "./PaperHeaders/PaperHeaderThree";
 
 const PaperView = () => {
   const fields = useQuestionBuilderStore((state) => state.fields);
@@ -29,7 +30,8 @@ const PaperView = () => {
         </p>
 
         <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white p-3 shadow-md">
-          <PaperHeaderTwo isPreview={false} />
+          <PaperHeaderThree isPreview={false} />
+          {/* <PaperHeaderTwo isPreview={false} /> */}
           {/* <PaperHeaderOne isPreview={false} /> */}
 
           <div className="flex w-full flex-col gap-3">
