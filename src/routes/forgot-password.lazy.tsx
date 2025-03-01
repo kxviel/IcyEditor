@@ -1,55 +1,6 @@
-import { createLazyFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
-import Logo from "@/assets/Logo.svg";
-import Grid_Bg from "@/assets/Grid_Bg.svg";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { createLazyFileRoute } from "@tanstack/react-router";
+import ForgotPassword from "@/features/Auth/ForgotPassword";
 
 export const Route = createLazyFileRoute("/forgot-password")({
-  component: RouteComponent,
+  component: ForgotPassword,
 });
-
-function RouteComponent() {
-  const [email, setEmail] = useState<string>("");
-
-  return (
-    <div className="flex h-screen w-full items-center justify-center">
-      <div className="flex h-full w-[376px] flex-col items-center gap-6 px-2 pt-40">
-        <div className="relative z-10">
-          <img src={Logo} alt="logo" />
-          <img
-            src={Grid_Bg}
-            alt="grid_bg"
-            className="absolute bottom-[-60px] z-[-10]"
-          />
-        </div>
-
-        <p className="text-2xl font-semibold">Forgot Password?</p>
-        <p className="text-lg text-gray-500">
-          No worries, we’ll send you reset instructions.
-        </p>
-
-        <div className="w-full space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            type="email"
-            placeholder="Enter your email"
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-
-        <Button className="w-full" type="submit" disabled={!email}>
-          Reset Password
-        </Button>
-
-        <Link to="/login">
-          <div className="flex items-center gap-2 text-sm">
-            <ArrowLeft className="h-5 w-5" /> Back to Login
-          </div>
-        </Link>
-      </div>
-    </div>
-  );
-}

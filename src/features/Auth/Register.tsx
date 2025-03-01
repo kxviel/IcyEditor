@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,7 +21,6 @@ import {
 } from "@/components/ui/select";
 import { useGetStates } from "./api/getStates";
 import { useGetCities } from "./api/getCities";
-import { useModalStore } from "@/store/useModalStore";
 import { useGetPublication } from "@/features/Builder/api/getPublication";
 import { useGetSeries } from "@/features/Builder/api/getSeries";
 
@@ -68,7 +66,6 @@ type RegisterSchemaTypes = z.infer<typeof registerSchema>;
 
 const Register = () => {
   const registerFn = useRegisterFn();
-  const setModal = useModalStore((state) => state.setModal);
   const form = useForm<RegisterSchemaTypes>({
     resolver: zodResolver(registerSchema),
   });
@@ -85,13 +82,6 @@ const Register = () => {
 
   return (
     <div className="w-[642px] py-3">
-      <Button
-        onClick={() => {
-          setModal("COMPLETE_PROFILE", { isOpen: true });
-        }}
-      >
-        TEAST
-      </Button>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -183,9 +173,6 @@ const Register = () => {
                       />
                     </FormControl>
                     <FormMessage />
-                    <FormDescription>
-                      Password must be at least 8 characters
-                    </FormDescription>
                   </FormItem>
                 )}
               />
@@ -287,6 +274,7 @@ const Register = () => {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="confirmPassword"
