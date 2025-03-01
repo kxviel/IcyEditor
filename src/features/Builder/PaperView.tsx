@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import PaperHeader from "./PaperHeader";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useNavigate } from "@tanstack/react-router";
 import { useModalStore } from "@/store/useModalStore";
 import { isObjectEmpty } from "@/lib/utils";
 import { toast } from "sonner";
+import PaperHeaderOne from "./PaperHeaders/PaperHeaderOne";
 
 const PaperView = () => {
   const fields = useQuestionBuilderStore((state) => state.fields);
@@ -28,7 +28,7 @@ const PaperView = () => {
         </p>
 
         <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white p-6 shadow-md">
-          <PaperHeader isPreview={true} />
+          <PaperHeaderOne isPreview={false} />
 
           <div className="flex w-full flex-col gap-3">
             {Object.values(fields).map((field, fieldIndex) => (

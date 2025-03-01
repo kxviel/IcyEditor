@@ -3,12 +3,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { useFontSizeStore } from "@/store/useFontSizeStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
 
-const PaperHeader = ({ isPreview }: { isPreview?: boolean }) => {
+const PaperHeaderOne = ({ isPreview }: { isPreview?: boolean }) => {
   const fields = useHeaderStore((state) => state.fields);
   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
   const setValue = useHeaderStore((state) => state.setValue);
   const setIsEditing = useHeaderStore((state) => state.setIsEditing);
-
   return (
     <div className="flex w-full flex-col items-center">
       {!fields.institutionName.isEditing ? (
@@ -156,4 +155,4 @@ const PaperHeader = ({ isPreview }: { isPreview?: boolean }) => {
   );
 };
 
-export default PaperHeader;
+export default PaperHeaderOne;
