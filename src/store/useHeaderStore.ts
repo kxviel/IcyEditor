@@ -1,17 +1,5 @@
 import { create } from "zustand";
 
-const initialHeaderValues = {
-  institutionName: "School Name",
-  examName: "Exam Name",
-  subjectName: "Subject Name",
-  duration: "1hr 30min",
-  totalMarks: "100",
-
-  date: "10-05-2024",
-  instructions:
-    "1. Mobile Phones are not Allowed\n2. Read all the Instructions carefully before attempting Questions.\n3. CO: Course Outcome ; BT: Bloom's Taxonomy ; PM: Partial Marks ; NM : Negative Marks",
-};
-
 const initialFieldState = {
   institutionName: {
     placeholder: "SCHOOL NAME",
@@ -36,14 +24,6 @@ const initialFieldState = {
   totalMarks: {
     placeholder: "Marks",
     value: "100",
-    isEditing: false,
-  },
-  instructions: {
-    value: initialHeaderValues.instructions,
-    isEditing: false,
-  },
-  date: {
-    value: initialHeaderValues.date,
     isEditing: false,
   },
 };

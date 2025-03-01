@@ -4,9 +4,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useModalStore } from "@/store/useModalStore";
 import { isObjectEmpty } from "@/lib/utils";
 import { toast } from "sonner";
-
-import PaperHeaderTwo from "./PaperHeaders/PaperHeaderTwo";
-import PaperHeaderThree from "./PaperHeaders/PaperHeaderThree";
+import PaperHeaderOne from "./PaperHeaders/PaperHeaderOne";
 
 const PaperView = () => {
   const fields = useQuestionBuilderStore((state) => state.fields);
@@ -30,9 +28,7 @@ const PaperView = () => {
         </p>
 
         <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white p-3 shadow-md">
-          <PaperHeaderThree isPreview={false} />
-          {/* <PaperHeaderTwo isPreview={false} /> */}
-          {/* <PaperHeaderOne isPreview={false} /> */}
+          <PaperHeaderOne isPreview={false} />
 
           <div className="flex w-full flex-col gap-3">
             {Object.values(fields).map((field, fieldIndex) => (
