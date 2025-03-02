@@ -4,7 +4,7 @@ const PaperHeaderOne = ({ isPreview = false }: { isPreview?: boolean }) => {
   return (
     <div className="mb-3 flex w-full flex-col items-center gap-4">
       <EditableField
-        headerId="institutionName"
+        headerId="schoolName"
         fontSize={30}
         fontWeight={700}
         isPreview={isPreview}

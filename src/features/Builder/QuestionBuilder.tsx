@@ -46,6 +46,7 @@ type Props = {
 };
 
 const QuestionBuilder = ({ examId }: Props) => {
+  const [modalView, setModalView] = useState<"prereq" | "autogen">("prereq");
   const [isModalOpen, setIsModalOpen] = useState(
     ["manual", "auto"].includes(examId),
   );
@@ -74,8 +75,6 @@ const QuestionBuilder = ({ examId }: Props) => {
   const chapters = useGetChapter(form.watch("bookId"));
 
   const onPrequisitesSubmit = (data: PrerequisitesForm) => {
-    console.log(data);
-
     const allListsExist =
       publication.data &&
       series.data &&
@@ -248,6 +247,8 @@ const QuestionBuilder = ({ examId }: Props) => {
         chapters={chapters}
         form={form}
         onPrequisitesSubmit={onPrequisitesSubmit}
+        modalView={modalView}
+        isAuto={examId === "auto"}
       />
 
       {status === "blocked" && (

@@ -37,6 +37,8 @@ type Props = {
   chapters: UseQueryResult<Chapter[], Error>;
   form: UseFormReturn<PrerequisitesForm, any, undefined>;
   onPrequisitesSubmit: (data: PrerequisitesForm) => void;
+  modalView: "prereq" | "autogen";
+  isAuto: boolean;
 };
 
 const PaperPrerequisitesModal = ({
@@ -50,8 +52,13 @@ const PaperPrerequisitesModal = ({
   chapters,
   form,
   onPrequisitesSubmit,
+  modalView,
 }: Props) => {
   const navigate = useNavigate();
+
+  // const { data: questionList } = useGetQuestionList(
+  //   form.getValues("chapterId"),
+  // );
 
   return (
     <Dialog
@@ -73,7 +80,7 @@ const PaperPrerequisitesModal = ({
             </VisuallyHidden>
             <p>Loading...</p>
           </div>
-        ) : (
+        ) : modalView === "prereq" ? (
           <div className="flex flex-col space-y-4">
             <DialogTitle>Select Subject and Proceed</DialogTitle>
 
@@ -181,6 +188,11 @@ const PaperPrerequisitesModal = ({
                 </Button>
               </form>
             </Form>
+          </div>
+        ) : (
+          <div className="flex flex-col space-y-4">
+            <DialogTitle>Select Subject and Proceed</DialogTitle>
+            <div></div>
           </div>
         )}
       </DialogContent>

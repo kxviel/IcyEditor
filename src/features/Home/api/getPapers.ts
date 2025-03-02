@@ -37,10 +37,10 @@ export const getPapersFn = (props: Props): Promise<AxiosResponse<Root>> => {
   if (page) params.page = page;
   if (order) params.order = order;
   if (searchTerm) params.searchTerm = searchTerm;
-  if (date && date.from && date.to) {
-    params.fromDate = date.from.toISOString();
-    params.toDate = date.to.toISOString();
-  }
+  // if (date && date.from && date.to) {
+  //   params.fromDate = date.from.toISOString();
+  //   params.toDate = date.to.toISOString();
+  // }
 
   return http.get(`/questionbank/getUserExamPaperDetails/${userId}`, {
     params,

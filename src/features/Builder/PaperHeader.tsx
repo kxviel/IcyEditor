@@ -4,29 +4,29 @@ import { useFontSizeStore } from "@/store/useFontSizeStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
 
 const PaperHeader = ({ isPreview }: { isPreview?: boolean }) => {
-  const fields = useHeaderStore((state) => state.fields);
+  const fields = useHeaderStore((state) => state.headerData);
   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
   const setValue = useHeaderStore((state) => state.setValue);
   const setIsEditing = useHeaderStore((state) => state.setIsEditing);
 
   return (
     <div className="flex w-full flex-col items-center">
-      {!fields.institutionName.isEditing ? (
+      {!fields.schoolName.isEditing ? (
         <p
           className="font-semibold"
           // className="text-xl font-semibold"
           style={{ fontSize: 20 + Number(currentFontSize) }}
-          onClick={() => setIsEditing("institutionName", true)}
+          onClick={() => setIsEditing("schoolName", true)}
         >
-          {fields.institutionName.value}
+          {fields.schoolName.value}
         </p>
       ) : (
         <Input
           className="w-full text-xl font-semibold"
           placeholder="Enter Institution Name"
-          value={fields.institutionName.value}
-          onBlur={() => setIsEditing("institutionName", false)}
-          onChange={(e) => setValue("institutionName", e.target.value)}
+          value={fields.schoolName.value}
+          onBlur={() => setIsEditing("schoolName", false)}
+          onChange={(e) => setValue("schoolName", e.target.value)}
         />
       )}
 

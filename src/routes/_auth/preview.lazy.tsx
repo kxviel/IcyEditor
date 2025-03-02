@@ -1,5 +1,4 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PaperHeader from "@/features/Builder/PaperHeader";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Fragment, useRef, useState } from "react";
@@ -11,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFontSizeStore } from "@/store/useFontSizeStore";
+import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
 
 export const Route = createLazyFileRoute("/_auth/preview")({
   component: () => (
@@ -143,7 +143,7 @@ const A4Page = ({
         .fill(0)
         .map((_, i) => (
           <Fragment key={i}>
-            <PaperHeader />
+            <PaperHeaderOne isPreview={false} />
 
             <div className="flex w-full flex-col gap-3">
               {Object.values(fields).map((field, fieldIndex) => (

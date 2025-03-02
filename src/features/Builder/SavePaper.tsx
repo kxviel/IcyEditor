@@ -1,22 +1,33 @@
 import { Button } from "@/components/ui/button";
 import { Printer, Save } from "lucide-react";
-import { useSaveManualPaper } from "./api/saveManualPaper";
+import { useSaveExamPaper } from "./api/saveExamPaper";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
+import { useHeaderStore } from "@/store/useHeaderStore";
 
 const SavePaper = () => {
-  const chapterId = useQuestionBuilderStore((state) => state.chapterId);
   const fields = useQuestionBuilderStore((state) => state.fields);
+  const headerData = useHeaderStore((state) => state.headerData);
 
-  const saveManualPaper = useSaveManualPaper();
+  const saveManualPaper = useSaveExamPaper();
 
   const handleSaveManualPaper = () => {
-    console.log(chapterId);
     console.log(fields);
     const body = {
-      chapterId,
-      questionIds: fields.map((f) => f.id),
+      SCHOOL_NAME: headerData.schoolName.value,
+      CLASS_NAME: headerData.className.value,
+      DURATION_MINS: headerData.duration.value,
+      EXAM_NAME: headerData.examName.value,
+      SUBJECT_NAME: headerData.subjectName.value,
+      MARKS: headerData.totalMarks.value,
+      USER_ID: 0,
+      LAYOUT: "1",
+      DATA_STRING: {
+        questionIds: Object.values(fields).flatMap((value) =>
+          value.questions.map((q) => q.questionId),
+        ),
+      },
     };
-
+    console.log(body);
     saveManualPaper.mutate({ body });
   };
 

@@ -14,7 +14,6 @@ import { useNavigate, useLocation } from "@tanstack/react-router";
 import SavePaper from "@/features/Builder/SavePaper";
 import { useAuth } from "@/hooks/useAuth";
 import Stepper from "./ui/stepper";
-import { LogoutIcon } from "@/assets/Icons/LogoutIcon";
 
 const Navbar = () => {
   const { signOut } = useAuth();
@@ -38,9 +37,7 @@ const Navbar = () => {
 
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" className="px-3">
-                  <LogoutIcon />
-                </Button>
+                <Button className="px-3">Logout</Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>

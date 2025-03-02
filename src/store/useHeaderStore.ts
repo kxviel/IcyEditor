@@ -1,9 +1,14 @@
 import { create } from "zustand";
 
 const initialFieldState = {
-  institutionName: {
+  schoolName: {
     placeholder: "SCHOOL NAME",
     value: "SCHOOL NAME",
+    isEditing: false,
+  },
+  className: {
+    placeholder: "CLASS NAME",
+    value: "CLASS NAME",
     isEditing: false,
   },
   examName: {
