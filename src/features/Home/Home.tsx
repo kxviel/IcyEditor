@@ -34,13 +34,6 @@ import SortDescIcon from "@/assets/Icons/SortDescIcon";
 import { DatePickerWithRange } from "@/components/DatePickerWithRange";
 import { DateRange } from "react-day-picker";
 
-const examCards = Array(6).fill({
-  lastEdited: "8th Jan 2025",
-  title: "End Semester Examination",
-  class: "Class ii",
-  subject: "English",
-});
-
 const Home = () => {
   const navigate = useNavigate();
   const { getUser } = useAuth();
@@ -117,22 +110,27 @@ const Home = () => {
       {isPending ? (
         <p>Loading...</p>
       ) : (
-        <div className="grid gap-6 px-8 md:grid-cols-2 lg:grid-cols-3">
-          {examCards.map((card, i) => (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {data?.examData.map((card, i) => (
             <Card
               key={i}
               className="group p-5"
               onClick={() =>
-                navigate({ to: "/builder/$examId", params: { examId: "123" } })
+                navigate({
+                  to: "/builder/$examId",
+                  params: { examId: card.ID.toString() },
+                })
               }
             >
               <div className="mb-4 flex items-start justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">
-                    Last edited on {card.lastEdited}
+                    Last edited on (data needed)
                   </p>
 
-                  <h2 className="mb-4 text-xl font-semibold">{card.title}</h2>
+                  <h2 className="mb-4 text-xl font-semibold">
+                    {card.EXAM_NAME}
+                  </h2>
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -153,13 +151,13 @@ const Home = () => {
                     variant="secondary"
                     className="bg-purple-50 text-purple-500 hover:bg-purple-50"
                   >
-                    {card.class}
+                    {card.Class_NAME}
                   </Badge>
                   <Badge
                     variant="secondary"
                     className="bg-pink-50 text-pink-500 hover:bg-pink-50"
                   >
-                    {card.subject}
+                    {card.Subject_Name}
                   </Badge>
                 </div>
 
@@ -172,7 +170,7 @@ const Home = () => {
         </div>
       )}
 
-      {!!data?.total && (
+      {!!data?.total && data.total > 10 && (
         <Pagination>
           <PaginationContent>
             <PaginationItem>
