@@ -12,8 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useBlocker } from "@tanstack/react-router";
-import RefreshBlockerModal from "./RefreshBlockerModal";
 import { useGetPublication } from "./api/getPublication";
 import { useGetSeries } from "./api/getSeries";
 import { useGetClass } from "./api/getClass";
@@ -47,6 +45,7 @@ type Props = {
 
 const QuestionBuilder = ({ examId }: Props) => {
   const [modalView, setModalView] = useState<"prereq" | "autogen">("prereq");
+
   const [isModalOpen, setIsModalOpen] = useState(
     ["manual", "auto"].includes(examId),
   );
@@ -56,11 +55,6 @@ const QuestionBuilder = ({ examId }: Props) => {
     seriesName: "",
     className: "",
     subjectName: "",
-  });
-
-  const { proceed, reset, status } = useBlocker({
-    shouldBlockFn: () => true,
-    withResolver: true,
   });
 
   const form = useForm<PrerequisitesForm>({
@@ -250,14 +244,6 @@ const QuestionBuilder = ({ examId }: Props) => {
         modalView={modalView}
         isAuto={examId === "auto"}
       />
-
-      {status === "blocked" && (
-        <RefreshBlockerModal
-          isBlockerOpen={status === "blocked"}
-          reset={reset}
-          proceed={proceed}
-        />
-      )}
     </div>
   );
 };

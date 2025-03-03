@@ -1,17 +1,29 @@
 import { Button } from "@/components/ui/button";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
-import { useNavigate } from "@tanstack/react-router";
+import { useBlocker, useNavigate } from "@tanstack/react-router";
 import { useModalStore } from "@/store/useModalStore";
 import { isObjectEmpty } from "@/lib/utils";
 import { toast } from "sonner";
 import PaperHeaderOne from "./PaperHeaders/PaperHeaderOne";
+import RefreshBlockerModal from "./RefreshBlockerModal";
 
 const PaperView = () => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const navigate = useNavigate();
   const setModal = useModalStore((state) => state.setModal);
 
-  const handleNext = () => {
+  const { proceed, reset, status } = useBlocker({
+    shouldBlockFn: ({ next }) => (next.fullPath === "/preview" ? false : true),
+    withResolver: true,
+  });
+
+  const handleBack = () => {
+    navigate({ to: "/exam-type" });
+  };
+
+  const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+
     if (!isObjectEmpty(fields)) {
       navigate({ to: "/preview" });
     } else {
@@ -78,15 +90,28 @@ const PaperView = () => {
         <Button
           variant="outline"
           className="w-full"
-          onClick={() => navigate({ to: "/exam-type" })}
+          // onClick={() => setShouldBlockNavigation(true)}
+          onClick={handleBack}
         >
           Back
         </Button>
 
-        <Button className="w-full" onClick={handleNext}>
+        <Button
+          className="w-full"
+          // onClick={() => setShouldBlockNavigation(false)}
+          onClick={handleNext}
+        >
           Next
         </Button>
       </div>
+
+      {status === "blocked" && (
+        <RefreshBlockerModal
+          isBlockerOpen={status === "blocked"}
+          reset={reset}
+          proceed={proceed}
+        />
+      )}
     </div>
   );
 };
