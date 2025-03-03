@@ -147,7 +147,10 @@ const Register = () => {
                       </FormControl>
                       <SelectContent>
                         {stateList?.map((state) => (
-                          <SelectItem value={state.id?.toString()}>
+                          <SelectItem
+                            key={state.id}
+                            value={state.id?.toString()}
+                          >
                             {state.NAME}
                           </SelectItem>
                         ))}
@@ -195,7 +198,7 @@ const Register = () => {
                       </FormControl>
                       <SelectContent>
                         {publication.data?.map((p) => (
-                          <SelectItem value={p.id?.toString()}>
+                          <SelectItem key={p.id} value={p.id?.toString()}>
                             {p.NAME}
                           </SelectItem>
                         ))}
@@ -264,7 +267,7 @@ const Register = () => {
                       </FormControl>
                       <SelectContent>
                         {cityList?.map((city) => (
-                          <SelectItem value={city.id?.toString()}>
+                          <SelectItem key={city.id} value={city.id?.toString()}>
                             {city.NAME}
                           </SelectItem>
                         ))}
@@ -313,7 +316,7 @@ const Register = () => {
                       </FormControl>
                       <SelectContent>
                         {series.data?.map((s) => (
-                          <SelectItem value={s.id?.toString()}>
+                          <SelectItem key={s.id} value={s.id?.toString()}>
                             {s.NAME}
                           </SelectItem>
                         ))}

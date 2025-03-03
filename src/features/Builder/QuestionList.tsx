@@ -12,9 +12,7 @@ const QuestionList = ({ chapterId }: Props) => {
   const addQuestion = useQuestionBuilderStore((state) => state.addQuestion);
 
   //Questions
-  const { data: questionList } = useGetQuestionList(
-    chapterId ? chapterId.toString() : "",
-  );
+  const { data: questionList } = useGetQuestionList(chapterId);
 
   return (
     <div className="custom_scrollbar flex flex-col gap-2 overflow-y-scroll">

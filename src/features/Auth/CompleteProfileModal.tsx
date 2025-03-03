@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetStates } from "./api/getStates";
-import { useGetCities } from "./api/getCities";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +27,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useModalStore } from "@/store/useModalStore";
+import { useGetCities } from "./api/getCities";
+import { useGetPublication } from "../Builder/api/getPublication";
+import { useGetSeries } from "../Builder/api/getSeries";
 
 const registerSchema = z
   .object({
@@ -60,6 +61,8 @@ const registerSchema = z
     city: z.string().trim().min(1, { message: "City is required" }),
     state: z.string().trim().min(1, { message: "State is required" }),
     school: z.string().trim().min(1, { message: "School is required" }),
+    publicationId: z.string().min(1, { message: "Publication is required" }),
+    seriesId: z.string().min(1, { message: "Series is required" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -84,15 +87,16 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
       password: "",
       confirmPassword: "",
       phone: "",
-      city: "",
+      // city: "",
       state: "",
       school: "",
     },
   });
 
-  // Book
   const { data: stateList } = useGetStates();
   const { data: cityList } = useGetCities(form.watch("state"));
+  const publication = useGetPublication();
+  const series = useGetSeries(form.watch("publicationId"));
 
   const onSubmit = (data: RegisterSchemaTypes) => {
     console.log(data);
@@ -104,6 +108,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
         <DialogHeader>
           <DialogTitle>Complete your Profile</DialogTitle>
         </DialogHeader>
+
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -115,6 +120,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="name"
                   defaultValue=""
+                  disabled={registerFn.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>FullName</FormLabel>
@@ -133,6 +139,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="phone"
                   defaultValue=""
+                  disabled={registerFn.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Phone No.</FormLabel>
@@ -152,6 +159,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="state"
                   defaultValue=""
+                  disabled={registerFn.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>State</FormLabel>
@@ -166,7 +174,10 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                         </FormControl>
                         <SelectContent>
                           {stateList?.map((state) => (
-                            <SelectItem value={state.id?.toString()}>
+                            <SelectItem
+                              key={state.id}
+                              value={state.id?.toString()}
+                            >
                               {state.NAME}
                             </SelectItem>
                           ))}
@@ -180,6 +191,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="password"
                   defaultValue=""
+                  disabled={registerFn.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Password</FormLabel>
@@ -191,9 +203,35 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                         />
                       </FormControl>
                       <FormMessage />
-                      <FormDescription>
-                        Password must be at least 8 characters
-                      </FormDescription>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="publicationId"
+                  defaultValue=""
+                  disabled={registerFn.isPending}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Publication</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a Publication" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {publication.data?.map((p) => (
+                            <SelectItem key={p.id} value={p.id?.toString()}>
+                              {p.NAME}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -203,6 +241,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="email"
                   defaultValue=""
+                  disabled={true}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
@@ -221,6 +260,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="school"
                   defaultValue=""
+                  disabled={registerFn.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>School Name</FormLabel>
@@ -239,6 +279,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="city"
                   defaultValue=""
+                  disabled={registerFn.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>City</FormLabel>
@@ -253,7 +294,10 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                         </FormControl>
                         <SelectContent>
                           {cityList?.map((city) => (
-                            <SelectItem value={city.id?.toString()}>
+                            <SelectItem
+                              key={city.id}
+                              value={city.id?.toString()}
+                            >
                               {city.NAME}
                             </SelectItem>
                           ))}
@@ -263,10 +307,12 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="confirmPassword"
                   defaultValue=""
+                  disabled={registerFn.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
@@ -281,11 +327,44 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="seriesId"
+                  defaultValue=""
+                  disabled={registerFn.isPending}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Series</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a Series" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {series.data?.map((s) => (
+                            <SelectItem key={s.id} value={s.id?.toString()}>
+                              {s.NAME}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
 
-            <Button className="w-96" type="submit">
-              Get Started
+            <Button
+              className="w-96"
+              type="submit"
+              disabled={registerFn.isPending}
+            >
+              {registerFn.isPending ? "Saving..." : "Save Profile"}
             </Button>
           </form>
         </Form>

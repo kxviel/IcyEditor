@@ -28,8 +28,12 @@ export const useRegisterFn = () => {
     onSuccess: ({ data }, { isGoogleAuth }) => {
       toast.success(data.message);
       signIn(data.data);
+
       if (isGoogleAuth) {
-        setModal("COMPLETE_PROFILE", data);
+        setModal("COMPLETE_PROFILE", {
+          isOpen: true,
+          data: data.data,
+        });
       } else {
         navigate({
           to: "/",

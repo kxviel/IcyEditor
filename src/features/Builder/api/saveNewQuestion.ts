@@ -1,4 +1,5 @@
 import http from "@/config/https";
+import { queryClient } from "@/main";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -25,6 +26,7 @@ export const useSaveNewQuestion = () => {
     mutationFn,
     onSuccess: ({ data }) => {
       toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["GetQuestionList"] });
     },
     onError: (err: string) => {
       toast.error(err);
