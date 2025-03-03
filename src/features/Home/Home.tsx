@@ -33,11 +33,13 @@ import SortAscIcon from "@/assets/Icons/SortAscIcon";
 import SortDescIcon from "@/assets/Icons/SortDescIcon";
 import { DatePickerWithRange } from "@/components/DatePickerWithRange";
 import { DateRange } from "react-day-picker";
+import { formatDistance } from "date-fns";
+import { useDeletePaper } from "./api/deletePaper";
 
 const Home = () => {
   const navigate = useNavigate();
   const { getUser } = useAuth();
-
+  const deleteFn = useDeletePaper();
   const userData = getUser();
   const [page, setPage] = useState(1);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
@@ -112,20 +114,14 @@ const Home = () => {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {data?.examData.map((card, i) => (
-            <Card
-              key={i}
-              className="group p-5"
-              onClick={() =>
-                navigate({
-                  to: "/builder/$examId",
-                  params: { examId: card.ID.toString() },
-                })
-              }
-            >
+            <Card key={i} className="group p-5">
               <div className="mb-4 flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">
-                    Last edited on (data needed)
+                  <p className="text-xs text-slate-600">
+                    Last edited{" "}
+                    {formatDistance(card.date, new Date(), {
+                      addSuffix: true,
+                    })}
                   </p>
 
                   <h2 className="mb-4 text-xl font-semibold">
@@ -139,8 +135,21 @@ const Home = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                    <DropdownMenuItem>Delete</DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        navigate({
+                          to: "/builder/$examId",
+                          params: { examId: card.ID.toString() },
+                        })
+                      }
+                    >
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => deleteFn.mutate({ body: { id: card.ID } })}
+                    >
+                      Delete
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -161,7 +170,15 @@ const Home = () => {
                   </Badge>
                 </div>
 
-                <Button variant="ghost">
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    navigate({
+                      to: "/builder/$examId",
+                      params: { examId: card.ID.toString() },
+                    })
+                  }
+                >
                   <ArrowUpRight />
                 </Button>
               </div>

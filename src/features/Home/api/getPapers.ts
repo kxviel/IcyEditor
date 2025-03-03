@@ -59,6 +59,5 @@ export const useGetPapers = (props: Props) => {
     queryKey: ["GetPapers", props],
     queryFn: () => getPapersFn(props),
     select: ({ data }) => data.data,
-    enabled: !!props?.page && !!props?.userId,
   });
 };
