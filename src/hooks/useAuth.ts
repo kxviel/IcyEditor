@@ -21,13 +21,11 @@ export const useAuth = () => {
     localStorage.setItem("user", JSON.stringify(user));
   };
 
-  const signIn = (user: User & { PASSWORD?: string }) => {
-    //Temporary
-    const tempDataWithoutPassword = user;
-    delete tempDataWithoutPassword.PASSWORD;
+  const signIn = (user: User) => {
+    console.log(user);
 
     localStorage.setItem("isAuthenticated", "true");
-    localStorage.setItem("user", JSON.stringify(tempDataWithoutPassword));
+    localStorage.setItem("user", JSON.stringify(user));
   };
 
   const signOut = () => {
