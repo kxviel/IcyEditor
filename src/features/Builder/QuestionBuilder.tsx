@@ -27,6 +27,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { toast } from "sonner";
+import { useGetExamById } from "./api/getExamById";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -67,6 +68,9 @@ const QuestionBuilder = ({ examId }: Props) => {
   const subjects = useGetSubject(form.watch("classId"));
   const books = useGetBook(form.watch("subjectId"));
   const chapters = useGetChapter(form.watch("bookId"));
+
+  const { data: examData } = useGetExamById(examId);
+  console.log(examData);
 
   const onPrequisitesSubmit = (data: PrerequisitesForm) => {
     const allListsExist =
