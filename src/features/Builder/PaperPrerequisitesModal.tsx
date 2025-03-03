@@ -61,12 +61,7 @@ const PaperPrerequisitesModal = ({
   // );
 
   return (
-    <Dialog
-      open={isModalOpen}
-      onOpenChange={(value) => {
-        setIsModalOpen(value);
-      }}
-    >
+    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
       <DialogContent
         className="md:w-[596px]"
         onEscapeKeyDown={(e) => e.preventDefault()}

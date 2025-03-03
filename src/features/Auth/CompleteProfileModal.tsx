@@ -11,7 +11,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useRegisterFn } from "./api/register";
 import {
   Select,
   SelectContent,
@@ -30,6 +29,8 @@ import { useModalStore } from "@/store/useModalStore";
 import { useGetCities } from "./api/getCities";
 import { useGetPublication } from "../Builder/api/getPublication";
 import { useGetSeries } from "../Builder/api/getSeries";
+import { useUpdateUser } from "./api/updateUser";
+import { useAuth } from "@/hooks/useAuth";
 
 const registerSchema = z
   .object({
@@ -58,7 +59,7 @@ const registerSchema = z
       .trim()
       .min(1, { message: "Phone is required" })
       .regex(/^\d{10}$/, { message: "Phone must be a valid 10-digit number" }),
-    city: z.string().trim().min(1, { message: "City is required" }),
+    // city: z.string().trim().min(1, { message: "City is required" }),
     state: z.string().trim().min(1, { message: "State is required" }),
     school: z.string().trim().min(1, { message: "School is required" }),
     publicationId: z.string().min(1, { message: "Publication is required" }),
@@ -73,17 +74,21 @@ type RegisterSchemaTypes = z.infer<typeof registerSchema>;
 
 type Props = {
   isOpen: boolean;
-  data: any;
+  data: {
+    EMAIL: string;
+    UNAME: string;
+  };
 };
 
 const CompleteProfileModal = ({ isOpen, data }: Props) => {
   const hideModal = useModalStore((state) => state.hideModal);
-  const registerFn = useRegisterFn();
+  const updateUser = useUpdateUser();
+  const { getUser } = useAuth();
   const form = useForm<RegisterSchemaTypes>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: data.name,
-      email: data.email,
+      name: data.UNAME,
+      email: data.EMAIL,
       password: "",
       confirmPassword: "",
       phone: "",
@@ -100,11 +105,21 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
 
   const onSubmit = (data: RegisterSchemaTypes) => {
     console.log(data);
-    registerFn.mutate({ body: data });
+    updateUser.mutate({
+      body: {
+        userId: getUser()?.id,
+        data,
+      },
+    });
   };
   return (
     <Dialog open={isOpen} onOpenChange={hideModal}>
-      <DialogContent className="max-w-fit">
+      <DialogContent
+        className="max-w-fit"
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        showClose={false}
+      >
         <DialogHeader>
           <DialogTitle>Complete your Profile</DialogTitle>
         </DialogHeader>
@@ -120,7 +135,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="name"
                   defaultValue=""
-                  disabled={registerFn.isPending}
+                  disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>FullName</FormLabel>
@@ -139,13 +154,12 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="phone"
                   defaultValue=""
-                  disabled={registerFn.isPending}
+                  disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Phone No.</FormLabel>
                       <FormControl>
                         <Input
-                          type="email"
                           placeholder="Enter your phone number"
                           {...field}
                         />
@@ -159,7 +173,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="state"
                   defaultValue=""
-                  disabled={registerFn.isPending}
+                  disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>State</FormLabel>
@@ -191,7 +205,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="password"
                   defaultValue=""
-                  disabled={registerFn.isPending}
+                  disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Password</FormLabel>
@@ -210,7 +224,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="publicationId"
                   defaultValue=""
-                  disabled={registerFn.isPending}
+                  disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Publication</FormLabel>
@@ -260,7 +274,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="school"
                   defaultValue=""
-                  disabled={registerFn.isPending}
+                  disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>School Name</FormLabel>
@@ -275,11 +289,11 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="city"
                   defaultValue=""
-                  disabled={registerFn.isPending}
+                  disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>City</FormLabel>
@@ -306,13 +320,13 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
 
                 <FormField
                   control={form.control}
                   name="confirmPassword"
                   defaultValue=""
-                  disabled={registerFn.isPending}
+                  disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
@@ -331,7 +345,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                   control={form.control}
                   name="seriesId"
                   defaultValue=""
-                  disabled={registerFn.isPending}
+                  disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Series</FormLabel>
@@ -362,9 +376,9 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
             <Button
               className="w-96"
               type="submit"
-              disabled={registerFn.isPending}
+              disabled={updateUser.isPending}
             >
-              {registerFn.isPending ? "Saving..." : "Save Profile"}
+              {updateUser.isPending ? "Saving..." : "Save Profile"}
             </Button>
           </form>
         </Form>

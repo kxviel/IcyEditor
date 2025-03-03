@@ -117,11 +117,7 @@ const Register = () => {
                   <FormItem>
                     <FormLabel>Phone No.</FormLabel>
                     <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Enter your phone number"
-                        {...field}
-                      />
+                      <Input placeholder="Enter your phone number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
