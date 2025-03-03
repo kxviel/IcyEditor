@@ -7,10 +7,10 @@ interface Root {
   message: string;
   statusCode: number;
   success: boolean;
-  data: Data;
+  data: ExamData;
 }
 
-interface Data {
+export interface ExamData {
   examId: string;
   type: string;
   totalQuestions: number;

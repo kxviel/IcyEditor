@@ -15,6 +15,7 @@ interface QuestionItem {
 
 interface HeaderStore {
   fields: Fieldtype;
+  presetFields: (fields: Fieldtype) => void;
   addQuestion: (
     categoryId: string,
     categoryName: string,
@@ -25,6 +26,7 @@ interface HeaderStore {
 
 export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
   fields: {},
+  presetFields: (fields) => set(() => ({ fields })),
   addQuestion: (categoryId, categoryName, question) =>
     set((state) => {
       if (Object.keys(state.fields).includes(categoryId)) {

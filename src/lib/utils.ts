@@ -1,3 +1,5 @@
+import { ExamData } from "@/features/Builder/api/getExamById";
+import { Fieldtype } from "@/store/useQuestionBuilderStore";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -13,6 +15,25 @@ export function isObjectEmpty(obj: any) {
   }
 
   return true;
+}
+
+type ReturnProps = {
+  fields: Fieldtype;
+};
+export function parseExamDataResponse(response: ExamData): ReturnProps {
+  const fields: Fieldtype = {};
+
+  response.categories.forEach((category) => {
+    fields[category.categoryId] = {
+      categoryId: category.categoryId,
+      categoryName: category.categoryName,
+      questions: category.questions.map((question) => ({
+        questionId: question.id,
+        questionText: question.QUESTION_DATA,
+      })),
+    };
+  });
+  return { fields };
 }
 
 export const tempFields = {

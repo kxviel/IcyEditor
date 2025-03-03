@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGetBook } from "./api/getBook";
 import PaperPrerequisitesModal from "./PaperPrerequisitesModal";
 import PaperView from "./PaperView";
@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { useGetExamById } from "./api/getExamById";
+import { parseExamDataResponse } from "@/lib/utils";
+import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -45,8 +47,8 @@ type Props = {
 };
 
 const QuestionBuilder = ({ examId }: Props) => {
+  const presetFields = useQuestionBuilderStore((state) => state.presetFields);
   const [modalView] = useState<"prereq" | "autogen">("prereq");
-
   const [isModalOpen, setIsModalOpen] = useState(
     ["manual", "auto"].includes(examId),
   );
@@ -70,7 +72,16 @@ const QuestionBuilder = ({ examId }: Props) => {
   const chapters = useGetChapter(form.watch("bookId"));
 
   const { data: examData } = useGetExamById(examId);
-  console.log(examData);
+
+  useEffect(() => {
+    if (examData && examData.examId) {
+      const parsedObject = parseExamDataResponse(examData);
+
+      if (parsedObject.fields) {
+        presetFields(parsedObject.fields);
+      }
+    }
+  }, [examData, presetFields]);
 
   const onPrequisitesSubmit = (data: PrerequisitesForm) => {
     const allListsExist =
