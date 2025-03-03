@@ -40,8 +40,9 @@ const SavePaper = () => {
       <Button variant="outline" onClick={handleSaveManualPaper}>
         <Save /> Save Paper
       </Button>
-      <Button>
-        Save & Download (Under Development) <Printer />
+
+      <Button onClick={() => window.print()}>
+        Save & Download PDF <Printer />
       </Button>
     </div>
   );

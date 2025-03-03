@@ -44,7 +44,7 @@ type Props = {
 };
 
 const QuestionBuilder = ({ examId }: Props) => {
-  const [modalView, setModalView] = useState<"prereq" | "autogen">("prereq");
+  const [modalView] = useState<"prereq" | "autogen">("prereq");
 
   const [isModalOpen, setIsModalOpen] = useState(
     ["manual", "auto"].includes(examId),

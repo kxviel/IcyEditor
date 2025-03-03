@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type Fieldtype = Record<string, CategoryItem>;
+export type Fieldtype = Record<string, CategoryItem>;
 
 interface CategoryItem {
   categoryId: string;

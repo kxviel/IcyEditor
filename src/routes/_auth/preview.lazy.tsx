@@ -28,6 +28,7 @@ function Preview() {
 
   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
   const setFontSize = useFontSizeStore((state) => state.setFontSize);
+  const [pageType, setPageType] = useState("a4");
 
   const [duplicateCapacity, setDuplicateCapacity] = useState(0);
   const [activeTab, setActiveTab] = useState("1");
@@ -82,14 +83,17 @@ function Preview() {
       </Tabs>
 
       <div className="flex items-center justify-center gap-3">
-        <Select>
+        <Select value={pageType} onValueChange={setPageType}>
           <SelectTrigger className="w-[180px] bg-white">
             <SelectValue placeholder="Paper Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="1">A4</SelectItem>
-            <SelectItem value="2">A3</SelectItem>
-            <SelectItem value="3">A2</SelectItem>
+            {/* <SelectItem value="a1">A1</SelectItem>
+            <SelectItem value="a2">A2</SelectItem>
+            <SelectItem value="a3">A3</SelectItem> */}
+            <SelectItem value="a4">A4</SelectItem>
+            <SelectItem value="a5">A5</SelectItem>
+            {/* <SelectItem value="a6">A6</SelectItem> */}
           </SelectContent>
         </Select>
 
@@ -113,6 +117,7 @@ function Preview() {
 
       <div className="custom_scrollbar w-fit overflow-y-auto">
         <A4Page
+          pageType={pageType}
           pageRef={pageRef}
           lastElementRef={lastElementRef}
           duplicateCapacity={duplicateCapacity}
@@ -123,10 +128,12 @@ function Preview() {
 }
 
 const A4Page = ({
+  pageType,
   pageRef,
   lastElementRef,
   duplicateCapacity,
 }: {
+  pageType: string;
   pageRef: React.RefObject<HTMLDivElement>;
   lastElementRef: React.RefObject<HTMLDivElement>;
   duplicateCapacity: number;
@@ -134,9 +141,19 @@ const A4Page = ({
   const fields = useQuestionBuilderStore((state) => state.fields);
   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
 
+  const pageDimensions: Record<string, string> = {
+    a1: "h-[841mm] w-[594mm]",
+    a2: "h-[594mm] w-[420mm]",
+    a3: "h-[420mm] w-[297mm]",
+    a4: "h-[297mm] w-[210mm]",
+    a5: "h-[210mm] w-[148mm]",
+    a6: "h-[148mm] w-[105mm]",
+  };
+
   return (
     <div
-      className="mx-auto h-[297mm] w-[210mm] border border-gray-300 bg-white p-6 shadow-md"
+      className={`toPrint mx-auto ${pageDimensions[pageType]} border border-gray-300 bg-white p-6 shadow-md`}
+      // className="mx-auto h-[297mm] w-[210mm] border border-gray-300 bg-white p-6 shadow-md"
       ref={pageRef}
     >
       {Array(duplicateCapacity === 0 ? 1 : duplicateCapacity)
