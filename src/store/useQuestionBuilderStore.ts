@@ -1,3 +1,4 @@
+import { tempFields } from "@/lib/utils";
 import { create } from "zustand";
 
 export type Fieldtype = Record<string, CategoryItem>;
@@ -25,7 +26,7 @@ interface HeaderStore {
 }
 
 export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
-  fields: {},
+  fields: tempFields,
   presetFields: (fields) => set(() => ({ fields })),
   addQuestion: (categoryId, categoryName, question) =>
     set((state) => {
