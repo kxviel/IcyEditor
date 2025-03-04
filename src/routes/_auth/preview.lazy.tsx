@@ -1,7 +1,7 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -13,7 +13,6 @@ import { useFontSizeStore } from "@/store/useFontSizeStore";
 import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
 import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
 import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
-import { Button } from "@/components/ui/button";
 
 const pageDimensions: Record<string, string> = {
   // A1: "h-[841mm] w-[594mm]",
@@ -48,13 +47,10 @@ function Preview() {
   const scaleStep = 0.1;
   const scrollStep = 20;
   const parentRef = useRef<HTMLDivElement>(null);
-  const pageRef = useRef<HTMLDivElement>(null);
-  const lastElementRef = useRef<HTMLDivElement>(null);
 
   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
   const setFontSize = useFontSizeStore((state) => state.setFontSize);
   const [pageSize, setPageSize] = useState("A4");
-  const [duplicateCapacity, setDuplicateCapacity] = useState(0);
   const [activeTab, setActiveTab] = useState("1");
 
   const handleWheel = useCallback(
@@ -95,28 +91,6 @@ function Preview() {
 
   const calcFontSize = (value: string) => {
     setFontSize(value);
-  };
-
-  const calcFn = () => {
-    if (pageRef.current && lastElementRef.current) {
-      // Page = EmptySpace + Content
-      // therefore if: EmptySpace > Page - Content then: Duplicate Content else: move on
-      // man im a genius hehe
-
-      const totalPageHeight = pageRef.current.getBoundingClientRect().height;
-      const parentTop = pageRef.current.getBoundingClientRect().top;
-      const lastContent = lastElementRef.current.getBoundingClientRect().bottom;
-      const heightToLastContent = lastContent - parentTop;
-
-      console.log(
-        totalPageHeight,
-        heightToLastContent,
-        "duplicate capacity: ",
-        Math.round(totalPageHeight / heightToLastContent),
-      );
-
-      setDuplicateCapacity(Math.round(totalPageHeight / heightToLastContent));
-    }
   };
 
   return (
@@ -168,21 +142,14 @@ function Preview() {
             <SelectItem value="6">28</SelectItem>
           </SelectContent>
         </Select>
-
-        <Button onClick={calcFn} disabled>
-          Duplicate (Under Construction)
-        </Button>
       </div>
 
       <div
         className="relative h-full w-full overflow-auto bg-black/70 p-2"
         ref={parentRef}
       >
-        <A4Page
+        <RenderedPage
           pageSize={pageSize}
-          pageRef={pageRef}
-          lastElementRef={lastElementRef}
-          duplicateCapacity={duplicateCapacity}
           scale={scale}
           position={position}
           activeTab={activeTab}
@@ -193,11 +160,8 @@ function Preview() {
   );
 }
 
-type A4Props = {
+type RenderedPageProps = {
   pageSize: string;
-  pageRef: React.RefObject<HTMLDivElement>;
-  lastElementRef: React.RefObject<HTMLDivElement>;
-  duplicateCapacity: number;
   scale: number;
   activeTab: string;
   position: {
@@ -206,223 +170,69 @@ type A4Props = {
   };
 };
 
-const A4Page = ({
+const RenderedPage = ({
   pageSize,
-  pageRef,
-  lastElementRef,
-  duplicateCapacity,
   scale,
   position,
   activeTab,
-}: A4Props) => {
+}: RenderedPageProps) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
 
   return (
     <div
-      ref={pageRef}
       className={`${pageDimensions[pageSize]} mx-auto border border-gray-300 bg-white p-6 shadow-md transition-transform duration-100 ease-in-out`}
       style={{
         transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
       }}
     >
-      {Array(duplicateCapacity === 0 ? 1 : duplicateCapacity)
-        .fill(0)
-        .map((_, i) => (
-          <Fragment key={i}>
-            {pageHeaders[activeTab]}
+      {pageHeaders[activeTab]}
 
-            <div className="flex w-full flex-col gap-3">
-              {Object.values(fields).map((field, fieldIndex) => (
-                <div
-                  className="w-full"
-                  key={field.categoryId}
-                  ref={
-                    i === Object.values(fields).length - 1
-                      ? lastElementRef
-                      : null
-                  }
-                >
-                  <div className="my-3 flex gap-2">
-                    <p
-                      className="font-semibold text-gray-800"
-                      style={{ fontSize: 16 + Number(currentFontSize) }}
-                    >
-                      Q{fieldIndex + 1}.
-                    </p>
-                    <p
-                      className="font-semibold text-gray-800"
-                      style={{ fontSize: 16 + Number(currentFontSize) }}
-                    >
-                      {field.categoryName}
-                    </p>
+      <div className="flex w-full flex-col gap-3">
+        {Object.values(fields).map((field, fieldIndex) => (
+          <div className="w-full" key={field.categoryId}>
+            <div className="my-3 flex gap-2">
+              <p
+                className="font-semibold text-gray-800"
+                style={{ fontSize: 16 + Number(currentFontSize) }}
+              >
+                Q{fieldIndex + 1}.
+              </p>
+              <p
+                className="font-semibold text-gray-800"
+                style={{ fontSize: 16 + Number(currentFontSize) }}
+              >
+                {field.categoryName}
+              </p>
 
-                    <p
-                      className="ml-auto"
-                      style={{ fontSize: 14 + Number(currentFontSize) }}
-                    >
-                      (1 x {field.questions.length}) = 5
-                    </p>
-                  </div>
-
-                  {field.questions.map((question, index) => (
-                    <div key={question.questionId} className="my-3 flex gap-2">
-                      <p
-                        className="font-semibold text-gray-800"
-                        style={{ fontSize: 14 + Number(currentFontSize) }}
-                      >
-                        {index + 1}.
-                      </p>
-                      <p
-                        className="text-gray-700"
-                        style={{ fontSize: 14 + Number(currentFontSize) }}
-                        dangerouslySetInnerHTML={{
-                          __html: question.questionText,
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              ))}
+              <p
+                className="ml-auto"
+                style={{ fontSize: 14 + Number(currentFontSize) }}
+              >
+                (1 x {field.questions.length}) = 5
+              </p>
             </div>
-          </Fragment>
+
+            {field.questions.map((question, index) => (
+              <div key={question.questionId} className="my-3 flex gap-2">
+                <p
+                  className="font-semibold text-gray-800"
+                  style={{ fontSize: 14 + Number(currentFontSize) }}
+                >
+                  {index + 1}.
+                </p>
+                <p
+                  className="text-gray-700"
+                  style={{ fontSize: 14 + Number(currentFontSize) }}
+                  dangerouslySetInnerHTML={{
+                    __html: question.questionText,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
         ))}
+      </div>
     </div>
   );
 };
-
-// const sx = StyleSheet.create({
-//   page: {
-//     width: "100%",
-//     flexDirection: "column",
-//     backgroundColor: "#fff",
-//   },
-//   section: {
-//     margin: 10,
-//     padding: 10,
-//     flexGrow: 1,
-//     fontSize: 12,
-//   },
-//   root: {
-//     marginBottom: "3",
-//     display: "flex",
-//     width: "full",
-//     flexDirection: "column",
-//     alignItems: "center",
-//     gap: "4",
-//   },
-//   schoolName: {
-//     fontSize: 30,
-//     fontWeight: 700,
-//   },
-// });
-
-// const styles = StyleSheet.create({
-//   page: {
-//     padding: 30,
-//     fontFamily: "Helvetica",
-//   },
-//   container: {
-//     display: "flex",
-//     flexDirection: "column",
-//     width: "100%",
-//     gap: 12,
-//   },
-//   categoryContainer: {
-//     width: "100%",
-//     marginBottom: 10,
-//     padding: 12,
-//   },
-//   categoryHeader: {
-//     display: "flex",
-//     flexDirection: "row",
-//     marginVertical: 8,
-//   },
-//   categoryNumberText: {
-//     fontWeight: "bold",
-//     color: "#333333",
-//     fontSize: 12,
-//     marginRight: 6,
-//   },
-//   categoryNameText: {
-//     fontWeight: "bold",
-//     color: "#333333",
-//     fontSize: 12,
-//   },
-//   pointsText: {
-//     fontSize: 10,
-//     marginLeft: "auto",
-//   },
-//   questionContainer: {
-//     display: "flex",
-//     flexDirection: "row",
-//     marginVertical: 8,
-//     paddingVertical: 4,
-//     paddingHorizontal: 2,
-//   },
-//   questionNumberText: {
-//     fontSize: 10,
-//     fontWeight: "bold",
-//     color: "#333333",
-//     marginRight: 6,
-//   },
-//   questionContentText: {
-//     fontSize: 10,
-//     color: "#4B5563",
-//     flex: 1,
-//   },
-// });
-
-// const A4Page = ({ pageSize }: { pageSize: PageProps["size"] }) => {
-//   const item = useHeaderStore((state) => state.headerData);
-//   const fields = useQuestionBuilderStore((state) => state.fields);
-//   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
-
-//   return (
-//     <PDFViewer width="100%" height="100%">
-//       <Document pageMode="fullScreen" pageLayout="singlePage">
-//         <Page size={pageSize} style={sx.page}>
-//           <PaperHeaderEinz item={item} currentFontSize={currentFontSize} />
-//           {Object.values(fields).map((field, fieldIndex) => (
-//             <View style={styles.categoryContainer} key={field.categoryId}>
-//               <View style={styles.categoryHeader}>
-//                 <Text style={styles.categoryNumberText}>
-//                   Q{fieldIndex + 1}.
-//                 </Text>
-//                 <Text style={styles.categoryNameText}>
-//                   {field.categoryName}
-//                 </Text>
-//                 <Text style={styles.pointsText}>
-//                   (1 x {field.questions.length}) = 5
-//                 </Text>
-//               </View>
-
-//               {field.questions.map((question, index) => {
-//                 const parsedHtml = htmlParser(question.questionText);
-//                 return (
-//                   <View
-//                     key={question.questionId}
-//                     style={styles.questionContainer}
-//                     wrap={true}
-//                   >
-//                     <Text style={styles.questionNumberText}>{index + 1}.</Text>
-//                     {/* For basic text content without HTML */}
-//                     {/* <Text style={styles.questionContentText}>
-//                       {question.questionText.replace(/<[^>]*>?/gm, "")}
-//                     </Text> */}
-//                     {/* {parsedHtml} */}
-//                     <Html stylesheet={boo}>{question.questionText}</Html>
-//                     {/* If you need HTML support, you would use: */}
-//                     {/* <Html style={styles.questionContentText}>
-//                     {question.questionText}
-//                   </Html> */}
-//                   </View>
-//                 );
-//               })}
-//             </View>
-//           ))}
-//         </Page>
-//       </Document>
-//     </PDFViewer>
-//   );
-// };
