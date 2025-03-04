@@ -1,4 +1,5 @@
 import { ExamData } from "@/features/Builder/api/getExamById";
+import { HeaderData } from "@/store/useHeaderStore";
 import { Fieldtype } from "@/store/useQuestionBuilderStore";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -19,9 +20,42 @@ export function isObjectEmpty(obj: any) {
 
 type ReturnProps = {
   fields: Fieldtype;
+  headerData: HeaderData;
 };
 export function parseExamDataResponse(response: ExamData): ReturnProps {
   const fields: Fieldtype = {};
+  const headerData: HeaderData = {
+    schoolName: {
+      placeholder: "SCHOOL NAME",
+      value: response.SCHOOL_NAME,
+      isEditing: false,
+    },
+    className: {
+      placeholder: "CLASS NAME",
+      value: response.CLASS_NAME,
+      isEditing: false,
+    },
+    examName: {
+      placeholder: "EXAMINATION TYPE",
+      value: response.EXAM_NAME,
+      isEditing: false,
+    },
+    subjectName: {
+      placeholder: "SUBJECT NAME",
+      value: response.SUBJECT_NAME,
+      isEditing: false,
+    },
+    duration: {
+      placeholder: "Duration",
+      value: response.DURATION_MINS.toString(),
+      isEditing: false,
+    },
+    totalMarks: {
+      placeholder: "Marks",
+      value: response.MARKS.toString(),
+      isEditing: false,
+    },
+  };
 
   response.categories.forEach((category) => {
     fields[category.categoryId] = {
@@ -33,7 +67,8 @@ export function parseExamDataResponse(response: ExamData): ReturnProps {
       })),
     };
   });
-  return { fields };
+
+  return { fields, headerData };
 }
 
 export const tempFields = {

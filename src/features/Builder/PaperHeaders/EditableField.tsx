@@ -80,7 +80,7 @@ const EditableField = ({
 
   return (
     <p
-      className={textClassName}
+      className={`${textClassName} p-1 hover:cursor-pointer hover:bg-gray-50`}
       onClick={() => !isPreview && setIsEditing(headerId, true)}
       style={{
         fontWeight,

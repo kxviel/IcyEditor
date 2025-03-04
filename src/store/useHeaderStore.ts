@@ -33,6 +33,8 @@ const initialFieldState = {
   },
 };
 
+export type HeaderData = typeof initialFieldState;
+
 export interface HeaderItem {
   value: string;
   isEditing: boolean;
@@ -43,12 +45,13 @@ interface HeaderStore {
   headerData: Record<string, HeaderItem>;
   setValue: (headerId: string, value: string) => void;
   setIsEditing: (headerId: string, isEditing: boolean) => void;
+  presetHeaderData: (headerData: HeaderData) => void;
 }
 
 export const useHeaderStore = create<HeaderStore>()((set) => ({
   // Initial state for all editable fields
   headerData: initialFieldState,
-
+  presetHeaderData: (headerData) => set(() => ({ headerData })),
   // Set value for any field
   setValue: (headerId, value) =>
     set((state) => ({

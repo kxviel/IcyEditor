@@ -2,7 +2,7 @@ import EditableField from "./EditableField";
 
 const PaperHeaderOne = ({ isPreview = false }: { isPreview?: boolean }) => {
   return (
-    <div className="mb-3 flex w-full flex-col items-center gap-4">
+    <div className="mb-2 flex w-full flex-col items-center gap-3">
       <EditableField
         headerId="schoolName"
         fontSize={30}

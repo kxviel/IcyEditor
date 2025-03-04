@@ -17,9 +17,26 @@ export interface ExamData {
   selectedQuestions: number;
   categories: Category[];
   originalData: OriginalData;
+  id: number;
+  STATUS: any;
+  CLASS_NAME: string;
+  DURATION_MINS: number;
+  EXAM_NAME: string;
+  DATA_STRING: string;
+  SCHOOL_NAME: string;
+  SUBJECT_NAME: string;
+  USER_ID: number;
+  createdAt: string;
+  updatedAt: string;
+  LAYOUT: string;
+  PAGE_COUNT: any;
+  TYPE: any;
+  FONT: any;
+  MARKS: number;
+  MARKS_DISTRIBUTION: string;
 }
 
-interface Category {
+export interface Category {
   categoryId: string;
   categoryName: string;
   questions: Question[];
@@ -27,7 +44,7 @@ interface Category {
   selectedCount: number;
 }
 
-interface Question {
+export interface Question {
   id: number;
   status: any;
   ANSWER_DATA: any;
@@ -42,7 +59,7 @@ interface Question {
   isSelected: boolean;
 }
 
-interface OriginalData {
+export interface OriginalData {
   questionIds: number[];
 }
 

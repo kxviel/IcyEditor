@@ -30,6 +30,7 @@ import { toast } from "sonner";
 import { useGetExamById } from "./api/getExamById";
 import { parseExamDataResponse } from "@/lib/utils";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
+import { useHeaderStore } from "@/store/useHeaderStore";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -48,6 +49,7 @@ type Props = {
 
 const QuestionBuilder = ({ examId }: Props) => {
   const presetFields = useQuestionBuilderStore((state) => state.presetFields);
+  const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
   const [modalView] = useState<"prereq" | "autogen">("prereq");
   const [isModalOpen, setIsModalOpen] = useState(
     ["manual", "auto"].includes(examId),
@@ -80,8 +82,11 @@ const QuestionBuilder = ({ examId }: Props) => {
       if (parsedObject.fields) {
         presetFields(parsedObject.fields);
       }
+      if (parsedObject.headerData) {
+        presetHeaderData(parsedObject.headerData);
+      }
     }
-  }, [examData, presetFields]);
+  }, [examData, presetFields, presetHeaderData]);
 
   const onPrequisitesSubmit = (data: PrerequisitesForm) => {
     const allListsExist =
