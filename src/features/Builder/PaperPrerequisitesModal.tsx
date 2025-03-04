@@ -1,19 +1,6 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Subject } from "./api/getSubject";
@@ -25,6 +12,7 @@ import { UseQueryResult } from "@tanstack/react-query";
 import { PrerequisitesForm } from "./QuestionBuilder";
 import { Book } from "./api/getBook";
 import { Chapter } from "./api/getChapter";
+import { ControlledSelect } from "@/components/ControlledSelect";
 
 type Props = {
   isModalOpen: boolean;
@@ -196,66 +184,3 @@ const PaperPrerequisitesModal = ({
 };
 
 export default PaperPrerequisitesModal;
-
-const labels = {
-  publicationId: "Publication",
-  seriesId: "Series",
-  classId: "Class",
-  subjectId: "Subject",
-  bookId: "Book",
-  chapterId: "Chapter",
-};
-
-type ControlledSelectProps = {
-  form: UseFormReturn<PrerequisitesForm, any, undefined>;
-  label:
-    | "publicationId"
-    | "seriesId"
-    | "classId"
-    | "subjectId"
-    | "bookId"
-    | "chapterId";
-  isDisabled: boolean;
-  options: { value: string; label: string }[];
-};
-
-const ControlledSelect = ({
-  form,
-  label,
-  options,
-  isDisabled,
-}: ControlledSelectProps) => {
-  return (
-    <FormField
-      control={form.control}
-      name={label}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>{labels[label]}</FormLabel>
-          <Select
-            onValueChange={field.onChange}
-            defaultValue={field.value}
-            disabled={isDisabled}
-          >
-            <FormControl>
-              <SelectTrigger
-                className={
-                  form.formState.errors[field.name] ? "border-red-100" : ""
-                }
-              >
-                <SelectValue placeholder={`Select ${labels[label]}`} />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              {options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FormItem>
-      )}
-    />
-  );
-};

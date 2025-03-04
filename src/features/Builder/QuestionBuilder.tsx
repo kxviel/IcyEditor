@@ -4,14 +4,6 @@ import PaperPrerequisitesModal from "./PaperPrerequisitesModal";
 import PaperView from "./PaperView";
 import QuestionList from "./QuestionList";
 import { useGetChapter } from "./api/getChapter";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useGetPublication } from "./api/getPublication";
 import { useGetSeries } from "./api/getSeries";
 import { useGetClass } from "./api/getClass";
@@ -19,18 +11,12 @@ import { useGetSubject } from "./api/getSubject";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { toast } from "sonner";
+import { Form } from "@/components/ui/form";
 import { useGetExamById } from "./api/getExamById";
 import { parseExamDataResponse } from "@/lib/utils";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
+import { ControlledSelect } from "@/components/ControlledSelect";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -54,13 +40,6 @@ const QuestionBuilder = ({ examId }: Props) => {
   const [isModalOpen, setIsModalOpen] = useState(
     ["manual", "auto"].includes(examId),
   );
-
-  const [fieldNames, setFieldNames] = useState({
-    publicationName: "",
-    seriesName: "",
-    className: "",
-    subjectName: "",
-  });
 
   const form = useForm<PrerequisitesForm>({
     resolver: zodResolver(prequisitesFormSchema),
@@ -88,7 +67,7 @@ const QuestionBuilder = ({ examId }: Props) => {
     }
   }, [examData, presetFields, presetHeaderData]);
 
-  const onPrequisitesSubmit = (data: PrerequisitesForm) => {
+  const onPrequisitesSubmit = () => {
     const allListsExist =
       publication.data &&
       series.data &&
@@ -98,41 +77,7 @@ const QuestionBuilder = ({ examId }: Props) => {
       chapters.data;
 
     if (allListsExist) {
-      const fieldNames = {
-        publicationName: "",
-        seriesName: "",
-        className: "",
-        subjectName: "",
-      };
-
-      try {
-        publication.data.forEach((item) => {
-          if (item.id === Number(data.publicationId)) {
-            fieldNames.publicationName = item.NAME;
-          }
-        });
-        series.data.forEach((item) => {
-          if (item.id === Number(data.seriesId)) {
-            fieldNames.seriesName = item.NAME;
-          }
-        });
-        classes.data.forEach((item) => {
-          if (item.id === Number(data.classId)) {
-            fieldNames.className = item.NAME;
-          }
-        });
-        subjects.data.forEach((item) => {
-          if (item.id === Number(data.subjectId)) {
-            fieldNames.subjectName = item.NAME;
-          }
-        });
-      } catch (error) {
-        console.log(error);
-        toast.error("Something went wrong");
-      } finally {
-        setFieldNames(fieldNames);
-        setIsModalOpen(false);
-      }
+      setIsModalOpen(false);
     }
   };
 
@@ -145,100 +90,91 @@ const QuestionBuilder = ({ examId }: Props) => {
             <Form {...form}>
               <form className="justify-centr flex flex-col gap-6 bg-white px-8 py-6">
                 <div className="grid w-full grid-cols-2 gap-4">
-                  <div>
-                    <Label>Publication</Label>
-                    <p>{fieldNames.publicationName || "-"}</p>
-                  </div>
-                  <div>
-                    <Label>Series</Label>
-                    <p>{fieldNames.seriesName || "-"}</p>
-                  </div>
-                  <div>
-                    <Label>Class</Label>
-                    <p>{fieldNames.className || "-"}</p>
-                  </div>
-                  <div>
-                    <Label>Subject</Label>
-                    <p>{fieldNames.subjectName || "-"}</p>
-                  </div>
-                  <div>
-                    <FormField
-                      control={form.control}
-                      name={"bookId"}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Book</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger
-                                className={
-                                  form.formState.errors[field.name]
-                                    ? "border-red-100"
-                                    : ""
-                                }
-                              >
-                                <SelectValue placeholder={"Select Chapter"} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {books?.data
-                                ? books.data.map((book) => (
-                                    <SelectItem
-                                      key={book.id}
-                                      value={book.id.toString()}
-                                    >
-                                      {book.NAME}
-                                    </SelectItem>
-                                  ))
-                                : null}
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div>
-                    <FormField
-                      control={form.control}
-                      name={"chapterId"}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Chapter</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger
-                                className={
-                                  form.formState.errors[field.name]
-                                    ? "border-red-100"
-                                    : ""
-                                }
-                              >
-                                <SelectValue placeholder={"Select Chapter"} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {chapters?.data
-                                ? chapters.data.map((chapter) => (
-                                    <SelectItem
-                                      key={chapter.id}
-                                      value={chapter.id.toString()}
-                                    >
-                                      {chapter.NAME}
-                                    </SelectItem>
-                                  ))
-                                : null}
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  <ControlledSelect
+                    form={form}
+                    label="publicationId"
+                    options={
+                      publication.data
+                        ? publication.data.map((option) => ({
+                            value: option.id?.toString(),
+                            label: option.NAME,
+                          }))
+                        : []
+                    }
+                    isDisabled={publication.isPending}
+                  />
+
+                  <ControlledSelect
+                    form={form}
+                    label="seriesId"
+                    options={
+                      series.data
+                        ? series.data.map(({ id, NAME }) => ({
+                            value: id.toString(),
+                            label: NAME,
+                          }))
+                        : []
+                    }
+                    isDisabled={
+                      series.isPending || !form.watch("publicationId")
+                    }
+                  />
+
+                  <ControlledSelect
+                    form={form}
+                    label="classId"
+                    options={
+                      classes.data
+                        ? classes.data.map(({ id, NAME }) => ({
+                            value: id.toString(),
+                            label: NAME,
+                          }))
+                        : []
+                    }
+                    isDisabled={classes.isPending || !form.watch("seriesId")}
+                  />
+
+                  <ControlledSelect
+                    form={form}
+                    label="subjectId"
+                    options={
+                      subjects.data
+                        ? subjects.data.map(({ id, NAME }) => ({
+                            value: id.toString(),
+                            label: NAME,
+                          }))
+                        : []
+                    }
+                    isDisabled={subjects.isPending || !form.watch("classId")}
+                  />
+
+                  <ControlledSelect
+                    form={form}
+                    label="bookId"
+                    options={
+                      books.data
+                        ? books.data.map(({ id, NAME }) => ({
+                            value: id.toString(),
+                            label: NAME,
+                          }))
+                        : []
+                    }
+                    isDisabled={books.isPending || !form.watch("classId")}
+                  />
+
+                  <ControlledSelect
+                    form={form}
+                    label="chapterId"
+                    options={
+                      chapters.data
+                        ? chapters.data.map(({ id, NAME }) => ({
+                            value: id.toString(),
+                            label: NAME,
+                          }))
+                        : []
+                    }
+                    isDisabled={chapters.isPending || !form.watch("classId")}
+                  />
                 </div>
               </form>
             </Form>
