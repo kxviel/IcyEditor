@@ -13,6 +13,7 @@ import { useFontSizeStore } from "@/store/useFontSizeStore";
 import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
 import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
 import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
+import { Button } from "@/components/ui/button";
 
 const pageDimensions: Record<string, string> = {
   // A1: "h-[841mm] w-[594mm]",
@@ -58,33 +59,25 @@ function Preview() {
 
   const handleWheel = useCallback(
     (event: WheelEvent) => {
-      // Check for key combinations
       if (event.ctrlKey) {
-        // Zoom with Ctrl + wheel
         event.preventDefault();
 
         if (event.deltaY < 0) {
-          // Zoom in (scroll up)
           setScale((prevScale) => Math.min(prevScale + scaleStep, maxScale));
         } else {
-          // Zoom out (scroll down)
           setScale((prevScale) => Math.max(prevScale - scaleStep, minScale));
         }
       } else if (event.shiftKey) {
-        // Horizontal scroll with Shift + wheel
         event.preventDefault();
         const newX = position.x + (event.deltaY > 0 ? -scrollStep : scrollStep);
         setPosition((prev) => ({ ...prev, x: newX }));
       }
-      // When no modifier keys are pressed, let the default scroll behavior happen
     },
     [position],
   );
 
   useEffect(() => {
-    // Type-safe ref checking
     if (parentRef.current) {
-      // Type-safe event handler attachment
       const element = parentRef.current;
       if (element) {
         parentRef.current.addEventListener(
@@ -100,10 +93,15 @@ function Preview() {
     }
   }, [handleWheel, position]);
 
+  const calcFontSize = (value: string) => {
+    setFontSize(value);
+  };
+
   const calcFn = () => {
     if (pageRef.current && lastElementRef.current) {
       // Page = EmptySpace + Content
       // therefore if: EmptySpace > Page - Content then: Duplicate Content else: move on
+      // man im a genius hehe
 
       const totalPageHeight = pageRef.current.getBoundingClientRect().height;
       const parentTop = pageRef.current.getBoundingClientRect().top;
@@ -121,19 +119,12 @@ function Preview() {
     }
   };
 
-  const calcFontSize = (value: string) => {
-    setFontSize(value);
-  };
-
   return (
     <div className="flex h-full flex-col items-center gap-6 py-6">
       <Tabs
         defaultValue="login"
         value={activeTab}
-        onValueChange={(value) => {
-          setActiveTab(value);
-          calcFn();
-        }}
+        onValueChange={setActiveTab}
         className="flex flex-col items-center justify-center"
       >
         <TabsList className="w-[632px]">
@@ -155,12 +146,9 @@ function Preview() {
             <SelectValue placeholder="Paper Type" />
           </SelectTrigger>
           <SelectContent>
-            {/* <SelectItem value="A1">A1</SelectItem>
-            <SelectItem value="A2">A2</SelectItem> */}
             <SelectItem value="A3">A3</SelectItem>
             <SelectItem value="A4">A4</SelectItem>
             <SelectItem value="A5">A5</SelectItem>
-            {/* <SelectItem value="A6">A6</SelectItem> */}
           </SelectContent>
         </Select>
 
@@ -180,6 +168,10 @@ function Preview() {
             <SelectItem value="6">28</SelectItem>
           </SelectContent>
         </Select>
+
+        <Button onClick={calcFn} disabled>
+          Duplicate (Under Construction)
+        </Button>
       </div>
 
       <div
@@ -201,15 +193,7 @@ function Preview() {
   );
 }
 
-const A4Page = ({
-  pageSize,
-  pageRef,
-  lastElementRef,
-  duplicateCapacity,
-  scale,
-  position,
-  activeTab,
-}: {
+type A4Props = {
   pageSize: string;
   pageRef: React.RefObject<HTMLDivElement>;
   lastElementRef: React.RefObject<HTMLDivElement>;
@@ -220,16 +204,24 @@ const A4Page = ({
     x: number;
     y: number;
   };
-}) => {
+};
+
+const A4Page = ({
+  pageSize,
+  pageRef,
+  lastElementRef,
+  duplicateCapacity,
+  scale,
+  position,
+  activeTab,
+}: A4Props) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
-  console.log(pageDimensions[pageSize]);
 
   return (
     <div
-      className={`mx-auto ${pageDimensions[pageSize]} border border-gray-300 bg-white p-6 shadow-md transition-transform duration-100 ease-in-out`}
-      // className="mx-auto h-[297mm] w-[210mm] border border-gray-300 bg-white p-6 shadow-md"
       ref={pageRef}
+      className={`${pageDimensions[pageSize]} mx-auto border border-gray-300 bg-white p-6 shadow-md transition-transform duration-100 ease-in-out`}
       style={{
         transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
       }}
@@ -293,20 +285,6 @@ const A4Page = ({
                 </div>
               ))}
             </div>
-
-            {/* <div className="flex w-full flex-col gap-3">
-              {fields.map((question, i) => (
-                <div
-                  className="h-10 w-full bg-slate-200"
-                  key={question.id}
-
-                >
-                  <p style={{ fontSize: 16 + Number(currentFontSize) }}>
-                    {question.value}
-                  </p>
-                </div>
-              ))}
-            </div> */}
           </Fragment>
         ))}
     </div>
