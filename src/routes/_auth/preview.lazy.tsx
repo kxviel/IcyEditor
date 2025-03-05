@@ -77,11 +77,8 @@ function Preview() {
     let totalPageHeight: number = 0;
     let currentChildHeight: number = 0;
     let currentPageIndex: number = 0;
-    let currentPageArray = [...pageArray];
 
     if (pageRef.current) {
-      currentPageArray = [[]];
-
       totalPageHeight =
         pageRef.current.getBoundingClientRect().height - 12 - 24;
       if (currentPageIndex === 0 && headerRef.current) {
@@ -98,28 +95,24 @@ function Preview() {
           const currentField = fields[Object.keys(fields)[index]];
 
           if (currentChildHeight < totalPageHeight) {
-            currentPageArray[currentPageIndex].push(currentField);
-            // setPageArray((page) => {
-            //   page[currentPageIndex].push(currentField);
-            //   return page;
-            // });
+            setPageArray((page) => {
+              if (page[currentPageIndex]) {
+                page[currentPageIndex].push(currentField);
+              } else {
+                page[currentPageIndex] = [currentField];
+              }
+              return page;
+            });
           } else {
             currentPageIndex += 1;
             currentChildHeight = 0;
-            currentPageArray.push([currentField]);
-            // setPageArray((page) => [...page, [currentField]]);
-          }
 
-          console.log("currentPageArray: ", currentPageArray);
+            setPageArray((page) => [...page, [currentField]]);
+          }
         });
       }
-      setPageArray(currentPageArray);
     }
   }, [scale, position, fields, currentFontSize]);
-
-  // useEffect(() => {
-  //   console.log("pageArray: ", pageArray);
-  // }, [pageArray]);
 
   return (
     <div className="flex h-full flex-col items-center gap-6 py-6">
