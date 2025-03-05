@@ -115,7 +115,7 @@ function Preview() {
   }, [fields, currentFontSize]);
 
   return (
-    <div className="flex h-full flex-col items-center gap-6 py-6">
+    <div className="flex h-full flex-col items-center gap-6 pt-6">
       <Tabs
         defaultValue="login"
         value={activeTab}
