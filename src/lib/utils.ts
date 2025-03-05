@@ -72,131 +72,112 @@ export function parseExamDataResponse(response: ExamData): ReturnProps {
 }
 
 export const tempFields = {
-  "50": {
-    categoryId: "50",
-    categoryName: "Tick (✔) the correct option.",
-    questions: [
-      {
-        questionId: 2798,
-        questionText:
-          "Mrs Jasleen started to walk quickly in the _______________.</p>a.&nbsp;corridor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;classroom",
-      },
-      {
-        questionId: 2796,
-        questionText:
-          "Mrs Jasleen was looking into her _________________.</p>a.&nbsp;folder&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;schedule",
-      },
-      {
-        questionId: 2797,
-        questionText:
-          "Mrs Jasleen picked up her ____________________ quickly.</p>a.&nbsp;spectacles&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;folder",
-      },
-      {
-        questionId: 2799,
-        questionText:
-          "_____________ was coming from the other side.</p>a.&nbsp;Ruhi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;Ruhan",
-      },
-      {
-        questionId: 2800,
-        questionText:
-          "Mrs Jasleen was correcting her_______________.</p>a.&nbsp;folder&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;spectacles",
-      },
-      {
-        questionId: 2801,
-        questionText:
-          "Students who were making noise sealed their __________________</p>a.&nbsp;lips&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;bags",
-      },
-      {
-        questionId: 2665,
-        questionText:
-          "Ruhan's _____________________ were growing taller than he did.</p>a.&nbsp;cousins&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;relatives",
-      },
-      {
-        questionId: 2666,
-        questionText:
-          "Ruhan's_______________________ noticed that he was sitting with a dull face.</p>a.&nbsp;mother&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;grandmother",
-      },
-      {
-        questionId: 2667,
-        questionText:
-          "_________________ grandmother went into deep thinking for a few minutes.</p>a.&nbsp;Ruhan's&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;Ruhi's",
-      },
-      {
-        questionId: 2668,
-        questionText:
-          "Mrs Shuchitra could give a concrete solution to Ruhan's _________________.</p>a.&nbsp;problem&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;question",
-      },
-      {
-        questionId: 2669,
-        questionText:
-          "There are some scientific____________________ behind a human body's growth.</p>a.&nbsp;problems&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;reasons",
-      },
-      {
-        questionId: 2670,
-        questionText:
-          "Mrs Shuchitra listened to every detail that _________________ gave her.</p>a.&nbsp;Ruhi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;Ruhan",
-      },
-    ],
-  },
-  "621": {
-    categoryId: "621",
-    categoryName: "Help Ruhi in writing down the  names of private body parts.",
-    questions: [
-      {
-        questionId: 4914,
-        questionText:
-          "1.&nbsp;m___ut____</p>2.&nbsp;____ut____ck____</p>3.&nbsp;____he____t</p>4.&nbsp;t____ig____",
-      },
-    ],
-  },
-  "622": {
-    categoryId: "622",
+  "660": {
+    categoryId: "660",
     categoryName:
-      'Is it your private body part? Look at the pictures and write " YES " or " NO" for these.',
+      "निम्नलिखित काव्यांश को ध्यानपूर्वक पढ़कर दिए गए प्रश्नों के उत्तर दीजिए—",
     questions: [
       {
-        questionId: 4915,
+        questionId: 8000,
         questionText:
-          '<p><img alt="" height="200" src="../data/Keylinks/826.png" width="250" /></p><p><img alt="" height="200" src="../data/Keylinks/827.png" width="250" /></p><p><img alt="" height="200" src="../data/Keylinks/828.png" width="250" /></p><p><img alt="" height="200" src="../data/Keylinks/829.png" width="250" /></p><p><img alt="" height="200" src="../data/Keylinks/830.png" width="250" /></p>',
+          "विंध्य-सतपुड़ा, नागा-रवसिया, ये दो औघट घाट महा,</p>(क)\tदो औघट महाघाट कौन-से हैं?</p>(ख)\tकविता में चिर-अटल किसे कहा गया है?</p>(ग)\tभारत के पूरब-पश्चिम में स्थित घाटों की तुलना किससे की गई है?</p>(घ)\tबताइए, ‘हिमालय’ का समानार्थी शब्द क्या होगा?",
       },
     ],
   },
-  "839": {
-    categoryId: "839",
-    categoryName: "Answer the Following Questions :",
+  "661": {
+    categoryId: "661",
+    categoryName: "उचित विकल्प पर सही (✓) का चिह्न लगाइए—",
     questions: [
       {
-        questionId: 2790,
+        questionId: 8001,
         questionText:
-          "Describe the situation of Mrs Jasleen on Monday morning.",
+          "भारत का गौरव निशान इनमें से कौन-सा पर्वत माना जाता है?</p>नागा पर्वत</p>खसिया पर्वत</p>हिमालय पर्वत",
       },
       {
-        questionId: 2792,
+        questionId: 8002,
         questionText:
-          "Describe the conversation that took between Mrs Jasleen and Ruhi in the recess.",
+          "कविता में किसको माता कहकर पुकारा गया है?</p>रावी</p>गंगा</p>कृष्णा",
       },
       {
-        questionId: 2793,
+        questionId: 8003,
         questionText:
-          "Describe the conversation that look place between Ruhi and Ruhan regarding Mrs Jasleen.",
+          "कविता में कौन-सी नदी का उल्लेख नहीं हुआ है?</p>नर्मदा नदी</p>सतलुज नदी</p>कावेरी नदी",
       },
       {
-        questionId: 2791,
+        questionId: 8004,
         questionText:
-          "What happened when Ruhi tried to interact with Mrs Jasleen on Monday morning?",
+          "‘कोटि-कोटि कंठों से निकली’ इस पंक्ति में कोटि-कोटि का अर्थ है–</p>कोमल</p>ह़जारों</p>करोड़ों",
       },
+    ],
+  },
+  "662": {
+    categoryId: "662",
+    categoryName: "निम्नलिखित पंक्तियों के भाव स्पष्ट कीजिए— ",
+    questions: [
       {
-        questionId: 2794,
-        questionText: "How did Jasleen clear Ruhi's doubts?",
-      },
-      {
-        questionId: 2795,
-        questionText: "What do you mean by intersex,gender and transgender?",
-      },
-      {
-        questionId: 2672,
+        questionId: 8005,
         questionText:
-          "What Ruhi and Ruhan thought about growing up when they were kids?",
+          "(क) तुंग-शिखर, चिर-अटल हिमालय है पर्वत-सम्राट यहाँ,यह गिरिवर बन गया युगों से, विजय-निशान हमारा है।......................................................................................</p>(ख) ब्रह्मपुत्र, कृष्णा, कावेरी, वत्सलता-उत्संग-मती,इनसे प्लावित देश हमारा, यह रसखान हमारा है।.......................................................",
+      },
+    ],
+  },
+  "663": {
+    categoryId: "663",
+    categoryName: "निम्नलिखित प्रश्नों के उत्तर लिखिए—",
+    questions: [
+      {
+        questionId: 8006,
+        questionText:
+          "लघु उत्तरीय प्रश्न</p></p>(क)\tभारतवासियों को किस बात पर गर्व है?</p>(ख) इस कविता में किन-किन नदियों के नाम दिए गए हैं?</p></p>विस्तृत उत्तरीय प्रश्न</p></p>(क)\t‘हिंदुस्तान हमारा है’ कविता किस भाव से ओत-प्रोत है? अपने विचार लिखिए।</p>(ख) हमारे देश को पुरातन कहे जाने का क्या कारण है?</p>(ग) हिमालय पर्वत किस प्रकार भारत देश की रक्षा करता है?",
+      },
+    ],
+  },
+  "808": {
+    categoryId: "808",
+    categoryName: "समास",
+    questions: [
+      {
+        questionId: 104002,
+        questionText:
+          "(क)\tजिस सामासिक शब्द के दोनों पद प्रधान हों तथा दोनों पद ‘और’, ‘या’ आदि समुच्चयबोधकों से न जुड़कर योजक चिह्नों (-) से जुड़े हों, उसे द्वंद्व समास कहते हैं।</p>उदाहरण\t–\tसमस्त पद\tसमास-विग्रह</p>विंध्य-सतपुड़ा\tविंध्य और सतपुड़ा",
+      },
+      {
+        questionId: 104003,
+        questionText:
+          "(ख)\tजिस समास में उत्तर पद प्रधान होता है, उसे तत्पुरुष समास कहते हैं। इस समास में दोनों पदों के मध्य कारक चिह्नों का लोप हो जाता है–</p>उदाहरण\t–\tसमास-विग्रह\tसमस्त पद</p>यश को प्राप्त\tयशप्राप्त</p>देश के लिए भक्ति\tदेशभक्ति",
+      },
+    ],
+  },
+  "809": {
+    categoryId: "809",
+    categoryName: "कविता में आए तत्पुरुष और द्वंद्व समास छाँटकर लिखिए–\t\t",
+    questions: [
+      {
+        questionId: 104004,
+        questionText:
+          "............................................................................................</p>..................................................................",
+      },
+    ],
+  },
+  "810": {
+    categoryId: "810",
+    categoryName: "दिए गए काव्यांश में उचित स्थान पर योजक चिह्न लगाइए–",
+    questions: [
+      {
+        questionId: 104005,
+        questionText:
+          "विंध्य सतपुड़ा, नागा खसिया, यह औघट घाट महा, भारत के पूरब पश्चिम के यह दो भीम कपाट महा, तुंग शिखर, चिर अटल हिमालय है पर्वत सम्राट यहाँ, यह गिरिवर बन गया युगों से, विजय निशान हमारा है।",
+      },
+    ],
+  },
+  "811": {
+    categoryId: "811",
+    categoryName: "निम्नलिखित शब्दों के विलोम शब्द लिखिए–",
+    questions: [
+      {
+        questionId: 104006,
+        questionText:
+          "(क)\tमानव\t....................................</p>(ख)\tपुरातन\t....................................</p>(ग)\tमान\t....................................</p>(घ)\tविजय\t....................................</p>(ङ)\tजागरण\t....................................</p>(च)\tसृजन\t....................................</p>(छ)\tज्ञान\t....................................</p>(ज)\tस्वदेश\t....................................",
       },
     ],
   },

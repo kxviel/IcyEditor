@@ -1,7 +1,10 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
+import {
+  CategoryItem,
+  useQuestionBuilderStore,
+} from "@/store/useQuestionBuilderStore";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -13,6 +16,7 @@ import { useFontSizeStore } from "@/store/useFontSizeStore";
 import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
 import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
 import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
+import { useZoomPan } from "@/hooks/useZoomPan";
 
 const pageDimensions: Record<string, string> = {
   // A1: "h-[841mm] w-[594mm]",
@@ -21,12 +25,6 @@ const pageDimensions: Record<string, string> = {
   A4: "h-[297mm] w-[210mm]",
   A5: "h-[210mm] w-[148mm]",
   // A6: "h-[148mm] w-[105mm]",
-};
-
-const pageHeaders: Record<string, React.ReactNode> = {
-  "1": <PaperHeaderOne isPreview={true} />,
-  "2": <PaperHeaderTwo isPreview={true} />,
-  "3": <PaperHeaderThree isPreview={true} />,
 };
 
 export const Route = createLazyFileRoute("/_auth/preview")({
@@ -39,59 +37,89 @@ export const Route = createLazyFileRoute("/_auth/preview")({
   ),
 });
 
-function Preview() {
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const minScale = 0.2;
-  const maxScale = 3;
-  const scaleStep = 0.1;
-  const scrollStep = 20;
-  const parentRef = useRef<HTMLDivElement>(null);
+type RenderedPageProps = {
+  pageRef: React.RefObject<HTMLDivElement>;
+  childRef: React.RefObject<HTMLDivElement>;
+  headerRef: React.RefObject<HTMLDivElement>;
+  pageIndex: number;
+  pageSize: string;
+  scale: number;
+  activeTab: string;
+  position: {
+    x: number;
+    y: number;
+  };
+  pageValue: CategoryItem[];
+  dontShow: boolean;
+};
 
+function Preview() {
+  const { scale, position, parentRef } = useZoomPan();
+  const pageRef = useRef<HTMLDivElement>(null);
+  const childRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  const fields = useQuestionBuilderStore((state) => state.fields);
   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
   const setFontSize = useFontSizeStore((state) => state.setFontSize);
+
   const [pageSize, setPageSize] = useState("A4");
   const [activeTab, setActiveTab] = useState("1");
-
-  const handleWheel = useCallback(
-    (event: WheelEvent) => {
-      if (event.ctrlKey) {
-        event.preventDefault();
-
-        if (event.deltaY < 0) {
-          setScale((prevScale) => Math.min(prevScale + scaleStep, maxScale));
-        } else {
-          setScale((prevScale) => Math.max(prevScale - scaleStep, minScale));
-        }
-      } else if (event.shiftKey) {
-        event.preventDefault();
-        const newX = position.x + (event.deltaY > 0 ? -scrollStep : scrollStep);
-        setPosition((prev) => ({ ...prev, x: newX }));
-      }
-    },
-    [position],
-  );
-
-  useEffect(() => {
-    if (parentRef.current) {
-      const element = parentRef.current;
-      if (element) {
-        parentRef.current.addEventListener(
-          "wheel",
-          handleWheel as EventListener,
-          { passive: false },
-        );
-      }
-
-      return () => {
-        element.removeEventListener("wheel", handleWheel as EventListener);
-      };
-    }
-  }, [handleWheel, position]);
+  const [dontShow, setDontShow] = useState(false);
 
   const calcFontSize = (value: string) => {
     setFontSize(value);
   };
+
+  const [pageArray, setPageArray] = useState<CategoryItem[][]>([[]]);
+
+  useEffect(() => {
+    let totalPageHeight: number = 0;
+    let currentChildHeight: number = 0;
+    let currentPageIndex: number = 0;
+    let currentPageArray = [...pageArray];
+
+    if (pageRef.current) {
+      currentPageArray = [[]];
+
+      totalPageHeight =
+        pageRef.current.getBoundingClientRect().height - 12 - 24;
+      if (currentPageIndex === 0 && headerRef.current) {
+        totalPageHeight -= headerRef.current.getBoundingClientRect().height - 8;
+      }
+      console.log("totalPageHeight: ", totalPageHeight);
+      console.log("currentFontSize: ", currentFontSize);
+
+      if (childRef.current) {
+        [...childRef.current.children].forEach((child, index) => {
+          currentChildHeight += child.getBoundingClientRect().height;
+          console.log("currentChildHeight: ", currentChildHeight);
+
+          const currentField = fields[Object.keys(fields)[index]];
+
+          if (currentChildHeight < totalPageHeight) {
+            currentPageArray[currentPageIndex].push(currentField);
+            // setPageArray((page) => {
+            //   page[currentPageIndex].push(currentField);
+            //   return page;
+            // });
+          } else {
+            currentPageIndex += 1;
+            currentChildHeight = 0;
+            currentPageArray.push([currentField]);
+            // setPageArray((page) => [...page, [currentField]]);
+          }
+
+          console.log("currentPageArray: ", currentPageArray);
+        });
+      }
+      setPageArray(currentPageArray);
+    }
+  }, [scale, position, fields, currentFontSize]);
+
+  // useEffect(() => {
+  //   console.log("pageArray: ", pageArray);
+  // }, [pageArray]);
 
   return (
     <div className="flex h-full flex-col items-center gap-6 py-6">
@@ -145,94 +173,159 @@ function Preview() {
       </div>
 
       <div
-        className="relative h-full w-full overflow-auto bg-black/70 p-2"
+        className="relative h-full w-full space-y-4 overflow-auto bg-black/70 p-2"
         ref={parentRef}
       >
-        <RenderedPage
-          pageSize={pageSize}
-          scale={scale}
-          position={position}
-          activeTab={activeTab}
-        />
-        {/* <A4Page pageSize={pageSize as PageProps["size"]} /> */}
+        {pageArray.map((pageValue, pageIndex) => (
+          <RenderedPage
+            key={pageIndex}
+            pageRef={pageRef}
+            childRef={childRef}
+            pageIndex={pageIndex}
+            pageSize={pageSize}
+            scale={scale}
+            position={position}
+            activeTab={activeTab}
+            pageValue={pageValue}
+            dontShow={dontShow}
+            headerRef={headerRef}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-type RenderedPageProps = {
-  pageSize: string;
-  scale: number;
-  activeTab: string;
-  position: {
-    x: number;
-    y: number;
-  };
-};
-
 const RenderedPage = ({
+  pageIndex,
   pageSize,
   scale,
   position,
   activeTab,
+  pageRef,
+  childRef,
+  pageValue,
+  dontShow,
+  headerRef,
 }: RenderedPageProps) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
 
   return (
     <div
-      className={`${pageDimensions[pageSize]} mx-auto border border-gray-300 bg-white p-6 shadow-md transition-transform duration-100 ease-in-out`}
+      ref={pageRef}
+      className={`${pageDimensions[pageSize]} mx-auto my-3 border border-gray-300 bg-white box-decoration-clone p-6 shadow-md transition-transform duration-100 ease-in-out`}
       style={{
         transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
       }}
     >
-      {pageHeaders[activeTab]}
+      {pageIndex === 0 &&
+        (activeTab === "1" ? (
+          <PaperHeaderOne isPreview={true} headerRef={headerRef} />
+        ) : activeTab === "2" ? (
+          <PaperHeaderTwo isPreview={true} headerRef={headerRef} />
+        ) : (
+          <PaperHeaderThree isPreview={true} headerRef={headerRef} />
+        ))}
 
       <div className="flex w-full flex-col gap-3">
-        {Object.values(fields).map((field, fieldIndex) => (
-          <div className="w-full" key={field.categoryId}>
-            <div className="my-3 flex gap-2">
-              <p
-                className="font-semibold text-gray-800"
-                style={{ fontSize: 16 + Number(currentFontSize) }}
-              >
-                Q{fieldIndex + 1}.
-              </p>
-              <p
-                className="font-semibold text-gray-800"
-                style={{ fontSize: 16 + Number(currentFontSize) }}
-              >
-                {field.categoryName}
-              </p>
+        {pageValue.map((field, fieldIndex) => {
+          if (pageValue.find((item) => item.categoryId === field.categoryId))
+            return (
+              <div className="w-full" key={field.categoryId}>
+                <div className="my-3 flex gap-2">
+                  <p
+                    className="font-semibold text-gray-800"
+                    style={{ fontSize: 16 + Number(currentFontSize) }}
+                  >
+                    Q{fieldIndex + 1}.
+                  </p>
+                  <p
+                    className="font-semibold text-gray-800"
+                    style={{ fontSize: 16 + Number(currentFontSize) }}
+                  >
+                    {field.categoryName}
+                  </p>
 
-              <p
-                className="ml-auto"
-                style={{ fontSize: 14 + Number(currentFontSize) }}
-              >
-                (1 x {field.questions.length}) = 5
-              </p>
-            </div>
+                  <p
+                    className="ml-auto"
+                    style={{ fontSize: 14 + Number(currentFontSize) }}
+                  >
+                    (1 x {field.questions.length}) = 5
+                  </p>
+                </div>
 
-            {field.questions.map((question, index) => (
-              <div key={question.questionId} className="my-3 flex gap-2">
-                <p
-                  className="font-semibold text-gray-800"
-                  style={{ fontSize: 14 + Number(currentFontSize) }}
-                >
-                  {index + 1}.
-                </p>
-                <p
-                  className="text-gray-700"
-                  style={{ fontSize: 14 + Number(currentFontSize) }}
-                  dangerouslySetInnerHTML={{
-                    __html: question.questionText,
-                  }}
-                />
+                {field.questions.map((question, index) => (
+                  <div key={question.questionId} className="my-3 flex gap-2">
+                    <p
+                      className="font-semibold text-gray-800"
+                      style={{ fontSize: 14 + Number(currentFontSize) }}
+                    >
+                      {index + 1}.
+                    </p>
+                    <p
+                      className="text-gray-700"
+                      style={{ fontSize: 14 + Number(currentFontSize) }}
+                      dangerouslySetInnerHTML={{
+                        __html: question.questionText,
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        ))}
+            );
+        })}
       </div>
+
+      {!dontShow && (
+        <div className="invisible flex w-full flex-col gap-3" ref={childRef}>
+          {Object.values(fields).map((field, fieldIndex) => {
+            return (
+              <div className="w-full" key={field.categoryId}>
+                <div className="my-3 flex gap-2">
+                  <p
+                    className="font-semibold text-gray-800"
+                    style={{ fontSize: 16 + Number(currentFontSize) }}
+                  >
+                    Q{fieldIndex + 1}.
+                  </p>
+                  <p
+                    className="font-semibold text-gray-800"
+                    style={{ fontSize: 16 + Number(currentFontSize) }}
+                  >
+                    {field.categoryName}
+                  </p>
+
+                  <p
+                    className="ml-auto"
+                    style={{ fontSize: 14 + Number(currentFontSize) }}
+                  >
+                    (1 x {field.questions.length}) = 5
+                  </p>
+                </div>
+
+                {field.questions.map((question, index) => (
+                  <div key={question.questionId} className="my-3 flex gap-2">
+                    <p
+                      className="font-semibold text-gray-800"
+                      style={{ fontSize: 14 + Number(currentFontSize) }}
+                    >
+                      {index + 1}.
+                    </p>
+                    <p
+                      className="text-gray-700"
+                      style={{ fontSize: 14 + Number(currentFontSize) }}
+                      dangerouslySetInnerHTML={{
+                        __html: question.questionText,
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,8 +1,17 @@
 import EditableField from "./EditableField";
 
-const PaperHeaderOne = ({ isPreview = false }: { isPreview?: boolean }) => {
+const PaperHeaderOne = ({
+  isPreview = false,
+  headerRef,
+}: {
+  isPreview?: boolean;
+  headerRef: React.RefObject<HTMLDivElement>;
+}) => {
   return (
-    <div className="mb-2 flex w-full flex-col items-center gap-3">
+    <div
+      className="mb-2 flex w-full flex-col items-center gap-3"
+      ref={headerRef}
+    >
       <EditableField
         headerId="schoolName"
         fontSize={30}

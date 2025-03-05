@@ -3,13 +3,13 @@ import { create } from "zustand";
 
 export type Fieldtype = Record<string, CategoryItem>;
 
-interface CategoryItem {
+export interface CategoryItem {
   categoryId: string;
   categoryName: string;
   questions: QuestionItem[];
 }
 
-interface QuestionItem {
+export interface QuestionItem {
   questionId: number;
   questionText: string;
 }
@@ -26,7 +26,7 @@ interface HeaderStore {
 }
 
 export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
-  fields: tempFields,
+  fields: {},
   presetFields: (fields) => set(() => ({ fields })),
   addQuestion: (categoryId, categoryName, question) =>
     set((state) => {
