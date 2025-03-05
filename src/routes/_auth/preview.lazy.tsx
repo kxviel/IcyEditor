@@ -112,7 +112,7 @@ function Preview() {
         });
       }
     }
-  }, [scale, position, fields, currentFontSize]);
+  }, [fields, currentFontSize]);
 
   return (
     <div className="flex h-full flex-col items-center gap-6 py-6">
@@ -166,7 +166,7 @@ function Preview() {
       </div>
 
       <div
-        className="relative h-full w-full space-y-4 overflow-auto bg-black/70 p-2"
+        className="relative h-full w-full overflow-auto bg-black/70 p-2"
         ref={parentRef}
       >
         {pageArray.map((pageValue, pageIndex) => (
@@ -192,8 +192,8 @@ function Preview() {
 const RenderedPage = ({
   pageIndex,
   pageSize,
-  scale,
-  position,
+  // scale,
+  // position,
   activeTab,
   pageRef,
   childRef,
@@ -207,10 +207,10 @@ const RenderedPage = ({
   return (
     <div
       ref={pageRef}
-      className={`${pageDimensions[pageSize]} mx-auto my-3 border border-gray-300 bg-white box-decoration-clone p-6 shadow-md transition-transform duration-100 ease-in-out`}
-      style={{
-        transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-      }}
+      className={`${pageDimensions[pageSize]} mx-auto mb-3 border border-gray-300 bg-white box-decoration-clone p-6 shadow-md transition-transform duration-100 ease-in-out`}
+      // style={{
+      //   transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
+      // }}
     >
       {pageIndex === 0 &&
         (activeTab === "1" ? (
