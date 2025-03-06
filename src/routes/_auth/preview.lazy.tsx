@@ -78,6 +78,8 @@ function Preview() {
     let currentChildHeight: number = 0;
     let currentPageIndex: number = 0;
 
+    const tempPageArray: CategoryItem[][] = [[]];
+
     if (pageRef.current) {
       totalPageHeight =
         pageRef.current.getBoundingClientRect().height - 12 - 24;
@@ -95,23 +97,33 @@ function Preview() {
           const currentField = fields[Object.keys(fields)[index]];
 
           if (currentChildHeight < totalPageHeight) {
-            setPageArray((page) => {
-              if (page[currentPageIndex]) {
-                page[currentPageIndex].push(currentField);
-              } else {
-                page[currentPageIndex] = [currentField];
-              }
-              return page;
-            });
+            if (tempPageArray[currentPageIndex]) {
+              tempPageArray[currentPageIndex].push(currentField);
+            } else {
+              tempPageArray[currentPageIndex] = [currentField];
+            }
+
+            // setPageArray((page) => {
+            //   if (page[currentPageIndex]) {
+            //     page[currentPageIndex].push(currentField);
+            //   } else {
+            //     page[currentPageIndex] = [currentField];
+            //   }
+            //   return page;
+            // });
           } else {
             currentPageIndex += 1;
             currentChildHeight = 0;
 
-            setPageArray((page) => [...page, [currentField]]);
+            tempPageArray[currentPageIndex] = [currentField];
+
+            // setPageArray((page) => [...page, [currentField]]);
           }
         });
       }
     }
+
+    setPageArray(tempPageArray);
   }, [fields, currentFontSize]);
 
   return (
