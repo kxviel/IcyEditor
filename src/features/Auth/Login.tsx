@@ -30,6 +30,10 @@ const Login = () => {
   const loginFn = useLoginFn();
   const form = useForm<LoginSchemaTypes>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
   const onSubmit = (data: LoginSchemaTypes) => {
@@ -48,14 +52,13 @@ const Login = () => {
           <FormField
             control={form.control}
             name="email"
-            defaultValue=""
-            disabled={loginFn.isPending}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
+                    disabled={loginFn.isPending}
                     placeholder="Enter your email"
                     {...field}
                   />
@@ -67,14 +70,13 @@ const Login = () => {
           <FormField
             control={form.control}
             name="password"
-            defaultValue=""
-            disabled={loginFn.isPending}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
                   <IconInput
                     type="password"
+                    disabled={loginFn.isPending}
                     placeholder="Enter your password"
                     {...field}
                   />

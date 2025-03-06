@@ -92,14 +92,13 @@ const Register = () => {
               <FormField
                 control={form.control}
                 name="name"
-                defaultValue=""
-                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>FullName</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
+                        disabled={registerFn.isPending}
                         placeholder="Enter your fullname"
                         {...field}
                       />
@@ -111,13 +110,16 @@ const Register = () => {
               <FormField
                 control={form.control}
                 name="phone"
-                defaultValue=""
-                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone No.</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your phone number" {...field} />
+                      <Input
+                        type="text"
+                        disabled={registerFn.isPending}
+                        placeholder="Enter your phone number"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -127,14 +129,13 @@ const Register = () => {
               <FormField
                 control={form.control}
                 name="state"
-                defaultValue=""
-                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>State</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={registerFn.isPending}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -159,14 +160,13 @@ const Register = () => {
               <FormField
                 control={form.control}
                 name="password"
-                defaultValue=""
-                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
+                        disabled={registerFn.isPending}
                         placeholder="Create your password"
                         {...field}
                       />
@@ -178,14 +178,13 @@ const Register = () => {
               <FormField
                 control={form.control}
                 name="publicationId"
-                defaultValue=""
-                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Publication</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={registerFn.isPending}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -209,14 +208,13 @@ const Register = () => {
               <FormField
                 control={form.control}
                 name="email"
-                defaultValue=""
-                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
+                        disabled={registerFn.isPending}
                         placeholder="Enter your email"
                         {...field}
                       />
@@ -228,14 +226,13 @@ const Register = () => {
               <FormField
                 control={form.control}
                 name="school"
-                defaultValue=""
-                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>School Name</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
+                        disabled={registerFn.isPending}
                         placeholder="Enter school name"
                         {...field}
                       />
@@ -247,14 +244,13 @@ const Register = () => {
               <FormField
                 control={form.control}
                 name="city"
-                defaultValue=""
-                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>City</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={registerFn.isPending}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -277,14 +273,13 @@ const Register = () => {
               <FormField
                 control={form.control}
                 name="confirmPassword"
-                defaultValue=""
-                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
+                        disabled={registerFn.isPending}
                         placeholder="Confirm your password"
                         {...field}
                       />
@@ -296,14 +291,13 @@ const Register = () => {
               <FormField
                 control={form.control}
                 name="seriesId"
-                defaultValue=""
-                disabled={registerFn.isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Series</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
+                      disabled={registerFn.isPending}
                     >
                       <FormControl>
                         <SelectTrigger>
