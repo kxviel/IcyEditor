@@ -16,7 +16,6 @@ import { useFontSizeStore } from "@/store/useFontSizeStore";
 import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
 import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
 import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
-import { useZoomPan } from "@/hooks/useZoomPan";
 
 const pageDimensions: Record<string, string> = {
   // A1: "h-[841mm] w-[594mm]",
@@ -24,7 +23,7 @@ const pageDimensions: Record<string, string> = {
   A3: "h-[420mm] w-[297mm]",
   A4: "h-[297mm] w-[210mm]",
   A5: "h-[210mm] w-[148mm]",
-  // A6: "h-[148mm] w-[105mm]",
+  A6: "h-[148mm] w-[105mm]",
 };
 
 export const Route = createLazyFileRoute("/_auth/preview")({
@@ -43,18 +42,13 @@ type RenderedPageProps = {
   headerRef: React.RefObject<HTMLDivElement>;
   pageIndex: number;
   pageSize: string;
-  scale: number;
   activeTab: string;
-  position: {
-    x: number;
-    y: number;
-  };
   pageValue: CategoryItem[];
-  dontShow: boolean;
+  showHiddenRender: boolean;
 };
 
 function Preview() {
-  const { scale, position, parentRef } = useZoomPan();
+  const parentRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const childRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +59,7 @@ function Preview() {
 
   const [pageSize, setPageSize] = useState("A4");
   const [activeTab, setActiveTab] = useState("1");
-  const [dontShow, setDontShow] = useState(false);
+  const [showHiddenRender, setShowHiddenRender] = useState(true);
 
   const calcFontSize = (value: string) => {
     setFontSize(value);
@@ -156,6 +150,7 @@ function Preview() {
             <SelectItem value="A3">A3</SelectItem>
             <SelectItem value="A4">A4</SelectItem>
             <SelectItem value="A5">A5</SelectItem>
+            <SelectItem value="A6">A6</SelectItem>
           </SelectContent>
         </Select>
 
@@ -188,11 +183,9 @@ function Preview() {
             childRef={childRef}
             pageIndex={pageIndex}
             pageSize={pageSize}
-            scale={scale}
-            position={position}
             activeTab={activeTab}
             pageValue={pageValue}
-            dontShow={dontShow}
+            showHiddenRender={showHiddenRender}
             headerRef={headerRef}
           />
         ))}
@@ -204,13 +197,11 @@ function Preview() {
 const RenderedPage = ({
   pageIndex,
   pageSize,
-  // scale,
-  // position,
   activeTab,
   pageRef,
   childRef,
   pageValue,
-  dontShow,
+  showHiddenRender,
   headerRef,
 }: RenderedPageProps) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
@@ -220,9 +211,6 @@ const RenderedPage = ({
     <div
       ref={pageRef}
       className={`${pageDimensions[pageSize]} mx-auto mb-3 border border-gray-300 bg-white box-decoration-clone p-6 shadow-md transition-transform duration-100 ease-in-out`}
-      // style={{
-      //   transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-      // }}
     >
       {pageIndex === 0 &&
         (activeTab === "1" ? (
@@ -282,7 +270,7 @@ const RenderedPage = ({
         })}
       </div>
 
-      {!dontShow && (
+      {showHiddenRender && (
         <div className="invisible flex w-full flex-col gap-3" ref={childRef}>
           {Object.values(fields).map((field, fieldIndex) => {
             return (
@@ -309,13 +297,13 @@ const RenderedPage = ({
                   </p>
                 </div>
 
-                {field.questions.map((question, index) => (
+                {field.questions.map((question, questionIndex) => (
                   <div key={question.questionId} className="my-3 flex gap-2">
                     <p
                       className="font-semibold text-gray-800"
                       style={{ fontSize: 14 + Number(currentFontSize) }}
                     >
-                      {index + 1}.
+                      {questionIndex + 1}.
                     </p>
                     <p
                       className="text-gray-700"
