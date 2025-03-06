@@ -90,7 +90,7 @@ export function addIndexesToFields(fields: Fieldtype): Fieldtype {
   return localFields;
 }
 
-export const tempFields = {
+export const tempFields: Fieldtype = {
   "50": {
     categoryId: "50",
     categoryName: "Tick (✔) the correct option.",

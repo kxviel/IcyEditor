@@ -5,6 +5,9 @@ import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "@tanstack/react-router";
+import { saveAs } from "file-saver";
+import { Packer } from "docx";
+import { docxBlob } from "@/lib/docxParser";
 
 const SavePaper = () => {
   const fields = useQuestionBuilderStore((state) => state.fields);
@@ -31,9 +34,6 @@ const SavePaper = () => {
       },
     };
 
-    console.log(fields);
-    console.log(body);
-
     saveManualPaper.mutate({ body });
   };
 
@@ -44,7 +44,19 @@ const SavePaper = () => {
       </Button>
 
       <Button onClick={() => navigate({ to: "/print" })}>
-        Save & Download PDF <Printer />
+        Download PDF <Printer />
+      </Button>
+      <Button
+        onClick={() => {
+          if (docxBlob) {
+            Packer.toBlob(docxBlob).then((blob) => {
+              console.log(blob);
+              saveAs(blob, "DaddyChill.docx");
+            });
+          }
+        }}
+      >
+        Download DOCX <Printer />
       </Button>
     </div>
   );
