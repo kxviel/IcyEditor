@@ -57,12 +57,14 @@ export function parseExamDataResponse(response: ExamData): ReturnProps {
     },
   };
 
-  response.categories.forEach((category) => {
+  response.categories.forEach((category, categoryIndex) => {
     fields[category.categoryId] = {
       categoryId: category.categoryId,
       categoryName: category.categoryName,
-      questions: category.questions.map((question) => ({
+      categoryIndex,
+      questions: category.questions.map((question, questionIndex) => ({
         questionId: question.id,
+        questionIndex,
         questionText: question.QUESTION_DATA,
       })),
     };
@@ -71,114 +73,166 @@ export function parseExamDataResponse(response: ExamData): ReturnProps {
   return { fields, headerData };
 }
 
+export function addIndexesToFields(fields: Fieldtype): Fieldtype {
+  const localFields = { ...fields };
+
+  Object.values(fields).forEach((field, fieldIndex) => {
+    localFields[field.categoryId] = {
+      ...field,
+      categoryIndex: fieldIndex,
+      questions: field.questions.map((question, questionIndex) => ({
+        ...question,
+        questionIndex,
+      })),
+    };
+  });
+
+  return localFields;
+}
+
 export const tempFields = {
-  "660": {
-    categoryId: "660",
+  "50": {
+    categoryId: "50",
+    categoryName: "Tick (✔) the correct option.",
+    questions: [
+      {
+        questionId: 2665,
+        questionText:
+          "Ruhan's _____________________ were growing taller than he did.</p>a.&nbsp;cousins&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;relatives",
+        questionIndex: 0,
+      },
+      {
+        questionId: 2666,
+        questionText:
+          "Ruhan's_______________________ noticed that he was sitting with a dull face.</p>a.&nbsp;mother&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;grandmother",
+        questionIndex: 1,
+      },
+      {
+        questionId: 2667,
+        questionText:
+          "_________________ grandmother went into deep thinking for a few minutes.</p>a.&nbsp;Ruhan's&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;Ruhi's",
+        questionIndex: 2,
+      },
+      {
+        questionId: 2668,
+        questionText:
+          "Mrs Shuchitra could give a concrete solution to Ruhan's _________________.</p>a.&nbsp;problem&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;question",
+        questionIndex: 3,
+      },
+      {
+        questionId: 2670,
+        questionText:
+          "Mrs Shuchitra listened to every detail that _________________ gave her.</p>a.&nbsp;Ruhi&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;Ruhan",
+        questionIndex: 4,
+      },
+      {
+        questionId: 2669,
+        questionText:
+          "There are some scientific____________________ behind a human body's growth.</p>a.&nbsp;problems&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b.&nbsp;reasons",
+        questionIndex: 5,
+      },
+    ],
+    categoryIndex: 0,
+  },
+  "472": {
+    categoryId: "472",
+    categoryName: "Write `T` for true and `F` for false statements.",
+    questions: [
+      {
+        questionId: 2676,
+        questionText: "Ruhan's black cloud of diubts started to split.",
+        questionIndex: 0,
+      },
+      {
+        questionId: 2677,
+        questionText: "Ruhan was confused regarding other physical changes.",
+        questionIndex: 1,
+      },
+      {
+        questionId: 2678,
+        questionText: "Ruhan sometimes notices the pimples on his face.",
+        questionIndex: 2,
+      },
+      {
+        questionId: 2679,
+        questionText: "Ruhan feels that his voice has become heavy.",
+        questionIndex: 3,
+      },
+      {
+        questionId: 2680,
+        questionText: "Every individual's body grows at same pace.",
+        questionIndex: 4,
+      },
+    ],
+    categoryIndex: 1,
+  },
+  "473": {
+    categoryId: "473",
     categoryName:
-      "निम्नलिखित काव्यांश को ध्यानपूर्वक पढ़कर दिए गए प्रश्नों के उत्तर दीजिए—",
+      "Correct and rewrite the wrong statements in your notebook. In case of no change, mark the statement with(Х)",
     questions: [
       {
-        questionId: 8000,
+        questionId: 2681,
+        questionText: "Ruhi said,''As we grow up, our eting habit changes''.",
+        questionIndex: 0,
+      },
+      {
+        questionId: 2682,
         questionText:
-          "विंध्य-सतपुड़ा, नागा-रवसिया, ये दो औघट घाट महा,</p>(क)\tदो औघट महाघाट कौन-से हैं?</p>(ख)\tकविता में चिर-अटल किसे कहा गया है?</p>(ग)\tभारत के पूरब-पश्चिम में स्थित घाटों की तुलना किससे की गई है?</p>(घ)\tबताइए, ‘हिमालय’ का समानार्थी शब्द क्या होगा?",
+          "Ruhan said,''As we grow up, the colour of our hair changes\".",
+        questionIndex: 1,
+      },
+      {
+        questionId: 2683,
+        questionText:
+          'Sky said,"As we grow up, we started to leave our childhood friends".',
+        questionIndex: 2,
+      },
+      {
+        questionId: 2684,
+        questionText:
+          'Ruhi said,"As we grow up,physical changes take place in our body".',
+        questionIndex: 3,
+      },
+      {
+        questionId: 2685,
+        questionText: 'Sky said,"As we grow up,we avoid social gatherings".',
+        questionIndex: 4,
       },
     ],
+    categoryIndex: 2,
   },
-  "661": {
-    categoryId: "661",
-    categoryName: "उचित विकल्प पर सही (✓) का चिह्न लगाइए—",
+  "839": {
+    categoryId: "839",
+    categoryName: "Answer the Following Questions :",
     questions: [
       {
-        questionId: 8001,
-        questionText:
-          "भारत का गौरव निशान इनमें से कौन-सा पर्वत माना जाता है?</p>नागा पर्वत</p>खसिया पर्वत</p>हिमालय पर्वत",
+        questionId: 2671,
+        questionText: "Why was Ruhan worried?",
+        questionIndex: 0,
       },
       {
-        questionId: 8002,
-        questionText:
-          "कविता में किसको माता कहकर पुकारा गया है?</p>रावी</p>गंगा</p>कृष्णा",
+        questionId: 2673,
+        questionText: "What difference came in Ruhi and Ruhan in the teenage?",
+        questionIndex: 1,
       },
       {
-        questionId: 8003,
+        questionId: 2672,
         questionText:
-          "कविता में कौन-सी नदी का उल्लेख नहीं हुआ है?</p>नर्मदा नदी</p>सतलुज नदी</p>कावेरी नदी",
+          "What Ruhi and Ruhan thought about growing up when they were kids?",
+        questionIndex: 2,
       },
       {
-        questionId: 8004,
-        questionText:
-          "‘कोटि-कोटि कंठों से निकली’ इस पंक्ति में कोटि-कोटि का अर्थ है–</p>कोमल</p>ह़जारों</p>करोड़ों",
+        questionId: 2674,
+        questionText: "What did Mrs Shuchitra tell about human body's growth?",
+        questionIndex: 3,
+      },
+      {
+        questionId: 2675,
+        questionText: "What were the changes that Ruhan noticed in his body?",
+        questionIndex: 4,
       },
     ],
-  },
-  "662": {
-    categoryId: "662",
-    categoryName: "निम्नलिखित पंक्तियों के भाव स्पष्ट कीजिए— ",
-    questions: [
-      {
-        questionId: 8005,
-        questionText:
-          "(क) तुंग-शिखर, चिर-अटल हिमालय है पर्वत-सम्राट यहाँ,यह गिरिवर बन गया युगों से, विजय-निशान हमारा है।......................................................................................</p>(ख) ब्रह्मपुत्र, कृष्णा, कावेरी, वत्सलता-उत्संग-मती,इनसे प्लावित देश हमारा, यह रसखान हमारा है।.......................................................",
-      },
-    ],
-  },
-  "663": {
-    categoryId: "663",
-    categoryName: "निम्नलिखित प्रश्नों के उत्तर लिखिए—",
-    questions: [
-      {
-        questionId: 8006,
-        questionText:
-          "लघु उत्तरीय प्रश्न</p></p>(क)\tभारतवासियों को किस बात पर गर्व है?</p>(ख) इस कविता में किन-किन नदियों के नाम दिए गए हैं?</p></p>विस्तृत उत्तरीय प्रश्न</p></p>(क)\t‘हिंदुस्तान हमारा है’ कविता किस भाव से ओत-प्रोत है? अपने विचार लिखिए।</p>(ख) हमारे देश को पुरातन कहे जाने का क्या कारण है?</p>(ग) हिमालय पर्वत किस प्रकार भारत देश की रक्षा करता है?",
-      },
-    ],
-  },
-  "808": {
-    categoryId: "808",
-    categoryName: "समास",
-    questions: [
-      {
-        questionId: 104002,
-        questionText:
-          "(क)\tजिस सामासिक शब्द के दोनों पद प्रधान हों तथा दोनों पद ‘और’, ‘या’ आदि समुच्चयबोधकों से न जुड़कर योजक चिह्नों (-) से जुड़े हों, उसे द्वंद्व समास कहते हैं।</p>उदाहरण\t–\tसमस्त पद\tसमास-विग्रह</p>विंध्य-सतपुड़ा\tविंध्य और सतपुड़ा",
-      },
-      {
-        questionId: 104003,
-        questionText:
-          "(ख)\tजिस समास में उत्तर पद प्रधान होता है, उसे तत्पुरुष समास कहते हैं। इस समास में दोनों पदों के मध्य कारक चिह्नों का लोप हो जाता है–</p>उदाहरण\t–\tसमास-विग्रह\tसमस्त पद</p>यश को प्राप्त\tयशप्राप्त</p>देश के लिए भक्ति\tदेशभक्ति",
-      },
-    ],
-  },
-  "809": {
-    categoryId: "809",
-    categoryName: "कविता में आए तत्पुरुष और द्वंद्व समास छाँटकर लिखिए–\t\t",
-    questions: [
-      {
-        questionId: 104004,
-        questionText:
-          "............................................................................................</p>..................................................................",
-      },
-    ],
-  },
-  "810": {
-    categoryId: "810",
-    categoryName: "दिए गए काव्यांश में उचित स्थान पर योजक चिह्न लगाइए–",
-    questions: [
-      {
-        questionId: 104005,
-        questionText:
-          "विंध्य सतपुड़ा, नागा खसिया, यह औघट घाट महा, भारत के पूरब पश्चिम के यह दो भीम कपाट महा, तुंग शिखर, चिर अटल हिमालय है पर्वत सम्राट यहाँ, यह गिरिवर बन गया युगों से, विजय निशान हमारा है।",
-      },
-    ],
-  },
-  "811": {
-    categoryId: "811",
-    categoryName: "निम्नलिखित शब्दों के विलोम शब्द लिखिए–",
-    questions: [
-      {
-        questionId: 104006,
-        questionText:
-          "(क)\tमानव\t....................................</p>(ख)\tपुरातन\t....................................</p>(ग)\tमान\t....................................</p>(घ)\tविजय\t....................................</p>(ङ)\tजागरण\t....................................</p>(च)\tसृजन\t....................................</p>(छ)\tज्ञान\t....................................</p>(ज)\tस्वदेश\t....................................",
-      },
-    ],
+    categoryIndex: 3,
   },
 };

@@ -222,7 +222,7 @@ const RenderedPage = ({
         ))}
 
       <div className="flex w-full flex-col gap-3">
-        {pageValue.map((field, fieldIndex) => {
+        {pageValue.map((field) => {
           if (pageValue.find((item) => item.categoryId === field.categoryId))
             return (
               <div className="w-full" key={field.categoryId}>
@@ -231,7 +231,7 @@ const RenderedPage = ({
                     className="font-semibold text-gray-800"
                     style={{ fontSize: 16 + Number(currentFontSize) }}
                   >
-                    Q{fieldIndex + 1}.
+                    Q{field.categoryIndex! + 1}.
                   </p>
                   <p
                     className="font-semibold text-gray-800"
@@ -248,13 +248,13 @@ const RenderedPage = ({
                   </p>
                 </div>
 
-                {field.questions.map((question, index) => (
+                {field.questions.map((question) => (
                   <div key={question.questionId} className="my-3 flex gap-2">
                     <p
                       className="font-semibold text-gray-800"
                       style={{ fontSize: 14 + Number(currentFontSize) }}
                     >
-                      {index + 1}.
+                      {question.questionIndex! + 1}.
                     </p>
                     <p
                       className="text-gray-700"

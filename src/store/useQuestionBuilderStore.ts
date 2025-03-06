@@ -1,4 +1,4 @@
-import { tempFields } from "@/lib/utils";
+import { addIndexesToFields, tempFields } from "@/lib/utils";
 import { create } from "zustand";
 
 export type Fieldtype = Record<string, CategoryItem>;
@@ -6,11 +6,13 @@ export type Fieldtype = Record<string, CategoryItem>;
 export interface CategoryItem {
   categoryId: string;
   categoryName: string;
+  categoryIndex?: number;
   questions: QuestionItem[];
 }
 
 export interface QuestionItem {
   questionId: number;
+  questionIndex?: number;
   questionText: string;
 }
 
@@ -20,28 +22,31 @@ interface HeaderStore {
   addQuestion: (
     categoryId: string,
     categoryName: string,
-    question: QuestionItem,
+    question: {
+      questionId: number;
+      questionText: string;
+    },
   ) => void;
   setValue: (id: number, value: string) => void;
 }
 
 export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
-  fields: {},
+  fields: tempFields,
   presetFields: (fields) => set(() => ({ fields })),
   addQuestion: (categoryId, categoryName, question) =>
     set((state) => {
+      // If category exists
       if (Object.keys(state.fields).includes(categoryId)) {
-        // If category exists
-        const existingQuestions = state.fields[categoryId].questions;
+        const currentQuestions = state.fields[categoryId].questions;
 
-        // Check if question already exists in this category
-        const questionExists = existingQuestions.some(
+        // If question exists in this category
+        const questionExists = currentQuestions.some(
           (q) => q.questionId === question.questionId,
         );
 
         if (questionExists) {
           // If question exists, remove it
-          const updatedQuestions = existingQuestions.filter(
+          const updatedQuestions = currentQuestions.filter(
             (q) => q.questionId !== question.questionId,
           );
 
@@ -50,43 +55,43 @@ export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
             const newFields = { ...state.fields };
             delete newFields[categoryId];
             return {
-              fields: newFields,
+              fields: addIndexesToFields(newFields),
             };
           }
 
           // Otherwise just update the category with fewer questions
           return {
-            fields: {
+            fields: addIndexesToFields({
               ...state.fields,
               [categoryId]: {
                 ...state.fields[categoryId],
                 questions: updatedQuestions,
               },
-            },
+            }),
           };
         } else {
           // If question doesn't exist, add it
           return {
-            fields: {
+            fields: addIndexesToFields({
               ...state.fields,
               [categoryId]: {
                 ...state.fields[categoryId],
-                questions: [...existingQuestions, question],
+                questions: [...currentQuestions, question],
               },
-            },
+            }),
           };
         }
       } else {
         // If category doesn't exist, create a new category with the question
         return {
-          fields: {
+          fields: addIndexesToFields({
             ...state.fields,
             [categoryId]: {
               categoryId,
               categoryName,
               questions: [question],
             },
-          },
+          }),
         };
       }
     }),
