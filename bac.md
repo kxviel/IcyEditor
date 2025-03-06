@@ -9,7 +9,7 @@ SelectItem,
 SelectTrigger,
 SelectValue,
 } from "@/components/ui/select";
-import { useFontSizeStore } from "@/store/useFontSizeStore";
+import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
 import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
 import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
@@ -32,6 +32,7 @@ const pageHeaders: Record<string, React.ReactNode> = {
 
 export const Route = createLazyFileRoute("/\_auth/preview")({
 component: () => (
+
 <div className="h-[calc(100vh-72px)] w-full bg-[#F9F5FF]">
 <div className="mx-auto h-full max-w-screen-xl">
 <Preview />
@@ -51,8 +52,8 @@ const parentRef = useRef<HTMLDivElement>(null);
 const pageRef = useRef<HTMLDivElement>(null);
 const lastElementRef = useRef<HTMLDivElement>(null);
 
-const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
-const setFontSize = useFontSizeStore((state) => state.setFontSize);
+const currentFontSize = usePageSettingsStore((state) => state.currentFontSize);
+const setFontSize = usePageSettingsStore((state) => state.setFontSize);
 const [pageSize, setPageSize] = useState("A4");
 const [duplicateCapacity, setDuplicateCapacity] = useState(0);
 const [activeTab, setActiveTab] = useState("1");
@@ -123,6 +124,7 @@ if (pageRef.current && lastElementRef.current) {
 };
 
 return (
+
 <div className="flex h-full flex-col items-center gap-6 py-6">
 <Tabs
         defaultValue="login"
@@ -220,9 +222,10 @@ position,
 activeTab,
 }: RenderedPageProps) => {
 const fields = useQuestionBuilderStore((state) => state.fields);
-const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
+const currentFontSize = usePageSettingsStore((state) => state.currentFontSize);
 
 return (
+
 <div
 ref={pageRef}
 className={`${pageDimensions[pageSize]} mx-auto border border-gray-300 bg-white p-6 shadow-md transition-transform duration-100 ease-in-out`}
@@ -380,7 +383,7 @@ style={{
 // const A4Page = ({ pageSize }: { pageSize: PageProps["size"] }) => {
 // const item = useHeaderStore((state) => state.headerData);
 // const fields = useQuestionBuilderStore((state) => state.fields);
-// const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
+// const currentFontSize = usePageSettingsStore((state) => state.currentFontSize);
 
 // return (
 // <PDFViewer width="100%" height="100%">

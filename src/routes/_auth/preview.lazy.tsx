@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useFontSizeStore } from "@/store/useFontSizeStore";
+import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
 import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
 import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
@@ -23,7 +23,7 @@ const pageDimensions: Record<string, string> = {
   A3: "h-[420mm] w-[297mm]",
   A4: "h-[297mm] w-[210mm]",
   A5: "h-[210mm] w-[148mm]",
-  A6: "h-[148mm] w-[105mm]",
+  // A6: "h-[148mm] w-[105mm]",
 };
 
 export const Route = createLazyFileRoute("/_auth/preview")({
@@ -42,9 +42,7 @@ type RenderedPageProps = {
   headerRef: React.RefObject<HTMLDivElement>;
   pageIndex: number;
   pageSize: string;
-  activeTab: string;
   pageValue: CategoryItem[];
-  showHiddenRender: boolean;
 };
 
 function Preview() {
@@ -54,12 +52,16 @@ function Preview() {
   const headerRef = useRef<HTMLDivElement>(null);
 
   const fields = useQuestionBuilderStore((state) => state.fields);
-  const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
-  const setFontSize = useFontSizeStore((state) => state.setFontSize);
+  const setFontSize = usePageSettingsStore((state) => state.setFontSize);
+  const setHeaderLayout = usePageSettingsStore(
+    (state) => state.setHeaderLayout,
+  );
+  const headerLayout = usePageSettingsStore((state) => state.headerLayout);
+  const currentFontSize = usePageSettingsStore(
+    (state) => state.currentFontSize,
+  );
 
   const [pageSize, setPageSize] = useState("A4");
-  const [activeTab, setActiveTab] = useState("1");
-  const [showHiddenRender, setShowHiddenRender] = useState(true);
 
   const calcFontSize = (value: string) => {
     setFontSize(value);
@@ -80,13 +82,10 @@ function Preview() {
       if (currentPageIndex === 0 && headerRef.current) {
         totalPageHeight -= headerRef.current.getBoundingClientRect().height - 8;
       }
-      console.log("totalPageHeight: ", totalPageHeight);
-      console.log("currentFontSize: ", currentFontSize);
 
       if (childRef.current) {
         [...childRef.current.children].forEach((child, index) => {
           currentChildHeight += child.getBoundingClientRect().height;
-          console.log("currentChildHeight: ", currentChildHeight);
 
           const currentField = fields[Object.keys(fields)[index]];
 
@@ -107,14 +106,13 @@ function Preview() {
     }
 
     setPageArray(tempPageArray);
-  }, [fields, currentFontSize]);
+  }, [fields, currentFontSize, pageSize]);
 
   return (
     <div className="flex h-full flex-col items-center gap-6 pt-6">
       <Tabs
-        defaultValue="login"
-        value={activeTab}
-        onValueChange={setActiveTab}
+        value={headerLayout}
+        onValueChange={setHeaderLayout}
         className="flex flex-col items-center justify-center"
       >
         <TabsList className="w-[632px]">
@@ -139,7 +137,6 @@ function Preview() {
             <SelectItem value="A3">A3</SelectItem>
             <SelectItem value="A4">A4</SelectItem>
             <SelectItem value="A5">A5</SelectItem>
-            <SelectItem value="A6">A6</SelectItem>
           </SelectContent>
         </Select>
 
@@ -172,9 +169,7 @@ function Preview() {
             childRef={childRef}
             pageIndex={pageIndex}
             pageSize={pageSize}
-            activeTab={activeTab}
             pageValue={pageValue}
-            showHiddenRender={showHiddenRender}
             headerRef={headerRef}
           />
         ))}
@@ -186,15 +181,16 @@ function Preview() {
 const RenderedPage = ({
   pageIndex,
   pageSize,
-  activeTab,
   pageRef,
   childRef,
   pageValue,
-  showHiddenRender,
   headerRef,
 }: RenderedPageProps) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
-  const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
+  const headerLayout = usePageSettingsStore((state) => state.headerLayout);
+  const currentFontSize = usePageSettingsStore(
+    (state) => state.currentFontSize,
+  );
 
   return (
     <div
@@ -202,9 +198,9 @@ const RenderedPage = ({
       className={`${pageDimensions[pageSize]} mx-auto mb-3 border border-gray-300 bg-white box-decoration-clone p-6 shadow-md transition-transform duration-100 ease-in-out`}
     >
       {pageIndex === 0 &&
-        (activeTab === "1" ? (
+        (headerLayout === "1" ? (
           <PaperHeaderOne isPreview={true} headerRef={headerRef} />
-        ) : activeTab === "2" ? (
+        ) : headerLayout === "2" ? (
           <PaperHeaderTwo isPreview={true} headerRef={headerRef} />
         ) : (
           <PaperHeaderThree isPreview={true} headerRef={headerRef} />
@@ -259,55 +255,53 @@ const RenderedPage = ({
         })}
       </div>
 
-      {showHiddenRender && (
-        <div className="invisible flex w-full flex-col gap-3" ref={childRef}>
-          {Object.values(fields).map((field, fieldIndex) => {
-            return (
-              <div className="w-full" key={field.categoryId}>
-                <div className="my-3 flex gap-2">
-                  <p
-                    className="font-semibold text-gray-800"
-                    style={{ fontSize: 16 + Number(currentFontSize) }}
-                  >
-                    Q{fieldIndex + 1}.
-                  </p>
-                  <p
-                    className="font-semibold text-gray-800"
-                    style={{ fontSize: 16 + Number(currentFontSize) }}
-                  >
-                    {field.categoryName}
-                  </p>
+      <div className="invisible flex w-full flex-col gap-3" ref={childRef}>
+        {Object.values(fields).map((field) => {
+          return (
+            <div className="w-full" key={field.categoryId}>
+              <div className="my-3 flex gap-2">
+                <p
+                  className="whitespace-nowrap font-semibold leading-6 text-gray-800"
+                  style={{ fontSize: 16 + Number(currentFontSize) }}
+                >
+                  Q{field.categoryIndex! + 1}.
+                </p>
+                <p
+                  className="font-semibold text-gray-800"
+                  style={{ fontSize: 16 + Number(currentFontSize) }}
+                >
+                  {field.categoryName}
+                </p>
 
+                <p
+                  className="ml-auto whitespace-nowrap text-sm leading-6"
+                  style={{ fontSize: 14 + Number(currentFontSize) }}
+                >
+                  (1 x {field.questions.length}) = 5
+                </p>
+              </div>
+
+              {field.questions.map((question) => (
+                <div key={question.questionId} className="my-3 flex gap-2">
                   <p
-                    className="ml-auto"
+                    className="font-semibold text-gray-800"
                     style={{ fontSize: 14 + Number(currentFontSize) }}
                   >
-                    (1 x {field.questions.length}) = 5
+                    {question.questionIndex! + 1}.
                   </p>
+                  <p
+                    className="whitespace-pre text-gray-700"
+                    style={{ fontSize: 14 + Number(currentFontSize) }}
+                    dangerouslySetInnerHTML={{
+                      __html: question.questionText,
+                    }}
+                  />
                 </div>
-
-                {field.questions.map((question, questionIndex) => (
-                  <div key={question.questionId} className="my-3 flex gap-2">
-                    <p
-                      className="font-semibold text-gray-800"
-                      style={{ fontSize: 14 + Number(currentFontSize) }}
-                    >
-                      {questionIndex + 1}.
-                    </p>
-                    <p
-                      className="text-gray-700"
-                      style={{ fontSize: 14 + Number(currentFontSize) }}
-                      dangerouslySetInnerHTML={{
-                        __html: question.questionText,
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            );
-          })}
-        </div>
-      )}
+              ))}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

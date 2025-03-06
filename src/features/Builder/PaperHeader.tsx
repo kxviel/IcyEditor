@@ -1,11 +1,13 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useFontSizeStore } from "@/store/useFontSizeStore";
+import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
 
 const PaperHeader = ({ isPreview }: { isPreview?: boolean }) => {
   const fields = useHeaderStore((state) => state.headerData);
-  const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
+  const currentFontSize = usePageSettingsStore(
+    (state) => state.currentFontSize,
+  );
   const setValue = useHeaderStore((state) => state.setValue);
   const setIsEditing = useHeaderStore((state) => state.setIsEditing);
 

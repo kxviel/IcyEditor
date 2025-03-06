@@ -4,11 +4,13 @@ import { useSaveExamPaper } from "./api/saveExamPaper";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "@tanstack/react-router";
 
 const SavePaper = () => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const headerData = useHeaderStore((state) => state.headerData);
   const { getUser } = useAuth();
+  const navigate = useNavigate();
   const saveManualPaper = useSaveExamPaper();
 
   const handleSaveManualPaper = () => {
@@ -41,7 +43,7 @@ const SavePaper = () => {
         <Save /> Save Paper
       </Button>
 
-      <Button onClick={() => window.print()}>
+      <Button onClick={() => navigate({ to: "/print" })}>
         Save & Download PDF <Printer />
       </Button>
     </div>

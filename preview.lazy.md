@@ -3,60 +3,61 @@ import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+Select,
+SelectContent,
+SelectItem,
+SelectTrigger,
+SelectValue,
 } from "@/components/ui/select";
-import { useFontSizeStore } from "@/store/useFontSizeStore";
+import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
 import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
 import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
 
 const pageDimensions: Record<string, string> = {
-  // A1: "h-[841mm] w-[594mm]",
-  // A2: "h-[594mm] w-[420mm]",
-  A3: "h-[420mm] w-[297mm]",
-  A4: "h-[297mm] w-[210mm]",
-  A5: "h-[210mm] w-[148mm]",
-  // A6: "h-[148mm] w-[105mm]",
+// A1: "h-[841mm] w-[594mm]",
+// A2: "h-[594mm] w-[420mm]",
+A3: "h-[420mm] w-[297mm]",
+A4: "h-[297mm] w-[210mm]",
+A5: "h-[210mm] w-[148mm]",
+// A6: "h-[148mm] w-[105mm]",
 };
 
 const pageHeaders: Record<string, React.ReactNode> = {
-  "1": <PaperHeaderOne isPreview={true} />,
-  "2": <PaperHeaderTwo isPreview={true} />,
-  "3": <PaperHeaderThree isPreview={true} />,
+"1": <PaperHeaderOne isPreview={true} />,
+"2": <PaperHeaderTwo isPreview={true} />,
+"3": <PaperHeaderThree isPreview={true} />,
 };
 
-export const Route = createLazyFileRoute("/_auth/preview/lazy copy")({
-  component: () => (
-    <div className="h-[calc(100vh-72px)] w-full bg-[#F9F5FF]">
-      <div className="mx-auto h-full max-w-screen-xl">
-        <Preview />
-      </div>
-    </div>
-  ),
+export const Route = createLazyFileRoute("/\_auth/preview/lazy copy")({
+component: () => (
+
+<div className="h-[calc(100vh-72px)] w-full bg-[#F9F5FF]">
+<div className="mx-auto h-full max-w-screen-xl">
+<Preview />
+</div>
+</div>
+),
 });
 
 function Preview() {
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const minScale = 0.2;
-  const maxScale = 3;
-  const scaleStep = 0.1;
-  const scrollStep = 20;
-  const parentRef = useRef<HTMLDivElement>(null);
+const [scale, setScale] = useState(1);
+const [position, setPosition] = useState({ x: 0, y: 0 });
+const minScale = 0.2;
+const maxScale = 3;
+const scaleStep = 0.1;
+const scrollStep = 20;
+const parentRef = useRef<HTMLDivElement>(null);
 
-  const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
-  const setFontSize = useFontSizeStore((state) => state.setFontSize);
-  const [pageSize, setPageSize] = useState("A4");
-  const [activeTab, setActiveTab] = useState("1");
+const currentFontSize = usePageSettingsStore((state) => state.currentFontSize);
+const setFontSize = usePageSettingsStore((state) => state.setFontSize);
+const [pageSize, setPageSize] = useState("A4");
+const [activeTab, setActiveTab] = useState("1");
 
-  const handleWheel = useCallback(
-    (event: WheelEvent) => {
-      if (event.ctrlKey) {
-        event.preventDefault();
+const handleWheel = useCallback(
+(event: WheelEvent) => {
+if (event.ctrlKey) {
+event.preventDefault();
 
         if (event.deltaY < 0) {
           setScale((prevScale) => Math.min(prevScale + scaleStep, maxScale));
@@ -70,49 +71,52 @@ function Preview() {
       }
     },
     [position],
-  );
 
-  useEffect(() => {
-    if (parentRef.current) {
-      const element = parentRef.current;
-      if (element) {
-        parentRef.current.addEventListener(
-          "wheel",
-          handleWheel as EventListener,
-          { passive: false },
-        );
-      }
+);
+
+useEffect(() => {
+if (parentRef.current) {
+const element = parentRef.current;
+if (element) {
+parentRef.current.addEventListener(
+"wheel",
+handleWheel as EventListener,
+{ passive: false },
+);
+}
 
       return () => {
         element.removeEventListener("wheel", handleWheel as EventListener);
       };
     }
-  }, [handleWheel, position]);
 
-  const calcFontSize = (value: string) => {
-    setFontSize(value);
-  };
+}, [handleWheel, position]);
 
-  return (
-    <div className="flex h-full flex-col items-center gap-6 py-6">
-      <Tabs
+const calcFontSize = (value: string) => {
+setFontSize(value);
+};
+
+return (
+
+<div className="flex h-full flex-col items-center gap-6 py-6">
+<Tabs
         defaultValue="login"
         value={activeTab}
         onValueChange={setActiveTab}
         className="flex flex-col items-center justify-center"
       >
-        <TabsList className="w-[632px]">
-          <TabsTrigger value="1" className="w-full">
-            Layout 1
-          </TabsTrigger>
-          <TabsTrigger value="2" className="w-full">
-            Layout 2
-          </TabsTrigger>
-          <TabsTrigger value="3" className="w-full">
-            Layout 3
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+<TabsList className="w-[632px]">
+<TabsTrigger value="1" className="w-full">
+Layout 1
+</TabsTrigger>
+<TabsTrigger value="2" className="w-full">
+Layout 2
+</TabsTrigger>
+<TabsTrigger value="3" className="w-full">
+Layout 3
+</TabsTrigger>
+</TabsList>
+</Tabs>
 
       <div className="flex items-center justify-center gap-3">
         <Select value={pageSize} onValueChange={setPageSize}>
@@ -157,36 +161,37 @@ function Preview() {
         {/* <A4Page pageSize={pageSize as PageProps["size"]} /> */}
       </div>
     </div>
-  );
+
+);
 }
 
 type RenderedPageProps = {
-  pageSize: string;
-  scale: number;
-  activeTab: string;
-  position: {
-    x: number;
-    y: number;
-  };
+pageSize: string;
+scale: number;
+activeTab: string;
+position: {
+x: number;
+y: number;
+};
 };
 
 const RenderedPage = ({
-  pageSize,
-  scale,
-  position,
-  activeTab,
+pageSize,
+scale,
+position,
+activeTab,
 }: RenderedPageProps) => {
-  const fields = useQuestionBuilderStore((state) => state.fields);
-  const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
+const fields = useQuestionBuilderStore((state) => state.fields);
+const currentFontSize = usePageSettingsStore((state) => state.currentFontSize);
 
-  return (
-    <div
-      className={`${pageDimensions[pageSize]} mx-auto border border-gray-300 bg-white p-6 shadow-md transition-transform duration-100 ease-in-out`}
-      style={{
+return (
+
+<div
+className={`${pageDimensions[pageSize]} mx-auto border border-gray-300 bg-white p-6 shadow-md transition-transform duration-100 ease-in-out`}
+style={{
         transform: `scale(${scale}) translate(${position.x}px, ${position.y}px)`,
-      }}
-    >
-      {pageHeaders[activeTab]}
+      }} >
+{pageHeaders[activeTab]}
 
       <div className="flex w-full flex-col gap-3">
         {Object.values(fields).map((field, fieldIndex) => (
@@ -234,5 +239,6 @@ const RenderedPage = ({
         ))}
       </div>
     </div>
-  );
+
+);
 };

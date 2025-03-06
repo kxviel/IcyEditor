@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as PrintImport } from './routes/print'
 import { Route as LoginImport } from './routes/login'
 import { Route as AuthImport } from './routes/_auth'
 
@@ -33,6 +34,12 @@ const ForgotPasswordLazyRoute = ForgotPasswordLazyImport.update({
 } as any).lazy(() =>
   import('./routes/forgot-password.lazy').then((d) => d.Route),
 )
+
+const PrintRoute = PrintImport.update({
+  id: '/print',
+  path: '/print',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LoginRoute = LoginImport.update({
   id: '/login',
@@ -89,6 +96,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/print': {
+      id: '/print'
+      path: '/print'
+      fullPath: '/print'
+      preLoaderRoute: typeof PrintImport
       parentRoute: typeof rootRoute
     }
     '/forgot-password': {
@@ -150,6 +164,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 export interface FileRoutesByFullPath {
   '': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
+  '/print': typeof PrintRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/exam-type': typeof AuthExamTypeLazyRoute
   '/preview': typeof AuthPreviewLazyRoute
@@ -159,6 +174,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/print': typeof PrintRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/exam-type': typeof AuthExamTypeLazyRoute
   '/preview': typeof AuthPreviewLazyRoute
@@ -170,6 +186,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
+  '/print': typeof PrintRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
   '/_auth/exam-type': typeof AuthExamTypeLazyRoute
   '/_auth/preview': typeof AuthPreviewLazyRoute
@@ -182,6 +199,7 @@ export interface FileRouteTypes {
   fullPaths:
     | ''
     | '/login'
+    | '/print'
     | '/forgot-password'
     | '/exam-type'
     | '/preview'
@@ -190,6 +208,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/print'
     | '/forgot-password'
     | '/exam-type'
     | '/preview'
@@ -199,6 +218,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_auth'
     | '/login'
+    | '/print'
     | '/forgot-password'
     | '/_auth/exam-type'
     | '/_auth/preview'
@@ -210,12 +230,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PrintRoute: typeof PrintRoute
   ForgotPasswordLazyRoute: typeof ForgotPasswordLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
+  PrintRoute: PrintRoute,
   ForgotPasswordLazyRoute: ForgotPasswordLazyRoute,
 }
 
@@ -231,6 +253,7 @@ export const routeTree = rootRoute
       "children": [
         "/_auth",
         "/login",
+        "/print",
         "/forgot-password"
       ]
     },
@@ -245,6 +268,9 @@ export const routeTree = rootRoute
     },
     "/login": {
       "filePath": "login.tsx"
+    },
+    "/print": {
+      "filePath": "print.tsx"
     },
     "/forgot-password": {
       "filePath": "forgot-password.lazy.tsx"

@@ -5,7 +5,7 @@ const PaperHeaderTwo = ({
   headerRef,
 }: {
   isPreview?: boolean;
-  headerRef: React.RefObject<HTMLDivElement>;
+  headerRef?: React.RefObject<HTMLDivElement>;
 }) => {
   return (
     <div

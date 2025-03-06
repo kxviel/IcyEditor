@@ -1,7 +1,7 @@
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useFontSizeStore } from "@/store/useFontSizeStore";
+import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 
 type Props = {
   headerId: string;
@@ -25,7 +25,9 @@ const EditableField = ({
   isTextarea = false,
 }: Props) => {
   const item = useHeaderStore((state) => state.headerData);
-  const currentFontSize = useFontSizeStore((state) => state.currentFontSize);
+  const currentFontSize = usePageSettingsStore(
+    (state) => state.currentFontSize,
+  );
 
   const setValue = useHeaderStore((state) => state.setValue);
   const setIsEditing = useHeaderStore((state) => state.setIsEditing);
