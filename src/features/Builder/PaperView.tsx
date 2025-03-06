@@ -46,14 +46,14 @@ const PaperView = () => {
             {Object.values(fields).map((field, fieldIndex) => (
               <div className="w-full" key={field.categoryId}>
                 <div className="my-3 flex gap-2">
-                  <p className="font-semibold text-gray-800">
+                  <p className="whitespace-nowrap font-semibold leading-6 text-gray-800">
                     Q{fieldIndex + 1}.
                   </p>
                   <p className="font-semibold text-gray-800">
                     {field.categoryName}
                   </p>
 
-                  <p className="ml-auto text-sm">
+                  <p className="ml-auto whitespace-nowrap text-sm leading-6">
                     (1 x {field.questions.length}) = 5
                   </p>
                 </div>
@@ -61,7 +61,7 @@ const PaperView = () => {
                 {field.questions.map((question, index) => (
                   <div
                     key={question.questionId}
-                    className="my-3 flex gap-2 py-1 hover:cursor-pointer hover:bg-gray-50"
+                    className="my-3 flex gap-2 whitespace-pre py-1 hover:cursor-pointer hover:bg-gray-50"
                     onClick={() => {
                       setModal("EDIT_QUESTION", {
                         isOpen: true,

@@ -96,22 +96,11 @@ function Preview() {
             } else {
               tempPageArray[currentPageIndex] = [currentField];
             }
-
-            // setPageArray((page) => {
-            //   if (page[currentPageIndex]) {
-            //     page[currentPageIndex].push(currentField);
-            //   } else {
-            //     page[currentPageIndex] = [currentField];
-            //   }
-            //   return page;
-            // });
           } else {
             currentPageIndex += 1;
             currentChildHeight = 0;
 
             tempPageArray[currentPageIndex] = [currentField];
-
-            // setPageArray((page) => [...page, [currentField]]);
           }
         });
       }
@@ -228,7 +217,7 @@ const RenderedPage = ({
               <div className="w-full" key={field.categoryId}>
                 <div className="my-3 flex gap-2">
                   <p
-                    className="font-semibold text-gray-800"
+                    className="whitespace-nowrap font-semibold leading-6 text-gray-800"
                     style={{ fontSize: 16 + Number(currentFontSize) }}
                   >
                     Q{field.categoryIndex! + 1}.
@@ -241,7 +230,7 @@ const RenderedPage = ({
                   </p>
 
                   <p
-                    className="ml-auto"
+                    className="ml-auto whitespace-nowrap text-sm leading-6"
                     style={{ fontSize: 14 + Number(currentFontSize) }}
                   >
                     (1 x {field.questions.length}) = 5
@@ -257,7 +246,7 @@ const RenderedPage = ({
                       {question.questionIndex! + 1}.
                     </p>
                     <p
-                      className="text-gray-700"
+                      className="whitespace-pre text-gray-700"
                       style={{ fontSize: 14 + Number(currentFontSize) }}
                       dangerouslySetInnerHTML={{
                         __html: question.questionText,
