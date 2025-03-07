@@ -9,6 +9,9 @@ import RefreshBlockerModal from "./RefreshBlockerModal";
 
 const PaperView = () => {
   const fields = useQuestionBuilderStore((state) => state.fields);
+  const sanitizeFields = useQuestionBuilderStore(
+    (state) => state.sanitizeFields,
+  );
   const navigate = useNavigate();
   const setModal = useModalStore((state) => state.setModal);
 
@@ -25,6 +28,7 @@ const PaperView = () => {
     e.preventDefault();
 
     if (!isObjectEmpty(fields)) {
+      sanitizeFields();
       navigate({ to: "/preview" });
     } else {
       toast.warning("Please add at least one question");
@@ -86,21 +90,12 @@ const PaperView = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-0 flex h-24 w-full items-center gap-4 bg-white px-4">
-        <Button
-          variant="outline"
-          className="w-full"
-          // onClick={() => setShouldBlockNavigation(true)}
-          onClick={handleBack}
-        >
+      <div className="absolute bottom-0 flex h-14 w-full items-center gap-4 bg-white px-4">
+        <Button variant="outline" className="w-full" onClick={handleBack}>
           Back
         </Button>
 
-        <Button
-          className="w-full"
-          // onClick={() => setShouldBlockNavigation(false)}
-          onClick={handleNext}
-        >
+        <Button className="w-full" onClick={handleNext}>
           Next
         </Button>
       </div>

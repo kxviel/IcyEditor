@@ -28,6 +28,7 @@ interface HeaderStore {
     },
   ) => void;
   setValue: (id: number, value: string) => void;
+  sanitizeFields: () => void;
 }
 
 export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
@@ -39,7 +40,7 @@ export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
       if (Object.keys(state.fields).includes(categoryId)) {
         const currentQuestions = state.fields[categoryId].questions;
 
-        // If question exists in this category
+        // Check if question already exists in this category
         const questionExists = currentQuestions.some(
           (q) => q.questionId === question.questionId,
         );
@@ -55,43 +56,43 @@ export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
             const newFields = { ...state.fields };
             delete newFields[categoryId];
             return {
-              fields: addIndexesToFields(newFields),
+              fields: newFields,
             };
           }
 
           // Otherwise just update the category with fewer questions
           return {
-            fields: addIndexesToFields({
+            fields: {
               ...state.fields,
               [categoryId]: {
                 ...state.fields[categoryId],
                 questions: updatedQuestions,
               },
-            }),
+            },
           };
         } else {
           // If question doesn't exist, add it
           return {
-            fields: addIndexesToFields({
+            fields: {
               ...state.fields,
               [categoryId]: {
                 ...state.fields[categoryId],
                 questions: [...currentQuestions, question],
               },
-            }),
+            },
           };
         }
       } else {
         // If category doesn't exist, create a new category with the question
         return {
-          fields: addIndexesToFields({
+          fields: {
             ...state.fields,
             [categoryId]: {
               categoryId,
               categoryName,
               questions: [question],
             },
-          }),
+          },
         };
       }
     }),
@@ -111,4 +112,6 @@ export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
 
       return { fields: updatedFields };
     }),
+  sanitizeFields: () =>
+    set((state) => ({ fields: addIndexesToFields(state.fields) })),
 }));
