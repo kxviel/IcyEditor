@@ -1,16 +1,26 @@
-import { Document, Paragraph, TextRun, HeadingLevel } from "docx";
-import { tempFields } from "./utils";
+import {
+  Document,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  Table,
+  TableRow,
+  TableCell,
+  WidthType,
+} from "docx";
 import { Fieldtype } from "@/store/useQuestionBuilderStore";
+import { HeaderItem } from "@/store/useHeaderStore";
 
 export const generateDocFromFields = (
   fields: Fieldtype,
-  currentFontSize = 0,
+  currentFontSize: number,
+  headerData: Record<string, HeaderItem>,
 ) => {
   // Create an array to hold all the paragraphs
   const paragraphs: any = [];
 
   // Iterate through each field (category)
-  Object.values(fields).forEach((field) => {
+  Array.from(fields.values()).forEach((field) => {
     // Add the category title paragraph
     paragraphs.push(
       new Paragraph({
@@ -61,7 +71,108 @@ export const generateDocFromFields = (
     sections: [
       {
         properties: {},
-        children: paragraphs,
+        children: [
+          // // School Name - Centered & Bold
+          // new Paragraph({
+          //   children: [
+          //     new TextRun({
+          //       text: "SCHOOL NAME",
+          //       bold: true,
+          //       size: 48,
+          //       font: "Times New Roman",
+          //     }),
+          //   ],
+          //   alignment: "center",
+          // }),
+
+          // // Examination Type & Subject
+          // new Paragraph({
+          //   children: [
+          //     new TextRun({
+          //       text: "EXAMINATION TYPE",
+          //       bold: true,
+          //       size: 32,
+          //       color: "4F772D", // Dark Green
+          //       font: "Times New Roman",
+          //     }),
+          //   ],
+          //   alignment: "center",
+          // }),
+
+          // new Paragraph({
+          //   children: [
+          //     new TextRun({
+          //       text: "SUBJECT",
+          //       bold: true,
+          //       size: 32,
+          //       color: "4F772D",
+          //       font: "Times New Roman",
+          //     }),
+          //   ],
+          //   alignment: "center",
+          // }),
+
+          // // Duration and Marks Table
+          // new Table({
+          //   width: { size: 100, type: WidthType.PERCENTAGE },
+          //   rows: [
+          //     new TableRow({
+          //       children: [
+          //         new TableCell({
+          //           children: [new Paragraph({ text: "Duration:" })],
+          //         }),
+          //         new TableCell({
+          //           children: [],
+          //         }),
+          //         new TableCell({
+          //           children: [new Paragraph({ text: "Marks:" })],
+          //         }),
+          //         new TableCell({
+          //           children: [],
+          //         }),
+          //       ],
+          //     }),
+          //   ],
+          // }),
+
+          // new Paragraph({ text: "", spacing: { before: 200, after: 200 } }),
+
+          // // Student Information Table with Green Background
+          // new Table({
+          //   width: { size: 100, type: WidthType.PERCENTAGE },
+          //   rows: [
+          //     new TableRow({
+          //       children: [
+          //         new TableCell({
+          //           children: [new Paragraph({ text: "Name:" })],
+          //           shading: { fill: "C3E6A3" }, // Light Green Background
+          //         }),
+          //         new TableCell({
+          //           children: [new Paragraph("_____________________")],
+          //           shading: { fill: "C3E6A3" },
+          //         }),
+          //         new TableCell({
+          //           children: [new Paragraph({ text: "Class:" })],
+          //           shading: { fill: "C3E6A3" },
+          //         }),
+          //         new TableCell({
+          //           children: [new Paragraph("_____________________")],
+          //           shading: { fill: "C3E6A3" },
+          //         }),
+          //         new TableCell({
+          //           children: [new Paragraph({ text: "Roll No:" })],
+          //           shading: { fill: "C3E6A3" },
+          //         }),
+          //         new TableCell({
+          //           children: [new Paragraph("_____________________")],
+          //           shading: { fill: "C3E6A3" },
+          //         }),
+          //       ],
+          //     }),
+          //   ],
+          // }),
+          ...paragraphs,
+        ],
       },
     ],
   });
@@ -120,5 +231,3 @@ const processQuestionText = (htmlText: string, currentFontSize: any) => {
 
   return textRuns;
 };
-
-export const docxBlob = generateDocFromFields(tempFields);

@@ -14,10 +14,10 @@ type Props = {
     USER_ID: number;
     LAYOUT: string;
     MARKS: string;
+    FONT: string;
     // STATUS: boolean;
     // PAGE_COUNT: number;
     // TYPE: string;
-    // FONT: string;
   };
 };
 

@@ -11,7 +11,6 @@ const QuestionList = ({ chapterId }: Props) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const addQuestion = useQuestionBuilderStore((state) => state.addQuestion);
 
-  //Questions
   const { data: questionList } = useGetQuestionList(chapterId);
 
   return (
@@ -43,13 +42,14 @@ const QuestionList = ({ chapterId }: Props) => {
                 <Checkbox
                   className="border-slate-400"
                   checked={
-                    fields[categoryId]?.questions?.some(
-                      (q) => q.questionId === question.id,
-                    ) || false
+                    fields
+                      .get(categoryId)
+                      ?.questions?.some((q) => q.questionId === question.id) ||
+                    false
                   }
                 />
                 <p
-                  className="text-sm"
+                  className="select-none text-sm"
                   dangerouslySetInnerHTML={{
                     __html: question.QUESTION_DATA,
                   }}

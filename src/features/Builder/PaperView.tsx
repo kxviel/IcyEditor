@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useBlocker, useNavigate } from "@tanstack/react-router";
 import { useModalStore } from "@/store/useModalStore";
-import { isObjectEmpty } from "@/lib/utils";
 import { toast } from "sonner";
 import PaperHeaderOne from "./PaperHeaders/PaperHeaderOne";
 import RefreshBlockerModal from "./RefreshBlockerModal";
@@ -27,7 +26,7 @@ const PaperView = () => {
   const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
-    if (!isObjectEmpty(fields)) {
+    if (Array.from(fields.entries()).length > 0) {
       sanitizeFields();
       navigate({ to: "/preview" });
     } else {
@@ -47,7 +46,7 @@ const PaperView = () => {
           <PaperHeaderOne isPreview={false} />
 
           <div className="flex w-full flex-col gap-3">
-            {Object.values(fields).map((field, fieldIndex) => (
+            {Array.from(fields.values()).map((field, fieldIndex) => (
               <div className="w-full" key={field.categoryId}>
                 <div className="my-3 flex gap-2">
                   <p className="whitespace-nowrap font-semibold leading-6 text-gray-800">

@@ -1,19 +1,19 @@
-import { addIndexesToFields } from "@/lib/utils";
+import { addIndexesToFields, tempFields } from "@/lib/utils";
 import { create } from "zustand";
 
-export type Fieldtype = Record<string, CategoryItem>;
+export type Fieldtype = Map<string, CategoryItem>;
 
 export interface CategoryItem {
   categoryId: string;
   categoryName: string;
-  categoryIndex?: number;
   questions: QuestionItem[];
+  categoryIndex?: number;
 }
 
 export interface QuestionItem {
   questionId: number;
-  questionIndex?: number;
   questionText: string;
+  questionIndex?: number;
 }
 
 interface HeaderStore {
@@ -22,95 +22,66 @@ interface HeaderStore {
   addQuestion: (
     categoryId: string,
     categoryName: string,
-    question: {
+    addedQuestion: {
       questionId: number;
       questionText: string;
     },
   ) => void;
-  setValue: (id: number, value: string) => void;
   sanitizeFields: () => void;
 }
 
 export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
-  fields: {},
+  // fields: tempFields,
+  fields: new Map(),
   presetFields: (fields) => set(() => ({ fields })),
-  addQuestion: (categoryId, categoryName, question) =>
+  addQuestion: (categoryId, categoryName, addedQuestion) =>
     set((state) => {
-      // If category exists
-      if (Object.keys(state.fields).includes(categoryId)) {
-        const currentQuestions = state.fields[categoryId].questions;
+      const newFields = new Map(state.fields);
+
+      if (newFields.has(categoryId)) {
+        const currentCategory = newFields.get(categoryId)!;
+        const currentQuestions = currentCategory.questions;
 
         // Check if question already exists in this category
         const questionExists = currentQuestions.some(
-          (q) => q.questionId === question.questionId,
+          (currentQuestion) =>
+            currentQuestion.questionId === addedQuestion.questionId,
         );
 
         if (questionExists) {
-          // If question exists, remove it
+          // Remove Existing Question
           const updatedQuestions = currentQuestions.filter(
-            (q) => q.questionId !== question.questionId,
+            (currentQuestion) =>
+              currentQuestion.questionId !== addedQuestion.questionId,
           );
 
-          // If this would make the category empty, remove the entire category
+          // Delete Category if Question Array is Empty
           if (updatedQuestions.length === 0) {
-            const newFields = { ...state.fields };
-            delete newFields[categoryId];
-            return {
-              fields: newFields,
-            };
+            newFields.delete(categoryId);
+          } else {
+            // Update Category with Updated Question Array
+            newFields.set(categoryId, {
+              ...currentCategory,
+              questions: updatedQuestions,
+            });
           }
-
-          // Otherwise just update the category with fewer questions
-          return {
-            fields: {
-              ...state.fields,
-              [categoryId]: {
-                ...state.fields[categoryId],
-                questions: updatedQuestions,
-              },
-            },
-          };
         } else {
-          // If question doesn't exist, add it
-          return {
-            fields: {
-              ...state.fields,
-              [categoryId]: {
-                ...state.fields[categoryId],
-                questions: [...currentQuestions, question],
-              },
-            },
-          };
+          // Add Question to Existing Category
+          newFields.set(categoryId, {
+            ...currentCategory,
+            questions: [...currentQuestions, addedQuestion],
+          });
         }
       } else {
-        // If category doesn't exist, create a new category with the question
-        return {
-          fields: {
-            ...state.fields,
-            [categoryId]: {
-              categoryId,
-              categoryName,
-              questions: [question],
-            },
-          },
-        };
+        // Add Category along with Added Question
+        newFields.set(categoryId, {
+          categoryId,
+          categoryName,
+          questions: [addedQuestion],
+        });
       }
-    }),
-  setValue: (fieldId, value) =>
-    set((state) => {
-      const updatedFields = { ...state.fields };
 
-      Object.keys(updatedFields).forEach((categoryId) => {
-        const category = updatedFields[categoryId];
-        updatedFields[categoryId] = {
-          ...category,
-          questions: category.questions.map((q) =>
-            q.questionId === fieldId ? { ...q, questionText: value } : q,
-          ),
-        };
-      });
-
-      return { fields: updatedFields };
+      return { fields: newFields };
     }),
   sanitizeFields: () =>
     set((state) => ({ fields: addIndexesToFields(state.fields) })),
