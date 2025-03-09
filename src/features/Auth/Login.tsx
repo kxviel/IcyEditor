@@ -38,10 +38,8 @@ const Login = () => {
 
   const onSubmit = (data: LoginSchemaTypes) => {
     loginFn.mutate({
-      body: {
-        phoneOrEmail: data.email,
-        password: data.password,
-      },
+      phoneOrEmail: data.email,
+      password: data.password,
     });
   };
 

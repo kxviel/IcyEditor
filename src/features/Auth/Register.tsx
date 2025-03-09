@@ -76,8 +76,7 @@ const Register = () => {
   const series = useGetSeries(form.watch("publicationId"));
 
   const onSubmit = (data: RegisterSchemaTypes) => {
-    console.log(data);
-    registerFn.mutate({ body: data });
+    registerFn.mutate({ ...data });
   };
 
   return (

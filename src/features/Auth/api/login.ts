@@ -5,32 +5,29 @@ import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 type Props = {
-  body: {
-    phoneOrEmail: string;
-    password: string;
-  };
+  phoneOrEmail: string;
+  password: string;
 };
 
-const loginFn = ({ body }: Props) => {
+const mutationFn = (body: Props) => {
   return http.post("/auth/login", body);
 };
 
 export const useLoginFn = () => {
   const navigate = useNavigate();
-  const { signIn, signOut } = useAuth();
+  const { saveUser } = useAuth();
 
   return useMutation({
-    mutationFn: loginFn,
+    mutationFn,
     onSuccess: ({ data }) => {
       toast.success(data.message);
-      signIn(data.data);
+      saveUser(data.data);
       navigate({
         to: "/",
       });
     },
     onError: (err: string) => {
       toast.error(err);
-      signOut();
     },
   });
 };

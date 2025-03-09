@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLoginWithGoogleFn } from "@/features/Auth/api/loginWithGoogle";
+import { useLoginWithGoogle } from "@/features/Auth/api/loginWithGoogle";
 import Login from "@/features/Auth/Login";
 import Register from "@/features/Auth/Register";
 import { useState } from "react";
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/login")({
 function RouteComponent() {
   const [activeTab, setActiveTab] = useState("login");
 
-  const continueWithGoogle = useLoginWithGoogleFn();
+  const { loginWithGoogle, isPending } = useLoginWithGoogle();
 
   return (
     <div className="mx-auto h-screen w-full">
@@ -76,10 +76,11 @@ function RouteComponent() {
           {/* Sign in with Google */}
           <Button
             variant={"outline"}
-            onClick={() => continueWithGoogle()}
+            onClick={() => loginWithGoogle()}
             className="w-96"
           >
-            <GoogleIcon /> Continue with Google
+            <GoogleIcon />{" "}
+            {isPending ? "Logging in..." : "Continue with Google"}
           </Button>
         </Tabs>
       </div>

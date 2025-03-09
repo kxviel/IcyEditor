@@ -16,7 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Stepper from "./ui/stepper";
 
 const Navbar = () => {
-  const { signOut } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -45,7 +45,7 @@ const Navbar = () => {
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={signOut}>
+                  <AlertDialogAction onClick={logout}>
                     Continue
                   </AlertDialogAction>
                 </AlertDialogFooter>

@@ -25,13 +25,13 @@ const mutationFn = ({ body }: Props) => {
 };
 
 export const useUpdateUser = () => {
-  const { signIn } = useAuth();
+  const { saveUser } = useAuth();
   const hideModal = useModalStore((state) => state.hideModal);
 
   return useMutation({
     mutationFn,
     onSuccess: ({ data }) => {
-      signIn(data.data);
+      saveUser(data.data);
       hideModal();
       toast.success("Updated Successfully");
     },
