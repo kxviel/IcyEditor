@@ -18,6 +18,7 @@ export const columns = [
   }),
   columnHelper.accessor("IS_SUPER_ADMIN", {
     header: () => <span>Is Super Admin</span>,
+    cell: (info) => <span>{info.getValue() ? "yes" : "no"}</span>,
   }),
   columnHelper.accessor("IS_SUPER_ADMIN", {
     header: () => <span>Status</span>,
