@@ -1,23 +1,12 @@
-import {
-  Document,
-  Paragraph,
-  TextRun,
-  HeadingLevel,
-  Table,
-  TableRow,
-  TableCell,
-  WidthType,
-} from "docx";
+import { Paragraph, TextRun, HeadingLevel, FileChild } from "docx";
 import { Fieldtype } from "@/store/useQuestionBuilderStore";
-import { HeaderItem } from "@/store/useHeaderStore";
 
 export const generateDocFromFields = (
   fields: Fieldtype,
   currentFontSize: number,
-  headerData: Record<string, HeaderItem>,
 ) => {
   // Create an array to hold all the paragraphs
-  const paragraphs: any = [];
+  const paragraphs: FileChild[] = [];
 
   // Iterate through each field (category)
   Array.from(fields.values()).forEach((field) => {
@@ -25,6 +14,13 @@ export const generateDocFromFields = (
     paragraphs.push(
       new Paragraph({
         heading: HeadingLevel.HEADING_2,
+        indent: {
+          left: 270,
+          right: 270,
+        },
+        spacing: {
+          after: 270,
+        },
         children: [
           new TextRun({
             text: `Q${field.categoryIndex! + 1}. `,
@@ -49,6 +45,10 @@ export const generateDocFromFields = (
       // Create a paragraph for each question
       paragraphs.push(
         new Paragraph({
+          indent: {
+            left: 270,
+            right: 270,
+          },
           children: [
             new TextRun({
               text: `${question.questionIndex! + 1}. `,
@@ -67,115 +67,15 @@ export const generateDocFromFields = (
   });
 
   // Create and return the document
-  return new Document({
-    sections: [
-      {
-        properties: {},
-        children: [
-          // // School Name - Centered & Bold
-          // new Paragraph({
-          //   children: [
-          //     new TextRun({
-          //       text: "SCHOOL NAME",
-          //       bold: true,
-          //       size: 48,
-          //       font: "Times New Roman",
-          //     }),
-          //   ],
-          //   alignment: "center",
-          // }),
-
-          // // Examination Type & Subject
-          // new Paragraph({
-          //   children: [
-          //     new TextRun({
-          //       text: "EXAMINATION TYPE",
-          //       bold: true,
-          //       size: 32,
-          //       color: "4F772D", // Dark Green
-          //       font: "Times New Roman",
-          //     }),
-          //   ],
-          //   alignment: "center",
-          // }),
-
-          // new Paragraph({
-          //   children: [
-          //     new TextRun({
-          //       text: "SUBJECT",
-          //       bold: true,
-          //       size: 32,
-          //       color: "4F772D",
-          //       font: "Times New Roman",
-          //     }),
-          //   ],
-          //   alignment: "center",
-          // }),
-
-          // // Duration and Marks Table
-          // new Table({
-          //   width: { size: 100, type: WidthType.PERCENTAGE },
-          //   rows: [
-          //     new TableRow({
-          //       children: [
-          //         new TableCell({
-          //           children: [new Paragraph({ text: "Duration:" })],
-          //         }),
-          //         new TableCell({
-          //           children: [],
-          //         }),
-          //         new TableCell({
-          //           children: [new Paragraph({ text: "Marks:" })],
-          //         }),
-          //         new TableCell({
-          //           children: [],
-          //         }),
-          //       ],
-          //     }),
-          //   ],
-          // }),
-
-          // new Paragraph({ text: "", spacing: { before: 200, after: 200 } }),
-
-          // // Student Information Table with Green Background
-          // new Table({
-          //   width: { size: 100, type: WidthType.PERCENTAGE },
-          //   rows: [
-          //     new TableRow({
-          //       children: [
-          //         new TableCell({
-          //           children: [new Paragraph({ text: "Name:" })],
-          //           shading: { fill: "C3E6A3" }, // Light Green Background
-          //         }),
-          //         new TableCell({
-          //           children: [new Paragraph("_____________________")],
-          //           shading: { fill: "C3E6A3" },
-          //         }),
-          //         new TableCell({
-          //           children: [new Paragraph({ text: "Class:" })],
-          //           shading: { fill: "C3E6A3" },
-          //         }),
-          //         new TableCell({
-          //           children: [new Paragraph("_____________________")],
-          //           shading: { fill: "C3E6A3" },
-          //         }),
-          //         new TableCell({
-          //           children: [new Paragraph({ text: "Roll No:" })],
-          //           shading: { fill: "C3E6A3" },
-          //         }),
-          //         new TableCell({
-          //           children: [new Paragraph("_____________________")],
-          //           shading: { fill: "C3E6A3" },
-          //         }),
-          //       ],
-          //     }),
-          //   ],
-          // }),
-          ...paragraphs,
-        ],
-      },
-    ],
-  });
+  return paragraphs;
+  // return new Document({
+  //   sections: [
+  //     {
+  //       properties: {},
+  //       children: paragraphs,
+  //     },
+  //   ],
+  // });
 };
 
 // Helper function to process question text and handle HTML content

@@ -5,11 +5,11 @@ import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "@tanstack/react-router";
-import { saveAs } from "file-saver";
-import { Packer } from "docx";
-import { generateDocFromFields } from "@/lib/docxParser";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { useState } from "react";
+// import { Packer, patchDocument, PatchType } from "docx";
+// import { generateDocFromFields } from "@/lib/docxParser";
+// import { saveAs } from "file-saver";
 
 const SavePaper = () => {
   const { getUser } = useAuth();
@@ -48,24 +48,31 @@ const SavePaper = () => {
     }
   };
 
-  const handleDownloadDOCX = () => {
-    const docxBlob = generateDocFromFields(
-      fields,
-      Number(fontSize),
-      headerData,
-    );
-
-    if (docxBlob) {
-      setDownloading(true);
-      Packer.toBlob(docxBlob)
-        .then((blob) => {
-          saveAs(
-            blob,
-            `${headerData.examName.value}-${new Date().toISOString()}.docx`,
-          );
-        })
-        .finally(() => setDownloading(false));
-    }
+  const handleDownloadDOCX = async () => {
+    // const docxBlob = generateDocFromFields(fields, Number(fontSize));
+    // const response = await fetch(
+    //   "http://localhost:7777/api/documents/one.docx",
+    // );
+    // const arrayBuffer = await response.arrayBuffer();
+    // if (docxBlob && arrayBuffer) {
+    //   // setDownloading(true);
+    //   patchDocument({
+    //     keepOriginalStyles: true,
+    //     outputType: "blob",
+    //     data: arrayBuffer,
+    //     patches: {
+    //       my_patch: {
+    //         type: PatchType.DOCUMENT,
+    //         children: docxBlob,
+    //       },
+    //     },
+    //   }).then((formattedDoc) => {
+    //     saveAs(
+    //       formattedDoc,
+    //       `${headerData.examName.value}-${new Date().toISOString()}.docx`,
+    //     );
+    //   });
+    // }
   };
 
   return (

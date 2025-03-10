@@ -31,7 +31,11 @@ const Navbar = () => {
         </div>
         {!["/builder", "/preview"].includes(pathname) && (
           <div className="flex items-center space-x-4">
-            <Button variant="outline" className="px-3">
+            <Button
+              variant="outline"
+              className="px-3"
+              onClick={() => navigate({ to: "/users" })}
+            >
               View Users
             </Button>
 
