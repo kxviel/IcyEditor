@@ -12,12 +12,12 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DataTablePagination } from "../Home/DataTablePagination";
 
 const UserList = () => {
   const [pagination, setPagination] = useState({
@@ -27,7 +27,7 @@ const UserList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
 
-  const { data, isPending } = useGetUsers({
+  const { data } = useGetUsers({
     page: pagination.pageIndex + 1,
     search: debouncedSearch,
   });
@@ -58,7 +58,6 @@ const UserList = () => {
       </div>
       <div className="p-2">
         <Table>
-          <TableCaption>A list of your recent activities.</TableCaption>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -88,43 +87,7 @@ const UserList = () => {
           </TableBody>
         </Table>
 
-        <div className="flex items-center gap-2">
-          <button
-            className="rounded border p-1"
-            onClick={() => table.firstPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            {"<<"}
-          </button>
-          <button
-            className="rounded border p-1"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            {"<"}
-          </button>
-          <button
-            className="rounded border p-1"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            {">"}
-          </button>
-          <button
-            className="rounded border p-1"
-            onClick={() => table.lastPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            {">>"}
-          </button>
-          <span className="flex items-center gap-1">
-            <div>Page</div>
-            <strong>
-              {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount().toLocaleString()}
-            </strong>
-          </span>
-        </div>
+        <DataTablePagination table={table} />
       </div>
     </div>
   );
