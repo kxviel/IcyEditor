@@ -1,6 +1,8 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { Button } from "../../components/ui/button";
 import { UserData } from "./api/getUsers";
+import { Switch } from "@/components/ui/switch";
+import http from "@/config/https";
+import { toast } from "sonner";
 
 const columnHelper = createColumnHelper<UserData>();
 
@@ -16,12 +18,28 @@ export const columns = [
   columnHelper.accessor("MOBILE", {
     header: "Mobile",
   }),
-  columnHelper.accessor("IS_SUPER_ADMIN", {
-    header: () => <span>Is Super Admin</span>,
-    cell: (info) => <span>{info.getValue() ? "yes" : "no"}</span>,
-  }),
-  columnHelper.accessor("IS_SUPER_ADMIN", {
-    header: () => <span>Status</span>,
-    cell: (info) => <Button>{info.getValue() ? "Active" : "Inactive"}</Button>,
+  columnHelper.accessor("RESTRICTED_ACCESS", {
+    header: () => <span>Is Restricted</span>,
+    cell: (info) => {
+      const userId = JSON.parse(localStorage.getItem("user") || "{}")?.id;
+      const editRestriction = () => {
+        http
+          .put(`/auth/update-restricted-access/${userId}`)
+          .then((data) => {
+            toast.success("Updated User Access");
+            localStorage.setItem("user", JSON.stringify(data.data));
+          })
+          .catch((err) => {
+            toast.error(err);
+          });
+      };
+
+      return (
+        <Switch
+          checked={info.getValue() > 0}
+          onCheckedChange={editRestriction}
+        />
+      );
+    },
   }),
 ];

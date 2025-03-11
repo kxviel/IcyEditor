@@ -1,8 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useGetBook } from "./api/getBook";
 import PaperPrerequisitesModal from "./PaperPrerequisitesModal";
-import PaperView from "./PaperView";
-import QuestionList from "./QuestionList";
 import { useGetChapter } from "./api/getChapter";
 import { useGetPublication } from "./api/getPublication";
 import { useGetSeries } from "./api/getSeries";
@@ -12,10 +10,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { useGetExamById } from "./api/getExamById";
-import { parseExamDataResponse } from "@/lib/utils";
-import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
-import { useHeaderStore } from "@/store/useHeaderStore";
 import { ControlledSelect } from "@/components/ControlledSelect";
 import {
   DropdownMenu,
@@ -24,6 +18,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import ChapterList from "./ChapterList";
+import QuestionSelect from "./QuestionSelect";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -39,16 +35,8 @@ const prequisitesFormSchema = z.object({
 
 export type PrerequisitesForm = z.infer<typeof prequisitesFormSchema>;
 
-type Props = {
-  examId: "manual" | "auto" | string;
-};
-
-const QuestionBuilder = ({ examId }: Props) => {
-  const presetFields = useQuestionBuilderStore((state) => state.presetFields);
-  const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
-  const [isModalOpen, setIsModalOpen] = useState(
-    ["manual", "auto"].includes(examId),
-  );
+const AutoGen = () => {
+  const [isModalOpen, setIsModalOpen] = useState(true);
 
   const form = useForm<PrerequisitesForm>({
     resolver: zodResolver(prequisitesFormSchema),
@@ -61,21 +49,6 @@ const QuestionBuilder = ({ examId }: Props) => {
   const subjects = useGetSubject(form.watch("classId"));
   const books = useGetBook(form.watch("subjectId"));
   const chapters = useGetChapter(form.watch("bookId"));
-
-  const { data: examData } = useGetExamById(examId);
-
-  useEffect(() => {
-    if (examData && examData.examId) {
-      const parsedObject = parseExamDataResponse(examData);
-
-      if (parsedObject.fields) {
-        presetFields(parsedObject.fields);
-      }
-      if (parsedObject.headerData) {
-        presetHeaderData(parsedObject.headerData);
-      }
-    }
-  }, [examData, presetFields, presetHeaderData]);
 
   const handleChapters = (chapterId: string) => {
     const currentIds = [...(selectedChapterIds || [])];
@@ -225,9 +198,13 @@ const QuestionBuilder = ({ examId }: Props) => {
               </form>
             </Form>
 
-            <QuestionList chapterIds={selectedChapterIds} />
+            <ChapterList
+              chapters={chapters.data || []}
+              selectedChapterIds={selectedChapterIds}
+              handleChapters={handleChapters}
+            />
           </div>
-          <PaperView />
+          <QuestionSelect chapterIds={selectedChapterIds} />
         </div>
       )}
 
@@ -249,4 +226,4 @@ const QuestionBuilder = ({ examId }: Props) => {
   );
 };
 
-export default QuestionBuilder;
+export default AutoGen;

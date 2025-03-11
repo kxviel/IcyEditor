@@ -4,14 +4,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 
 type Props = {
-  chapterId: string[];
+  chapterIds: string[];
 };
 
-const QuestionList = ({ chapterId }: Props) => {
+const QuestionList = ({ chapterIds }: Props) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const addQuestion = useQuestionBuilderStore((state) => state.addQuestion);
 
-  const { data: questionList } = useGetQuestions(chapterId);
+  const { data: questionList } = useGetQuestions(chapterIds);
 
   return (
     <div className="custom_scrollbar flex flex-col gap-2 overflow-y-scroll">
