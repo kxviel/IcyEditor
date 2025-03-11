@@ -37,14 +37,14 @@ export interface Question {
   type: any;
 }
 
-const getQuestionFn = (chapterId: string): Promise<AxiosResponse<Root>> => {
-  return http.get(`/questionbank/chapter/${chapterId}`);
+const getQuestionsFn = (chapterId: string[]): Promise<AxiosResponse<Root>> => {
+  return http.get(`/questionbank/chapter/${chapterId[0]}`);
 };
 
-export const useGetQuestionList = (chapterId: string) => {
+export const useGetQuestions = (chapterId: string[]) => {
   return useQuery({
     queryKey: ["GetQuestionList", chapterId],
-    queryFn: () => getQuestionFn(chapterId),
+    queryFn: () => getQuestionsFn(chapterId),
     select: ({ data }) => data.data,
     enabled: !!chapterId,
   });

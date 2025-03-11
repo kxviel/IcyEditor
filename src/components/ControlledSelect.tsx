@@ -20,18 +20,11 @@ const labels = {
   classId: "Class",
   subjectId: "Subject",
   bookId: "Book",
-  chapterId: "Chapter",
 };
 
 type ControlledSelectProps = {
   form: UseFormReturn<PrerequisitesForm, any, undefined>;
-  label:
-    | "publicationId"
-    | "seriesId"
-    | "classId"
-    | "subjectId"
-    | "bookId"
-    | "chapterId";
+  label: "publicationId" | "seriesId" | "classId" | "subjectId" | "bookId";
   isDisabled: boolean;
   options: { value: string; label: string }[];
 };

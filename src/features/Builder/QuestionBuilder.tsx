@@ -11,12 +11,19 @@ import { useGetSubject } from "./api/getSubject";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Form } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useGetExamById } from "./api/getExamById";
 import { parseExamDataResponse } from "@/lib/utils";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { ControlledSelect } from "@/components/ControlledSelect";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -24,7 +31,10 @@ const prequisitesFormSchema = z.object({
   classId: z.string(),
   subjectId: z.string(),
   bookId: z.string(),
-  chapterId: z.string(),
+  chapterIds: z
+    .array(z.string())
+    .min(1, { message: "Select at least one chapter" })
+    .max(10, { message: "You can select a maximum of 10 chapters" }),
 });
 
 export type PrerequisitesForm = z.infer<typeof prequisitesFormSchema>;
@@ -45,6 +55,7 @@ const QuestionBuilder = ({ examId }: Props) => {
     resolver: zodResolver(prequisitesFormSchema),
   });
 
+  const selectedChapterIds = form.watch("chapterIds");
   const publication = useGetPublication();
   const series = useGetSeries(form.watch("publicationId"));
   const classes = useGetClass(form.watch("seriesId"));
@@ -66,6 +77,19 @@ const QuestionBuilder = ({ examId }: Props) => {
       }
     }
   }, [examData, presetFields, presetHeaderData]);
+
+  const handleChapters = (chapterId: string) => {
+    const currentIds = [...(selectedChapterIds || [])];
+
+    if (currentIds.includes(chapterId)) {
+      const updatedIds = currentIds.filter((id) => id !== chapterId);
+      form.setValue("chapterIds", updatedIds, { shouldValidate: true });
+    } else {
+      form.setValue("chapterIds", [...currentIds, chapterId], {
+        shouldValidate: true,
+      });
+    }
+  };
 
   const onPrequisitesSubmit = () => {
     const allListsExist =
@@ -162,24 +186,46 @@ const QuestionBuilder = ({ examId }: Props) => {
                     isDisabled={books.isPending || !form.watch("classId")}
                   />
 
-                  <ControlledSelect
-                    form={form}
-                    label="chapterId"
-                    options={
-                      chapters.data
-                        ? chapters.data.map(({ id, NAME }) => ({
-                            value: id.toString(),
-                            label: NAME,
-                          }))
-                        : []
-                    }
-                    isDisabled={chapters.isPending || !form.watch("classId")}
+                  <FormField
+                    control={form.control}
+                    name={"chapterIds"}
+                    render={() => (
+                      <FormItem>
+                        <FormLabel>Select Chapter</FormLabel>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="flex w-full items-center justify-start font-light text-slate-600 hover:bg-slate-50"
+                            >
+                              Select Chapter
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="custom_scrollbar max-h-56 w-56">
+                            {chapters.data &&
+                              chapters.data.map(({ id, NAME }) => (
+                                <DropdownMenuCheckboxItem
+                                  key={id}
+                                  checked={selectedChapterIds?.includes(
+                                    id.toString(),
+                                  )}
+                                  onCheckedChange={() =>
+                                    handleChapters(id.toString())
+                                  }
+                                >
+                                  {NAME}
+                                </DropdownMenuCheckboxItem>
+                              ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </FormItem>
+                    )}
                   />
                 </div>
               </form>
             </Form>
 
-            <QuestionList chapterId={form.watch("chapterId")} />
+            <QuestionList chapterId={form.watch("chapterIds")} />
           </div>
           <PaperView />
         </div>
@@ -199,6 +245,7 @@ const QuestionBuilder = ({ examId }: Props) => {
         onPrequisitesSubmit={onPrequisitesSubmit}
         modalView={modalView}
         isAuto={examId === "auto"}
+        handleChapters={handleChapters}
       />
     </div>
   );

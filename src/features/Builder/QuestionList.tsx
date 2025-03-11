@@ -1,17 +1,17 @@
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
-import { useGetQuestionList } from "./api/getQuestionTitles";
+import { useGetQuestions } from "./api/getQuestions";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 
 type Props = {
-  chapterId: string;
+  chapterId: string[];
 };
 
 const QuestionList = ({ chapterId }: Props) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const addQuestion = useQuestionBuilderStore((state) => state.addQuestion);
 
-  const { data: questionList } = useGetQuestionList(chapterId);
+  const { data: questionList } = useGetQuestions(chapterId);
 
   return (
     <div className="custom_scrollbar flex flex-col gap-2 overflow-y-scroll">

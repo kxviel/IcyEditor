@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "@tanstack/react-router";
-import { Form } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Subject } from "./api/getSubject";
@@ -13,6 +12,13 @@ import { PrerequisitesForm } from "./QuestionBuilder";
 import { Book } from "./api/getBook";
 import { Chapter } from "./api/getChapter";
 import { ControlledSelect } from "@/components/ControlledSelect";
+import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Props = {
   isModalOpen: boolean;
@@ -27,6 +33,7 @@ type Props = {
   onPrequisitesSubmit: (data: PrerequisitesForm) => void;
   modalView: "prereq" | "autogen";
   isAuto: boolean;
+  handleChapters: (chapterId: string) => void;
 };
 
 const PaperPrerequisitesModal = ({
@@ -41,12 +48,10 @@ const PaperPrerequisitesModal = ({
   form,
   onPrequisitesSubmit,
   modalView,
+  handleChapters,
 }: Props) => {
   const navigate = useNavigate();
-
-  // const { data: questionList } = useGetQuestionList(
-  //   form.getValues("chapterId"),
-  // );
+  const selectedChapterIds = form.watch("chapterIds");
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -137,18 +142,41 @@ const PaperPrerequisitesModal = ({
                   }
                   isDisabled={books.isPending || !form.watch("classId")}
                 />
-                <ControlledSelect
-                  form={form}
-                  label="chapterId"
-                  options={
-                    chapters.data
-                      ? chapters.data.map(({ id, NAME }) => ({
-                          value: id.toString(),
-                          label: NAME,
-                        }))
-                      : []
-                  }
-                  isDisabled={chapters.isPending || !form.watch("classId")}
+
+                <FormField
+                  control={form.control}
+                  name={"chapterIds"}
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Select Chapter</FormLabel>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="flex w-full items-center justify-start font-light text-slate-600 hover:bg-slate-50"
+                          >
+                            Select Chapter
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="custom_scrollbar max-h-56 w-56">
+                          {chapters.data &&
+                            chapters.data.map(({ id, NAME }) => (
+                              <DropdownMenuCheckboxItem
+                                key={id}
+                                checked={selectedChapterIds?.includes(
+                                  id.toString(),
+                                )}
+                                onCheckedChange={() =>
+                                  handleChapters(id.toString())
+                                }
+                              >
+                                {NAME}
+                              </DropdownMenuCheckboxItem>
+                            ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </FormItem>
+                  )}
                 />
 
                 <Button
