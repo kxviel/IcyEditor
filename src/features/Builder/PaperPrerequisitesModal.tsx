@@ -166,9 +166,10 @@ const PaperPrerequisitesModal = ({
                                 checked={selectedChapterIds?.includes(
                                   id.toString(),
                                 )}
-                                onCheckedChange={() =>
-                                  handleChapters(id.toString())
-                                }
+                                onSelect={(e) => {
+                                  e.preventDefault();
+                                  handleChapters(id.toString());
+                                }}
                               >
                                 {NAME}
                               </DropdownMenuCheckboxItem>
