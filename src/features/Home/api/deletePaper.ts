@@ -17,7 +17,7 @@ export const useDeletePaper = () => {
   return useMutation({
     mutationFn,
     onSuccess: ({ data }) => {
-      queryClient.invalidateQueries({ queryKey: ["GetPapers"] });
+      queryClient.refetchQueries({ queryKey: ["GetPapers"] });
       toast.success(data.message);
     },
     onError: (err: string) => {

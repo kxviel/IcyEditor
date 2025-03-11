@@ -3,6 +3,7 @@ import { UserData } from "./api/getUsers";
 import { Switch } from "@/components/ui/switch";
 import http from "@/config/https";
 import { toast } from "sonner";
+import { queryClient } from "@/main";
 
 const columnHelper = createColumnHelper<UserData>();
 
@@ -21,17 +22,20 @@ export const columns = [
   columnHelper.accessor("RESTRICTED_ACCESS", {
     header: () => <span>Is Restricted</span>,
     cell: (info) => {
-      const userId = JSON.parse(localStorage.getItem("user") || "{}")?.id;
       const editRestriction = () => {
-        http
-          .put(`/auth/update-restricted-access/${userId}`)
-          .then((data) => {
-            toast.success("Updated User Access");
-            localStorage.setItem("user", JSON.stringify(data.data));
-          })
-          .catch((err) => {
-            toast.error(err);
-          });
+        const userId = info.row.original?.id;
+
+        if (userId) {
+          http
+            .put(`/auth/update-restricted-access/${userId}`)
+            .then(() => {
+              toast.success("Updated User Access");
+              queryClient.refetchQueries({ queryKey: ["GetUsers"] });
+            })
+            .catch((err) => {
+              toast.error(err);
+            });
+        }
       };
 
       return (

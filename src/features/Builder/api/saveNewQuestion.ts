@@ -26,7 +26,7 @@ export const useSaveNewQuestion = () => {
     mutationFn,
     onSuccess: ({ data }) => {
       toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ["GetQuestionList"] });
+      queryClient.refetchQueries({ queryKey: ["GetQuestionList"] });
     },
     onError: (err: string) => {
       toast.error(err);

@@ -20,7 +20,7 @@ export const useEditRestriction = () => {
     onSuccess: ({ data }) => {
       saveUser(data.data);
       toast.success("Updated User Access");
-      queryClient.invalidateQueries({ queryKey: ["GetUsers"] });
+      queryClient.refetchQueries({ queryKey: ["GetUsers"] });
     },
     onError: (err: string) => {
       toast.error(err);
