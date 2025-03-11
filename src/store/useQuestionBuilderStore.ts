@@ -31,8 +31,8 @@ interface HeaderStore {
 }
 
 export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
-  // fields: tempFields,
-  fields: new Map(),
+  fields: tempFields,
+  // fields: new Map(),
   presetFields: (fields) => set(() => ({ fields })),
   addQuestion: (categoryId, categoryName, addedQuestion) =>
     set((state) => {

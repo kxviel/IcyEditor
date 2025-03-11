@@ -7,9 +7,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "@tanstack/react-router";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { useState } from "react";
-// import { Packer, patchDocument, PatchType } from "docx";
-// import { generateDocFromFields } from "@/lib/docxParser";
-// import { saveAs } from "file-saver";
+import { IPatch, patchDocument, PatchType } from "docx";
+import { generateDocFromFields } from "@/lib/docxParser";
+import { saveAs } from "file-saver";
+import { format } from "date-fns";
+import { docxHeaderOne } from "@/lib/docxHeaders";
+import { toast } from "sonner";
 
 const SavePaper = () => {
   const { getUser } = useAuth();
@@ -49,30 +52,41 @@ const SavePaper = () => {
   };
 
   const handleDownloadDOCX = async () => {
-    // const docxBlob = generateDocFromFields(fields, Number(fontSize));
-    // const response = await fetch(
-    //   "http://localhost:7777/api/documents/one.docx",
-    // );
-    // const arrayBuffer = await response.arrayBuffer();
-    // if (docxBlob && arrayBuffer) {
-    //   // setDownloading(true);
-    //   patchDocument({
-    //     keepOriginalStyles: true,
-    //     outputType: "blob",
-    //     data: arrayBuffer,
-    //     patches: {
-    //       my_patch: {
-    //         type: PatchType.DOCUMENT,
-    //         children: docxBlob,
-    //       },
-    //     },
-    //   }).then((formattedDoc) => {
-    //     saveAs(
-    //       formattedDoc,
-    //       `${headerData.examName.value}-${new Date().toISOString()}.docx`,
-    //     );
-    //   });
-    // }
+    setDownloading(true);
+    const response = await fetch("./src/assets/headers/layout_one.docx");
+    const responseBlob = await response.blob();
+
+    const docxBlob = generateDocFromFields(fields, Number(fontSize));
+    const layoutDict: Record<string, Record<string, IPatch>> = {
+      "1": docxHeaderOne(headerData, fontSize),
+      "2": docxHeaderOne(headerData, fontSize),
+      "3": docxHeaderOne(headerData, fontSize),
+    };
+
+    if (docxBlob && responseBlob) {
+      patchDocument({
+        keepOriginalStyles: true,
+        outputType: "blob",
+        data: responseBlob,
+        patches: {
+          content: {
+            type: PatchType.DOCUMENT,
+            children: docxBlob,
+          },
+          ...layoutDict[headerLayout],
+        },
+      })
+        .then((formattedDoc) => {
+          saveAs(
+            formattedDoc,
+            `${headerData.examName.value} - ${format(new Date(), "dd-MM-yyyy HH:mm")}.docx`,
+          );
+        })
+        .finally(() => {
+          toast.success("Word File Downloaded");
+          setDownloading(false);
+        });
+    }
   };
 
   return (
@@ -85,23 +99,7 @@ const SavePaper = () => {
         {downloading ? "Downloading..." : "Download PDF "}
         <Printer />
       </Button>
-      <Button
-        // onClick={() => {
-        //   if (docxBlob) {
-        //     setDownloading(true);
-        //     Packer.toBlob(docxBlob)
-        //       .then((blob) => {
-        //         saveAs(
-        //           blob,
-        //           `${headerData.examName.value}-${new Date().toISOString()}.docx`,
-        //         );
-        //       })
-        //       .finally(() => setDownloading(false));
-        //   }
-        // }}
-        onClick={handleDownloadDOCX}
-        disabled={downloading}
-      >
+      <Button onClick={handleDownloadDOCX} disabled={downloading}>
         {downloading ? "Downloading..." : "Download DOCX "}
         <Printer />
       </Button>
