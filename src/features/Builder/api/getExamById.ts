@@ -72,6 +72,10 @@ export const useGetExamById = (examId: string) => {
     queryKey: ["GetExamById", examId],
     queryFn: () => getExamByIdFn(examId),
     select: ({ data }) => data.data,
-    enabled: !["manual", "auto"].includes(examId),
+    enabled: ![
+      "manual-selection",
+      "auto-preselection",
+      "auto-postselection",
+    ].includes(examId),
   });
 };

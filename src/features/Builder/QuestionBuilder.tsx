@@ -42,7 +42,11 @@ const prequisitesFormSchema = z.object({
 export type PrerequisitesForm = z.infer<typeof prequisitesFormSchema>;
 
 type Props = {
-  examId: "manual" | "auto" | string;
+  examId:
+    | "manual-selection"
+    | "auto-preselection"
+    | "auto-postselection"
+    | string;
 };
 
 const QuestionBuilder = ({ examId }: Props) => {
@@ -60,7 +64,7 @@ const QuestionBuilder = ({ examId }: Props) => {
 
   const [chapterNames, setChapterNames] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(
-    ["manual", "auto"].includes(examId),
+    ["manual-selection", "auto-preselection"].includes(examId),
   );
 
   const form = useForm<PrerequisitesForm>({
@@ -86,7 +90,10 @@ const QuestionBuilder = ({ examId }: Props) => {
   const { data: examData } = useGetExamById(examId);
 
   useEffect(() => {
-    if (!["manual", "auto"].includes(examId) && examData) {
+    if (
+      !["manual-selection", "auto-preselection"].includes(examId) &&
+      examData
+    ) {
       const parsedObject = parseExamDataResponse(examData);
 
       if (parsedObject.fields) {
@@ -255,7 +262,7 @@ const QuestionBuilder = ({ examId }: Props) => {
               </form>
             </Form>
 
-            {examId === "auto" ? (
+            {examId === "auto-preselection" ? (
               <ChapterList
                 chapters={chapters.data || []}
                 selectedChapterIds={selectedChapterIds}
@@ -265,7 +272,7 @@ const QuestionBuilder = ({ examId }: Props) => {
               <QuestionList chapterIds={selectedChapterIds} />
             )}
           </div>
-          {examId === "auto" ? (
+          {examId === "auto-preselection" ? (
             <QuestionSelect chapterIds={selectedChapterIds} />
           ) : (
             <PaperView />

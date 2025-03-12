@@ -57,11 +57,13 @@ export const useGenerateQuestions = () => {
   const handlePreset = (examData: AutoGenData) => {
     if (examData && examData.categories) {
       const parsedObject = parseAutoGenResponse(examData);
-      console.log(parsedObject);
 
       if (parsedObject.fields) {
         presetFields(parsedObject.fields);
-        navigate({ to: "/builder/$examId", params: { examId: "auto" } });
+        navigate({
+          to: "/builder/$examId",
+          params: { examId: "auto-postselection" },
+        });
       }
     }
   };
