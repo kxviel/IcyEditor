@@ -50,7 +50,9 @@ const registerSchema = z
       .string()
       .trim()
       .min(1, { message: "Phone is required" })
-      .regex(/^\d{10}$/, { message: "Phone must be a valid 10-digit number" }),
+      .regex(/^(\+91[-\s]?)?[0]?(91)?[6789]\d{9}$/, {
+        message: "Please enter a valid Indian phone number",
+      }),
     city: z.string().trim().min(1, { message: "City is required" }),
     state: z.string().trim().min(1, { message: "State is required" }),
     school: z.string().trim().min(1, { message: "School is required" }),
