@@ -5,9 +5,17 @@ import { useModalStore } from "@/store/useModalStore";
 import { toast } from "sonner";
 import PaperHeaderOne from "./PaperHeaders/PaperHeaderOne";
 import RefreshBlockerModal from "./RefreshBlockerModal";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { usePageSettingsStore } from "@/store/usePageSettingsStore";
+import PaperHeaderTwo from "./PaperHeaders/PaperHeaderTwo";
+import PaperHeaderThree from "./PaperHeaders/PaperHeaderThree";
 
 const PaperView = () => {
+  const headerLayout = usePageSettingsStore((state) => state.headerLayout);
   const fields = useQuestionBuilderStore((state) => state.fields);
+  const setHeaderLayout = usePageSettingsStore(
+    (state) => state.setHeaderLayout,
+  );
   const sanitizeFields = useQuestionBuilderStore(
     (state) => state.sanitizeFields,
   );
@@ -36,14 +44,44 @@ const PaperView = () => {
 
   return (
     <div className="relative h-full w-1/2">
-      <div className="custom_scrollbar flex h-full flex-col items-center overflow-y-auto px-6">
-        <p className="py-6 text-sm font-semibold">
+      <div className="custom_scrollbar flex h-full flex-col items-center gap-3 overflow-y-auto p-6">
+        <p className="text-sm font-semibold">
           <span className="text-red-500">Note</span>: You can change the format,
           font size, etc., on the next page.
         </p>
 
+        <Tabs
+          value={headerLayout}
+          onValueChange={setHeaderLayout}
+          className="flex flex-col items-center justify-center"
+        >
+          <TabsList className="w-[632px]">
+            <TabsTrigger value="1" className="w-full">
+              Layout 1
+            </TabsTrigger>
+            <TabsTrigger value="2" className="w-full">
+              Layout 2
+            </TabsTrigger>
+            <TabsTrigger value="3" className="w-full">
+              Layout 3
+            </TabsTrigger>
+            {/* <TabsTrigger value="4" className="w-full">
+              Layout 4
+            </TabsTrigger>
+            <TabsTrigger value="5" className="w-full">
+              Layout 5
+            </TabsTrigger> */}
+          </TabsList>
+        </Tabs>
+
         <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white p-3 shadow-md">
-          <PaperHeaderOne isPreview={false} />
+          {headerLayout === "1" ? (
+            <PaperHeaderOne isPreview={false} />
+          ) : headerLayout === "2" ? (
+            <PaperHeaderTwo isPreview={false} />
+          ) : (
+            <PaperHeaderThree isPreview={false} />
+          )}
 
           <div className="flex w-full flex-col gap-3">
             {Array.from(fields.values()).map((field, fieldIndex) => (

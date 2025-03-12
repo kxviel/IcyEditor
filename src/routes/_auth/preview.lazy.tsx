@@ -1,4 +1,3 @@
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   CategoryItem,
   useQuestionBuilderStore,
@@ -18,12 +17,9 @@ import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
 import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
 
 const pageDimensions: Record<string, string> = {
-  // A1: "h-[841mm] w-[594mm]",
-  // A2: "h-[594mm] w-[420mm]",
   A3: "h-[420mm] w-[297mm]",
   A4: "h-[297mm] w-[210mm]",
   A5: "h-[210mm] w-[148mm]",
-  // A6: "h-[148mm] w-[105mm]",
 };
 
 export const Route = createLazyFileRoute("/_auth/preview")({
@@ -53,10 +49,7 @@ function Preview() {
 
   const fields = useQuestionBuilderStore((state) => state.fields);
   const setFontSize = usePageSettingsStore((state) => state.setFontSize);
-  const setHeaderLayout = usePageSettingsStore(
-    (state) => state.setHeaderLayout,
-  );
-  const headerLayout = usePageSettingsStore((state) => state.headerLayout);
+
   const currentFontSize = usePageSettingsStore(
     (state) => state.currentFontSize,
   );
@@ -110,24 +103,6 @@ function Preview() {
 
   return (
     <div className="flex h-full flex-col items-center gap-6 pt-6">
-      <Tabs
-        value={headerLayout}
-        onValueChange={setHeaderLayout}
-        className="flex flex-col items-center justify-center"
-      >
-        <TabsList className="w-[632px]">
-          <TabsTrigger value="1" className="w-full">
-            Layout 1
-          </TabsTrigger>
-          <TabsTrigger value="2" className="w-full">
-            Layout 2
-          </TabsTrigger>
-          <TabsTrigger value="3" className="w-full">
-            Layout 3
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
-
       <div className="flex items-center justify-center gap-3">
         <Select value={pageSize} onValueChange={setPageSize}>
           <SelectTrigger className="w-[180px] bg-white">
