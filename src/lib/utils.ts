@@ -1,3 +1,4 @@
+import { AutoGenData } from "@/features/Builder/api/generateQuestions";
 import { ExamData } from "@/features/Builder/api/getExamById";
 import { HeaderData } from "@/store/useHeaderStore";
 import { Fieldtype } from "@/store/useQuestionBuilderStore";
@@ -61,6 +62,28 @@ export function parseExamDataResponse(response: ExamData): ReturnProps {
   });
 
   return { fields, headerData };
+}
+
+export function parseAutoGenResponse(
+  response: AutoGenData,
+): Omit<ReturnProps, "headerData"> {
+  const fields: Fieldtype = new Map();
+
+  response.categories.forEach((category, categoryIndex) => {
+    fields.set(category.categoryId, {
+      categoryId: category.categoryId,
+      categoryName: category.categoryName,
+      categoryIndex,
+      questions: category.questions.map((question, questionIndex) => ({
+        questionId: question.id,
+        questionIndex,
+        questionText: question.QUESTION_DATA,
+      })),
+    });
+  });
+  console.log(fields);
+
+  return { fields };
 }
 
 export function addIndexesToFields(fields: Fieldtype): Fieldtype {

@@ -46,6 +46,7 @@ interface HeaderStore {
   setValue: (headerId: string, value: string) => void;
   setIsEditing: (headerId: string, isEditing: boolean) => void;
   presetHeaderData: (headerData: HeaderData) => void;
+  reset: () => void;
 }
 
 export const useHeaderStore = create<HeaderStore>()((set) => ({

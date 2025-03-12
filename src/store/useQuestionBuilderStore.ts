@@ -16,8 +16,23 @@ export interface QuestionItem {
   questionIndex?: number;
 }
 
+type IdKey =
+  | "publicationId"
+  | "seriesId"
+  | "classId"
+  | "subjectId"
+  | "bookId"
+  | "chapterIds";
+
 interface HeaderStore {
   fields: Fieldtype;
+  publicationId: string;
+  seriesId: string;
+  classId: string;
+  subjectId: string;
+  bookId: string;
+  chapterIds: string[];
+  setIds: (idKey: IdKey, value: string | string[]) => void;
   presetFields: (fields: Fieldtype) => void;
   addQuestion: (
     categoryId: string,
@@ -28,10 +43,18 @@ interface HeaderStore {
     },
   ) => void;
   sanitizeFields: () => void;
+  reset: () => void;
 }
 
 export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
   fields: new Map(),
+  publicationId: "",
+  seriesId: "",
+  classId: "",
+  subjectId: "",
+  bookId: "",
+  chapterIds: [],
+  setIds: (idKey, value) => set(() => ({ [idKey]: value })),
   presetFields: (fields) => set(() => ({ fields })),
   addQuestion: (categoryId, categoryName, addedQuestion) =>
     set((state) => {
@@ -84,4 +107,15 @@ export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
     }),
   sanitizeFields: () =>
     set((state) => ({ fields: addIndexesToFields(state.fields) })),
+  reset: () => {
+    set({
+      fields: new Map(),
+      publicationId: "",
+      seriesId: "",
+      classId: "",
+      subjectId: "",
+      bookId: "",
+      chapterIds: [],
+    });
+  },
 }));

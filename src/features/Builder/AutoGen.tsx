@@ -8,7 +8,7 @@ import { useGetClass } from "./api/getClass";
 import { useGetSubject } from "./api/getSubject";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { ControlledSelect } from "@/components/ControlledSelect";
 import {
@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import ChapterList from "./ChapterList";
 import QuestionSelect from "./QuestionSelect";
+import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -36,6 +37,8 @@ const prequisitesFormSchema = z.object({
 export type PrerequisitesForm = z.infer<typeof prequisitesFormSchema>;
 
 const AutoGen = () => {
+  const setIds = useQuestionBuilderStore((state) => state.setIds);
+
   const [isModalOpen, setIsModalOpen] = useState(true);
 
   const form = useForm<PrerequisitesForm>({
@@ -63,18 +66,15 @@ const AutoGen = () => {
     }
   };
 
-  const onPrequisitesSubmit = () => {
-    const allListsExist =
-      publication.data &&
-      series.data &&
-      classes.data &&
-      subjects.data &&
-      books.data &&
-      chapters.data;
+  const onPrequisitesSubmit: SubmitHandler<PrerequisitesForm> = (data) => {
+    setIds("publicationId", data.publicationId);
+    setIds("seriesId", data.seriesId);
+    setIds("classId", data.classId);
+    setIds("subjectId", data.subjectId);
+    setIds("bookId", data.bookId);
+    setIds("chapterIds", selectedChapterIds);
 
-    if (allListsExist) {
-      setIsModalOpen(false);
-    }
+    setIsModalOpen(false);
   };
 
   return (

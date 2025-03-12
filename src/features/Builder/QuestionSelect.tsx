@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { useGetQuestions } from "./api/getQuestions";
 import { Input } from "@/components/ui/input";
+import { useGenerateQuestions } from "./api/generateQuestions";
 
 type Props = {
   chapterIds: string[];
@@ -19,6 +20,7 @@ type Props = {
 
 const QuestionSelect = ({ chapterIds }: Props) => {
   const navigate = useNavigate();
+  const autoGenerate = useGenerateQuestions();
 
   const { data: questionList } = useGetQuestions(chapterIds);
 
@@ -27,7 +29,10 @@ const QuestionSelect = ({ chapterIds }: Props) => {
   };
 
   const handleNext = () => {
-    navigate({ to: "/builder/$examId", params: { examId: "auto" } });
+    autoGenerate.mutate({
+      chapterIds: chapterIds.map((id) => Number(id)),
+      questionCount: 15,
+    });
   };
 
   return (

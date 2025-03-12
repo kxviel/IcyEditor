@@ -6,20 +6,22 @@ import { useHeaderStore } from "@/store/useHeaderStore";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "@tanstack/react-router";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
-import { useState } from "react";
 import { IPatch, patchDocument, PatchType } from "docx";
 import { generateDocFromFields } from "@/lib/docxParser";
 import { saveAs } from "file-saver";
 import { format } from "date-fns";
 import { docxHeaderOne } from "@/lib/docxHeaders";
-import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const SavePaper = () => {
   const { getUser } = useAuth();
   const navigate = useNavigate();
   const saveManualPaper = useSaveExamPaper();
-
-  const [downloading, setDownloading] = useState(false);
 
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
   const fontSize = usePageSettingsStore((state) => state.currentFontSize);
@@ -52,7 +54,6 @@ const SavePaper = () => {
   };
 
   const handleDownloadDOCX = async () => {
-    setDownloading(true);
     const response = await fetch("./src/assets/headers/layout_one.docx");
     const responseBlob = await response.blob();
 
@@ -75,18 +76,17 @@ const SavePaper = () => {
           },
           ...layoutDict[headerLayout],
         },
-      })
-        .then((formattedDoc) => {
-          saveAs(
-            formattedDoc,
-            `${headerData.examName.value} - ${format(new Date(), "dd-MM-yyyy HH:mm")}.docx`,
-          );
-        })
-        .finally(() => {
-          toast.success("Word File Downloaded");
-          setDownloading(false);
-        });
+      }).then((formattedDoc) => {
+        saveAs(
+          formattedDoc,
+          `${headerData.examName.value} - ${format(new Date(), "dd-MM-yyyy HH:mm")}.docx`,
+        );
+      });
     }
+  };
+
+  const handleDownloadPDF = async () => {
+    navigate({ to: "/print" });
   };
 
   return (
@@ -95,14 +95,21 @@ const SavePaper = () => {
         <Save /> Save Paper
       </Button>
 
-      <Button onClick={() => navigate({ to: "/print" })} disabled={downloading}>
-        {downloading ? "Downloading..." : "Download PDF "}
-        <Printer />
-      </Button>
-      <Button onClick={handleDownloadDOCX} disabled={downloading}>
-        {downloading ? "Downloading..." : "Download DOCX "}
-        <Printer />
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger>
+          <Button>
+            Download <Printer />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={handleDownloadPDF}>
+            Download as PDF
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleDownloadDOCX}>
+            Download as Word
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

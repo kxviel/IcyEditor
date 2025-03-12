@@ -10,7 +10,7 @@ import { useGetClass } from "./api/getClass";
 import { useGetSubject } from "./api/getSubject";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useGetExamById } from "./api/getExamById";
 import { parseExamDataResponse } from "@/lib/utils";
@@ -44,14 +44,29 @@ type Props = {
 };
 
 const QuestionBuilder = ({ examId }: Props) => {
-  const presetFields = useQuestionBuilderStore((state) => state.presetFields);
+  const {
+    publicationId,
+    seriesId,
+    classId,
+    subjectId,
+    bookId,
+    chapterIds,
+    setIds,
+    presetFields,
+  } = useQuestionBuilderStore();
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
-  const [isModalOpen, setIsModalOpen] = useState(
-    ["manual", "auto"].includes(examId),
-  );
+  const [isModalOpen, setIsModalOpen] = useState(examId === "manual");
 
   const form = useForm<PrerequisitesForm>({
     resolver: zodResolver(prequisitesFormSchema),
+    defaultValues: {
+      publicationId,
+      seriesId,
+      classId,
+      subjectId,
+      bookId,
+      chapterIds,
+    },
   });
 
   const selectedChapterIds = form.watch("chapterIds") || [];
@@ -90,18 +105,15 @@ const QuestionBuilder = ({ examId }: Props) => {
     }
   };
 
-  const onPrequisitesSubmit = () => {
-    const allListsExist =
-      publication.data &&
-      series.data &&
-      classes.data &&
-      subjects.data &&
-      books.data &&
-      chapters.data;
+  const onPrequisitesSubmit: SubmitHandler<PrerequisitesForm> = (data) => {
+    setIds("publicationId", data.publicationId);
+    setIds("seriesId", data.seriesId);
+    setIds("classId", data.classId);
+    setIds("subjectId", data.subjectId);
+    setIds("bookId", data.bookId);
+    setIds("chapterIds", selectedChapterIds);
 
-    if (allListsExist) {
-      setIsModalOpen(false);
-    }
+    setIsModalOpen(false);
   };
 
   return (
