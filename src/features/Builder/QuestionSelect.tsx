@@ -5,7 +5,6 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -13,7 +12,7 @@ import {
 import { useGetQuestions } from "./api/getQuestions";
 import { Input } from "@/components/ui/input";
 import { useGenerateQuestions } from "./api/generateQuestions";
-
+import { useFieldArray, useForm } from "react-hook-form";
 type Props = {
   chapterIds: string[];
 };
@@ -24,14 +23,35 @@ const QuestionSelect = ({ chapterIds }: Props) => {
 
   const { data: questionList } = useGetQuestions(chapterIds);
 
+  const { control, register, watch } = useForm({
+    defaultValues: {
+      categories:
+        questionList?.categories.map((category) => ({
+          categoryId: category.categoryId,
+          categoryName: category.categoryName,
+          questionCount: "",
+        })) || [],
+    },
+  });
+
+  const { fields } = useFieldArray({
+    control,
+    name: "categories",
+  });
+
   const handleBack = () => {
     navigate({ to: "/exam-type" });
   };
 
   const handleNext = () => {
+    const count = watch("categories")?.reduce((total, category) => {
+      const count = Number(category.questionCount) || 0;
+      return total + count;
+    }, 0);
+
     autoGenerate.mutate({
       chapterIds: chapterIds.map((id) => Number(id)),
-      questionCount: 15,
+      questionCount: count,
     });
   };
 
@@ -48,24 +68,20 @@ const QuestionSelect = ({ chapterIds }: Props) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {questionList?.categories.map((category) => (
-              <TableRow key={category.categoryId}>
+            {fields.map((field, index) => (
+              <TableRow key={field.id}>
                 <TableCell className="font-medium">
-                  {category.categoryName}
+                  {questionList?.categories[index].categoryName}
                 </TableCell>
-                <TableCell>{category.questionCount}</TableCell>
                 <TableCell>
-                  <Input />
+                  {questionList?.categories[index].questionCount}
+                </TableCell>
+                <TableCell>
+                  <Input {...register(`categories.${index}.questionCount`)} />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell colSpan={3}>Total Selcted Questions</TableCell>
-              <TableCell className="text-right">230</TableCell>
-            </TableRow>
-          </TableFooter>
         </Table>
       </div>
 
