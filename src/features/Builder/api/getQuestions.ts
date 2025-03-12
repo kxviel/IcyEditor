@@ -10,23 +10,23 @@ interface Root {
   data: Data;
 }
 
-export interface Data {
+interface Data {
   type: string;
   totalQuestions: number;
   categories: Category[];
 }
 
-export interface Category {
+interface Category {
   categoryId: string;
   categoryName: string;
   questions: Question[];
   questionCount: number;
 }
 
-export interface Question {
+interface Question {
   id: number;
   status: any;
-  ANSWER_DATA: any;
+  ANSWER_DATA: string;
   CATEGORY_ID: string;
   CHAPTER_ID: number;
   FILE_ID: any;
@@ -34,18 +34,18 @@ export interface Question {
   REASON: any;
   REMARKS: any;
   STAGE: any;
-  type: any;
+  type: string;
 }
 
-const getQuestionsFn = (chapterId: string[]): Promise<AxiosResponse<Root>> => {
-  return http.get(`/questionbank/chapter/${chapterId[0]}`);
+const getQuestionsFn = (chapterIds: string[]): Promise<AxiosResponse<Root>> => {
+  return http.post(`/questionbank/chapters/bulk`, { chapterIds });
 };
 
-export const useGetQuestions = (chapterId: string[]) => {
+export const useGetQuestions = (chapterIds: string[]) => {
   return useQuery({
-    queryKey: ["GetQuestionList", chapterId],
-    queryFn: () => getQuestionsFn(chapterId),
+    queryKey: ["GetQuestionList", chapterIds],
+    queryFn: () => getQuestionsFn(chapterIds),
     select: ({ data }) => data.data,
-    enabled: !!chapterId,
+    enabled: chapterIds.length > 0,
   });
 };

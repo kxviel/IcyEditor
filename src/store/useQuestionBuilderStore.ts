@@ -1,4 +1,4 @@
-import { addIndexesToFields, tempFields } from "@/lib/utils";
+import { addIndexesToFields } from "@/lib/utils";
 import { create } from "zustand";
 
 export type Fieldtype = Map<string, CategoryItem>;
@@ -31,8 +31,7 @@ interface HeaderStore {
 }
 
 export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
-  fields: tempFields,
-  // fields: new Map(),
+  fields: new Map(),
   presetFields: (fields) => set(() => ({ fields })),
   addQuestion: (categoryId, categoryName, addedQuestion) =>
     set((state) => {
