@@ -30,8 +30,9 @@ type Props = {
   books: UseQueryResult<Book[], Error>;
   chapters: UseQueryResult<Chapter[], Error>;
   form: UseFormReturn<PrerequisitesForm, any, undefined>;
+  chapterNames: string[];
   onPrequisitesSubmit: (data: PrerequisitesForm) => void;
-  handleChapters: (chapterId: string) => void;
+  handleChapters: (chapterId: string, chapterName: string) => void;
 };
 
 const PaperPrerequisitesModal = ({
@@ -46,6 +47,7 @@ const PaperPrerequisitesModal = ({
   form,
   onPrequisitesSubmit,
   handleChapters,
+  chapterNames,
 }: Props) => {
   const navigate = useNavigate();
   const selectedChapterIds = form.watch("chapterIds");
@@ -150,9 +152,17 @@ const PaperPrerequisitesModal = ({
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="outline"
-                            className="flex w-full items-center justify-start font-light text-slate-600 hover:bg-slate-50"
+                            className="flex w-full items-center justify-start hover:bg-slate-50"
                           >
-                            Select Chapter
+                            {chapterNames.length > 0 ? (
+                              <p className="truncate font-normal text-black">
+                                {chapterNames.map((name) => `'${name},'`)}
+                              </p>
+                            ) : (
+                              <p className="truncate font-light text-slate-600">
+                                Select Chapter
+                              </p>
+                            )}
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="custom_scrollbar max-h-56 w-56">
@@ -165,7 +175,7 @@ const PaperPrerequisitesModal = ({
                                 )}
                                 onSelect={(e) => {
                                   e.preventDefault();
-                                  handleChapters(id.toString());
+                                  handleChapters(id.toString(), NAME);
                                 }}
                               >
                                 {NAME}

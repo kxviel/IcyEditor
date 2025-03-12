@@ -56,6 +56,7 @@ const QuestionBuilder = ({ examId }: Props) => {
   } = useQuestionBuilderStore();
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
   const [isModalOpen, setIsModalOpen] = useState(examId === "manual");
+  const [chapterNames, setChapterNames] = useState<string[]>([]);
 
   const form = useForm<PrerequisitesForm>({
     resolver: zodResolver(prequisitesFormSchema),
@@ -92,13 +93,17 @@ const QuestionBuilder = ({ examId }: Props) => {
     }
   }, [examData, presetFields, presetHeaderData]);
 
-  const handleChapters = (chapterId: string) => {
+  const handleChapters = (chapterId: string, chapterName: string) => {
     const currentIds = [...(selectedChapterIds || [])];
+    const currentNames = [...(chapterNames || [])];
 
     if (currentIds.includes(chapterId)) {
       const updatedIds = currentIds.filter((id) => id !== chapterId);
+      const updatedNames = currentNames.filter((name) => name !== chapterName);
+      setChapterNames(updatedNames);
       form.setValue("chapterIds", updatedIds, { shouldValidate: true });
     } else {
+      setChapterNames([...currentNames, chapterName]);
       form.setValue("chapterIds", [...currentIds, chapterId], {
         shouldValidate: true,
       });
@@ -207,9 +212,17 @@ const QuestionBuilder = ({ examId }: Props) => {
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="outline"
-                              className="flex w-full items-center justify-start font-light text-slate-600 hover:bg-slate-50"
+                              className="flex w-full items-center justify-start hover:bg-slate-50"
                             >
-                              Select Chapter
+                              {chapterNames.length > 0 ? (
+                                <p className="truncate font-normal text-black">
+                                  {chapterNames.map((name) => `'${name},'`)}
+                                </p>
+                              ) : (
+                                <p className="truncate font-light text-slate-600">
+                                  Select Chapter
+                                </p>
+                              )}
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="custom_scrollbar max-h-56 w-56">
@@ -222,7 +235,7 @@ const QuestionBuilder = ({ examId }: Props) => {
                                   )}
                                   onSelect={(e) => {
                                     e.preventDefault();
-                                    handleChapters(id.toString());
+                                    handleChapters(id.toString(), NAME);
                                   }}
                                 >
                                   {NAME}
@@ -256,6 +269,7 @@ const QuestionBuilder = ({ examId }: Props) => {
         form={form}
         onPrequisitesSubmit={onPrequisitesSubmit}
         handleChapters={handleChapters}
+        chapterNames={chapterNames}
       />
     </div>
   );

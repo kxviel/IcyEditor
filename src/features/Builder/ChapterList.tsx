@@ -4,7 +4,7 @@ import { Chapter } from "./api/getChapter";
 type Props = {
   chapters: Chapter[];
   selectedChapterIds: string[];
-  handleChapters: (chapterId: string) => void;
+  handleChapters: (chapterId: string, chapterName: string) => void;
 };
 
 const ChapterList = ({
@@ -18,7 +18,7 @@ const ChapterList = ({
         <div
           key={chapter.id}
           className="flex items-center gap-4 border-b border-gray-100 bg-white p-4 hover:cursor-pointer hover:bg-white/50"
-          onClick={() => handleChapters(chapter.id.toString())}
+          onClick={() => handleChapters(chapter.id.toString(), chapter.NAME)}
         >
           <Checkbox
             className="border-slate-400"

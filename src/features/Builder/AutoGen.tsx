@@ -40,6 +40,7 @@ const AutoGen = () => {
   const setIds = useQuestionBuilderStore((state) => state.setIds);
 
   const [isModalOpen, setIsModalOpen] = useState(true);
+  const [chapterNames, setChapterNames] = useState<string[]>([]);
 
   const form = useForm<PrerequisitesForm>({
     resolver: zodResolver(prequisitesFormSchema),
@@ -53,13 +54,17 @@ const AutoGen = () => {
   const books = useGetBook(form.watch("subjectId"));
   const chapters = useGetChapter(form.watch("bookId"));
 
-  const handleChapters = (chapterId: string) => {
+  const handleChapters = (chapterId: string, chapterName: string) => {
     const currentIds = [...(selectedChapterIds || [])];
+    const currentNames = [...(chapterNames || [])];
 
     if (currentIds.includes(chapterId)) {
       const updatedIds = currentIds.filter((id) => id !== chapterId);
+      const updatedNames = currentNames.filter((name) => name !== chapterName);
+      setChapterNames(updatedNames);
       form.setValue("chapterIds", updatedIds, { shouldValidate: true });
     } else {
+      setChapterNames([...currentNames, chapterName]);
       form.setValue("chapterIds", [...currentIds, chapterId], {
         shouldValidate: true,
       });
@@ -168,9 +173,17 @@ const AutoGen = () => {
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="outline"
-                              className="flex w-full items-center justify-start font-light text-slate-600 hover:bg-slate-50"
+                              className="flex w-full items-center justify-start hover:bg-slate-50"
                             >
-                              Select Chapter
+                              {chapterNames.length > 0 ? (
+                                <p className="truncate font-normal text-black">
+                                  {chapterNames.map((name) => `'${name},'`)}
+                                </p>
+                              ) : (
+                                <p className="truncate font-light text-slate-600">
+                                  Select Chapter
+                                </p>
+                              )}
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="custom_scrollbar max-h-56 w-56">
@@ -183,7 +196,7 @@ const AutoGen = () => {
                                   )}
                                   onSelect={(e) => {
                                     e.preventDefault();
-                                    handleChapters(id.toString());
+                                    handleChapters(id.toString(), NAME);
                                   }}
                                 >
                                   {NAME}
@@ -221,6 +234,7 @@ const AutoGen = () => {
         form={form}
         onPrequisitesSubmit={onPrequisitesSubmit}
         handleChapters={handleChapters}
+        chapterNames={chapterNames}
       />
     </div>
   );
