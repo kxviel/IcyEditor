@@ -3,7 +3,6 @@ import { useNavigate } from "@tanstack/react-router";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -13,6 +12,7 @@ import { useGetQuestions } from "./api/getQuestions";
 import { Input } from "@/components/ui/input";
 import { useGenerateQuestions } from "./api/generateQuestions";
 import { useFieldArray, useForm } from "react-hook-form";
+import { useEffect } from "react";
 type Props = {
   chapterIds: string[];
 };
@@ -23,7 +23,7 @@ const QuestionSelect = ({ chapterIds }: Props) => {
 
   const { data: questionList } = useGetQuestions(chapterIds);
 
-  const { control, register, watch } = useForm({
+  const { control, register, watch, setValue } = useForm({
     defaultValues: {
       categories:
         questionList?.categories.map((category) => ({
@@ -38,6 +38,19 @@ const QuestionSelect = ({ chapterIds }: Props) => {
     control,
     name: "categories",
   });
+
+  useEffect(() => {
+    if (questionList) {
+      setValue(
+        "categories",
+        questionList?.categories.map((category) => ({
+          categoryId: category.categoryId,
+          categoryName: category.categoryName,
+          questionCount: "",
+        })),
+      );
+    }
+  }, [questionList, setValue]);
 
   const handleBack = () => {
     navigate({ to: "/exam-type" });
@@ -59,7 +72,6 @@ const QuestionSelect = ({ chapterIds }: Props) => {
     <div className="relative h-full w-1/2">
       <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white p-3 shadow-md">
         <Table>
-          <TableCaption>A list of your recent invoices.</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead>Section Name</TableHead>

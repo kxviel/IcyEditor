@@ -24,6 +24,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import QuestionSelect from "./QuestionSelect";
+import ChapterList from "./ChapterList";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -55,8 +57,11 @@ const QuestionBuilder = ({ examId }: Props) => {
     presetFields,
   } = useQuestionBuilderStore();
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
-  const [isModalOpen, setIsModalOpen] = useState(examId === "manual");
+
   const [chapterNames, setChapterNames] = useState<string[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(
+    ["manual", "auto"].includes(examId),
+  );
 
   const form = useForm<PrerequisitesForm>({
     resolver: zodResolver(prequisitesFormSchema),
@@ -81,7 +86,7 @@ const QuestionBuilder = ({ examId }: Props) => {
   const { data: examData } = useGetExamById(examId);
 
   useEffect(() => {
-    if (examData && examData.examId) {
+    if (!["manual", "auto"].includes(examId) && examData) {
       const parsedObject = parseExamDataResponse(examData);
 
       if (parsedObject.fields) {
@@ -91,7 +96,7 @@ const QuestionBuilder = ({ examId }: Props) => {
         presetHeaderData(parsedObject.headerData);
       }
     }
-  }, [examData, presetFields, presetHeaderData]);
+  }, [examData, examId, presetFields, presetHeaderData]);
 
   const handleChapters = (chapterId: string, chapterName: string) => {
     const currentIds = [...(selectedChapterIds || [])];
@@ -250,9 +255,21 @@ const QuestionBuilder = ({ examId }: Props) => {
               </form>
             </Form>
 
-            <QuestionList chapterIds={selectedChapterIds} />
+            {examId === "auto" ? (
+              <ChapterList
+                chapters={chapters.data || []}
+                selectedChapterIds={selectedChapterIds}
+                handleChapters={handleChapters}
+              />
+            ) : (
+              <QuestionList chapterIds={selectedChapterIds} />
+            )}
           </div>
-          <PaperView />
+          {examId === "auto" ? (
+            <QuestionSelect chapterIds={selectedChapterIds} />
+          ) : (
+            <PaperView />
+          )}
         </div>
       )}
 

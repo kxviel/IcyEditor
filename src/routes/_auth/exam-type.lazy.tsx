@@ -64,7 +64,9 @@ function ExamType() {
 
         <Card
           className="relative flex h-[319px] w-[343px] flex-col bg-[#6941C6] text-white hover:cursor-pointer hover:opacity-95"
-          onClick={() => navigate({ to: "/auto-builder" })}
+          onClick={() =>
+            navigate({ to: "/builder/$examId", params: { examId: "auto" } })
+          }
         >
           <div className="flex h-[274px] flex-col gap-6 px-4 py-5">
             <div className="flex gap-4">

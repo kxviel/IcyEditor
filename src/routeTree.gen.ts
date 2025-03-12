@@ -24,7 +24,6 @@ const AuthIndexLazyImport = createFileRoute('/_auth/')()
 const AuthUsersLazyImport = createFileRoute('/_auth/users')()
 const AuthPreviewLazyImport = createFileRoute('/_auth/preview')()
 const AuthExamTypeLazyImport = createFileRoute('/_auth/exam-type')()
-const AuthAutoBuilderLazyImport = createFileRoute('/_auth/auto-builder')()
 const AuthBuilderExamIdLazyImport = createFileRoute('/_auth/builder/$examId')()
 
 // Create/Update Routes
@@ -80,14 +79,6 @@ const AuthExamTypeLazyRoute = AuthExamTypeLazyImport.update({
   import('./routes/_auth/exam-type.lazy').then((d) => d.Route),
 )
 
-const AuthAutoBuilderLazyRoute = AuthAutoBuilderLazyImport.update({
-  id: '/auto-builder',
-  path: '/auto-builder',
-  getParentRoute: () => AuthRoute,
-} as any).lazy(() =>
-  import('./routes/_auth/auto-builder.lazy').then((d) => d.Route),
-)
-
 const AuthBuilderExamIdLazyRoute = AuthBuilderExamIdLazyImport.update({
   id: '/builder/$examId',
   path: '/builder/$examId',
@@ -127,13 +118,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordLazyImport
       parentRoute: typeof rootRoute
-    }
-    '/_auth/auto-builder': {
-      id: '/_auth/auto-builder'
-      path: '/auto-builder'
-      fullPath: '/auto-builder'
-      preLoaderRoute: typeof AuthAutoBuilderLazyImport
-      parentRoute: typeof AuthImport
     }
     '/_auth/exam-type': {
       id: '/_auth/exam-type'
@@ -176,7 +160,6 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthRouteChildren {
-  AuthAutoBuilderLazyRoute: typeof AuthAutoBuilderLazyRoute
   AuthExamTypeLazyRoute: typeof AuthExamTypeLazyRoute
   AuthPreviewLazyRoute: typeof AuthPreviewLazyRoute
   AuthUsersLazyRoute: typeof AuthUsersLazyRoute
@@ -185,7 +168,6 @@ interface AuthRouteChildren {
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthAutoBuilderLazyRoute: AuthAutoBuilderLazyRoute,
   AuthExamTypeLazyRoute: AuthExamTypeLazyRoute,
   AuthPreviewLazyRoute: AuthPreviewLazyRoute,
   AuthUsersLazyRoute: AuthUsersLazyRoute,
@@ -200,7 +182,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/print': typeof PrintRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
-  '/auto-builder': typeof AuthAutoBuilderLazyRoute
   '/exam-type': typeof AuthExamTypeLazyRoute
   '/preview': typeof AuthPreviewLazyRoute
   '/users': typeof AuthUsersLazyRoute
@@ -212,7 +193,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/print': typeof PrintRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
-  '/auto-builder': typeof AuthAutoBuilderLazyRoute
   '/exam-type': typeof AuthExamTypeLazyRoute
   '/preview': typeof AuthPreviewLazyRoute
   '/users': typeof AuthUsersLazyRoute
@@ -226,7 +206,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/print': typeof PrintRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
-  '/_auth/auto-builder': typeof AuthAutoBuilderLazyRoute
   '/_auth/exam-type': typeof AuthExamTypeLazyRoute
   '/_auth/preview': typeof AuthPreviewLazyRoute
   '/_auth/users': typeof AuthUsersLazyRoute
@@ -241,7 +220,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/print'
     | '/forgot-password'
-    | '/auto-builder'
     | '/exam-type'
     | '/preview'
     | '/users'
@@ -252,7 +230,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/print'
     | '/forgot-password'
-    | '/auto-builder'
     | '/exam-type'
     | '/preview'
     | '/users'
@@ -264,7 +241,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/print'
     | '/forgot-password'
-    | '/_auth/auto-builder'
     | '/_auth/exam-type'
     | '/_auth/preview'
     | '/_auth/users'
@@ -306,7 +282,6 @@ export const routeTree = rootRoute
     "/_auth": {
       "filePath": "_auth.tsx",
       "children": [
-        "/_auth/auto-builder",
         "/_auth/exam-type",
         "/_auth/preview",
         "/_auth/users",
@@ -322,10 +297,6 @@ export const routeTree = rootRoute
     },
     "/forgot-password": {
       "filePath": "forgot-password.lazy.tsx"
-    },
-    "/_auth/auto-builder": {
-      "filePath": "_auth/auto-builder.lazy.tsx",
-      "parent": "/_auth"
     },
     "/_auth/exam-type": {
       "filePath": "_auth/exam-type.lazy.tsx",

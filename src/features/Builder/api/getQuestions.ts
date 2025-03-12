@@ -46,6 +46,6 @@ export const useGetQuestions = (chapterIds: string[]) => {
     queryKey: ["GetQuestionList", chapterIds],
     queryFn: () => getQuestionsFn(chapterIds),
     select: ({ data }) => data.data,
-    enabled: chapterIds.length > 0,
+    // enabled: chapterIds.length > 0,
   });
 };
