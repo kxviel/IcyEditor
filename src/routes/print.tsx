@@ -25,10 +25,12 @@ const RenderedPage = () => {
       navigate({ to: "/preview" });
     };
 
+    window.addEventListener("beforeprint", handleAfterPrint);
     window.addEventListener("afterprint", handleAfterPrint);
 
     return () => {
-      window.removeEventListener("afterprint", () => {});
+      window.addEventListener("beforeprint", handleAfterPrint);
+      window.addEventListener("afterprint", handleAfterPrint);
     };
   }, [navigate]);
 
