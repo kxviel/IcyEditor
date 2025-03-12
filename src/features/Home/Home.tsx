@@ -26,7 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { IconInput } from "@/components/ui/IconInput";
 import { useNavigate } from "@tanstack/react-router";
 import { useGetPapers } from "./api/getPapers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import useDebounce from "@/hooks/useDebounce";
 import SortAscIcon from "@/assets/Icons/SortAscIcon";
@@ -35,12 +35,19 @@ import { DatePickerWithRange } from "@/components/DatePickerWithRange";
 import { DateRange } from "react-day-picker";
 import { formatDistance } from "date-fns";
 import { useDeletePaper } from "./api/deletePaper";
+import { useHeaderStore } from "@/store/useHeaderStore";
+import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
+import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 
 const Home = () => {
   const navigate = useNavigate();
   const { getUser } = useAuth();
   const deleteFn = useDeletePaper();
   const userData = getUser();
+  const resetHeader = useHeaderStore((state) => state.reset);
+  const resetBuilder = useQuestionBuilderStore((state) => state.reset);
+  const resetPageSettings = usePageSettingsStore((state) => state.reset);
+
   const [page, setPage] = useState(1);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,6 +66,12 @@ const Home = () => {
     searchTerm: debouncedSearch,
     date,
   });
+
+  useEffect(() => {
+    resetHeader();
+    resetBuilder();
+    resetPageSettings();
+  }, [resetBuilder, resetHeader, resetPageSettings]);
 
   const handleSort = () => {
     setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
