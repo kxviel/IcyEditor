@@ -44,7 +44,7 @@ const PaperView = () => {
 
   return (
     <div className="relative h-full w-1/2">
-      <div className="custom_scrollbar flex h-full flex-col items-center gap-3 overflow-y-auto p-6">
+      <div className="custom_scrollbar flex h-[calc(100%-56px)] flex-col items-center gap-3 overflow-y-auto p-6 pb-0">
         <p className="text-sm font-semibold">
           <span className="text-red-500">Note</span>: You can change the format,
           font size, etc., on the next page.
@@ -136,7 +136,6 @@ const PaperView = () => {
           Next
         </Button>
       </div>
-
       {status === "blocked" && (
         <RefreshBlockerModal
           isBlockerOpen={status === "blocked"}
