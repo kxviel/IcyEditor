@@ -62,7 +62,8 @@ export const useGenerateQuestions = () => {
         presetFields(parsedObject.fields);
         navigate({
           to: "/builder/$examId",
-          params: { examId: "auto-postselection" },
+          params: { examId: "manual-selection" },
+          search: { needPreselection: false },
         });
       }
     }

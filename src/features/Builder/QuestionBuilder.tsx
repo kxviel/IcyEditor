@@ -26,6 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import QuestionSelect from "./QuestionSelect";
 import ChapterList from "./ChapterList";
+import { useSearch } from "@tanstack/react-router";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -42,11 +43,7 @@ const prequisitesFormSchema = z.object({
 export type PrerequisitesForm = z.infer<typeof prequisitesFormSchema>;
 
 type Props = {
-  examId:
-    | "manual-selection"
-    | "auto-preselection"
-    | "auto-postselection"
-    | string;
+  examId: "manual-selection" | "auto-selection" | string;
 };
 
 const QuestionBuilder = ({ examId }: Props) => {
@@ -63,10 +60,11 @@ const QuestionBuilder = ({ examId }: Props) => {
     setChapterNames,
   } = useQuestionBuilderStore();
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
+  const { needPreselection } = useSearch({
+    from: "/_auth/builder/$examId",
+  }) as { needPreselection: boolean };
 
-  const [isModalOpen, setIsModalOpen] = useState(
-    ["manual-selection", "auto-preselection"].includes(examId),
-  );
+  const [isModalOpen, setIsModalOpen] = useState(needPreselection === true);
 
   const form = useForm<PrerequisitesForm>({
     resolver: zodResolver(prequisitesFormSchema),
@@ -91,10 +89,7 @@ const QuestionBuilder = ({ examId }: Props) => {
   const { data: examData } = useGetExamById(examId);
 
   useEffect(() => {
-    if (
-      !["manual-selection", "auto-preselection"].includes(examId) &&
-      examData
-    ) {
+    if (!["manual-selection", "auto-selection"].includes(examId) && examData) {
       const parsedObject = parseExamDataResponse(examData);
 
       if (parsedObject.fields) {
@@ -263,7 +258,7 @@ const QuestionBuilder = ({ examId }: Props) => {
               </form>
             </Form>
 
-            {examId === "auto-preselection" ? (
+            {examId === "auto-selection" ? (
               <ChapterList
                 chapters={chapters.data || []}
                 selectedChapterIds={selectedChapterIds}
@@ -273,7 +268,7 @@ const QuestionBuilder = ({ examId }: Props) => {
               <QuestionList chapterIds={selectedChapterIds} />
             )}
           </div>
-          {examId === "auto-preselection" ? (
+          {examId === "auto-selection" ? (
             <QuestionSelect chapterIds={selectedChapterIds} />
           ) : (
             <PaperView />

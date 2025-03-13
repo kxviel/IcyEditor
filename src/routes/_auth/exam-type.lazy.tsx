@@ -35,6 +35,7 @@ function ExamType() {
             navigate({
               to: "/builder/$examId",
               params: { examId: "manual-selection" },
+              search: { needPreselection: true },
             })
           }
         >
@@ -70,7 +71,8 @@ function ExamType() {
           onClick={() =>
             navigate({
               to: "/builder/$examId",
-              params: { examId: "auto-preselection" },
+              params: { examId: "auto-selection" },
+              search: { needPreselection: true },
             })
           }
         >
