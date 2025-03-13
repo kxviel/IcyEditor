@@ -57,12 +57,13 @@ const QuestionBuilder = ({ examId }: Props) => {
     subjectId,
     bookId,
     chapterIds,
+    chapterNames,
     setIds,
     presetFields,
+    setChapterNames,
   } = useQuestionBuilderStore();
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
 
-  const [chapterNames, setChapterNames] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(
     ["manual-selection", "auto-preselection"].includes(examId),
   );
@@ -293,7 +294,6 @@ const QuestionBuilder = ({ examId }: Props) => {
         form={form}
         onPrequisitesSubmit={onPrequisitesSubmit}
         handleChapters={handleChapters}
-        chapterNames={chapterNames}
       />
     </div>
   );

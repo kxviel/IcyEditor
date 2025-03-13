@@ -32,7 +32,9 @@ interface HeaderStore {
   subjectId: string;
   bookId: string;
   chapterIds: string[];
+  chapterNames: string[];
   setIds: (idKey: IdKey, value: string | string[]) => void;
+  setChapterNames: (names: string[]) => void;
   presetFields: (fields: Fieldtype) => void;
   addQuestion: (
     categoryId: string,
@@ -54,7 +56,9 @@ export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
   subjectId: "",
   bookId: "",
   chapterIds: [],
+  chapterNames: [],
   setIds: (idKey, value) => set(() => ({ [idKey]: value })),
+  setChapterNames: (names) => set(() => ({ chapterNames: names })),
   presetFields: (fields) => set(() => ({ fields })),
   addQuestion: (categoryId, categoryName, addedQuestion) =>
     set((state) => {

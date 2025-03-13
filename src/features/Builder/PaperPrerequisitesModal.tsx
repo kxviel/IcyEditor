@@ -19,6 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 
 type Props = {
   isModalOpen: boolean;
@@ -30,7 +31,6 @@ type Props = {
   books: UseQueryResult<Book[], Error>;
   chapters: UseQueryResult<Chapter[], Error>;
   form: UseFormReturn<PrerequisitesForm, any, undefined>;
-  chapterNames: string[];
   onPrequisitesSubmit: (data: PrerequisitesForm) => void;
   handleChapters: (chapterId: string, chapterName: string) => void;
 };
@@ -47,10 +47,10 @@ const PaperPrerequisitesModal = ({
   form,
   onPrequisitesSubmit,
   handleChapters,
-  chapterNames,
 }: Props) => {
   const navigate = useNavigate();
   const selectedChapterIds = form.watch("chapterIds");
+  const chapterNames = useQuestionBuilderStore((state) => state.chapterNames);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
