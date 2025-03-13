@@ -88,6 +88,7 @@ const PaperPrerequisitesModal = ({
                       : []
                   }
                   isDisabled={publication.isPending}
+                  isModal={true}
                 />
                 <ControlledSelect
                   form={form}
@@ -101,6 +102,7 @@ const PaperPrerequisitesModal = ({
                       : []
                   }
                   isDisabled={series.isPending || !form.watch("publicationId")}
+                  isModal={true}
                 />
                 <ControlledSelect
                   form={form}
@@ -114,6 +116,7 @@ const PaperPrerequisitesModal = ({
                       : []
                   }
                   isDisabled={classes.isPending || !form.watch("seriesId")}
+                  isModal={true}
                 />
                 <ControlledSelect
                   form={form}
@@ -127,6 +130,7 @@ const PaperPrerequisitesModal = ({
                       : []
                   }
                   isDisabled={subjects.isPending || !form.watch("classId")}
+                  isModal={true}
                 />
                 <ControlledSelect
                   form={form}
@@ -140,6 +144,7 @@ const PaperPrerequisitesModal = ({
                       : []
                   }
                   isDisabled={books.isPending || !form.watch("classId")}
+                  isModal={true}
                 />
 
                 <FormField

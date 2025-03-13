@@ -16,7 +16,7 @@ export interface QuestionItem {
   questionIndex?: number;
 }
 
-type IdKey =
+export type IdKey =
   | "publicationId"
   | "seriesId"
   | "classId"
