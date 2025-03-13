@@ -74,7 +74,7 @@ const PaperView = () => {
           </TabsList>
         </Tabs>
 
-        <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white p-3 shadow-md">
+        <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white shadow-md">
           {headerLayout === "1" ? (
             <PaperHeaderOne isPreview={false} />
           ) : headerLayout === "2" ? (
@@ -83,7 +83,7 @@ const PaperView = () => {
             <PaperHeaderThree isPreview={false} />
           )}
 
-          <div className="flex w-full flex-col gap-3">
+          <div className="flex w-full flex-col gap-3 p-3">
             {Array.from(fields.values()).map((field, fieldIndex) => (
               <div className="w-full" key={field.categoryId}>
                 <div className="my-3 flex gap-2">

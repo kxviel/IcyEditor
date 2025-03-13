@@ -70,7 +70,7 @@ const QuestionSelect = ({ chapterIds }: Props) => {
 
   return (
     <div className="relative h-full w-1/2">
-      <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white p-3 shadow-md">
+      <div className="custom_scrollbar h-[calc(100%-56px)] w-full overflow-y-auto bg-white p-3 shadow-md">
         <Table>
           <TableHeader>
             <TableRow>
