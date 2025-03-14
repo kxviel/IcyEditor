@@ -46,7 +46,7 @@ const Pagination: React.FC<PaginationProps> = ({
           variant={"outline"}
           key={i}
           onClick={() => handlePageChange(i)}
-          className={`${i === currentPage ? "border border-primary" : ""}`}
+          className={`${i === currentPage ? "border border-violet-300" : ""}`}
         >
           {i}
         </Button>,
