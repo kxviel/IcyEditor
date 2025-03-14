@@ -1,6 +1,12 @@
 import RefreshBlockerModal from "@/features/Builder/RefreshBlockerModal";
 import { useBlocker, useLocation, useNavigate } from "@tanstack/react-router";
 import { Check } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const stepperDict: Record<string, number> = {
   "/exam-type": 0,
@@ -51,23 +57,39 @@ const Stepper = () => {
 
   return (
     <>
-      <div className="flex items-center">
-        {Array.from({ length: STEPS }).map((_, index) => (
-          <div key={index} className="flex items-center">
-            <div
-              className={`${index <= stepperDict[pathname] ? "bg-violet-500" : "bg-gray-200"} flex h-6 w-6 items-center justify-center rounded-full hover:cursor-pointer hover:shadow-md`}
-              onClick={() => handleClick(index)}
-            >
-              {index < stepperDict[pathname] ? (
-                <Check className="h-4 w-4 text-white" />
-              ) : (
-                <div className="h-2 w-2 rounded-full bg-white" />
-              )}
+      <TooltipProvider delayDuration={300}>
+        <div className="flex items-center">
+          {Array.from({ length: STEPS }).map((_, index) => (
+            <div key={index} className="flex items-center">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className={`${index <= stepperDict[pathname] ? "bg-violet-500" : "bg-gray-200"} flex h-6 w-6 items-center justify-center rounded-full hover:cursor-pointer hover:shadow-md`}
+                    onClick={() => handleClick(index)}
+                  >
+                    {index < stepperDict[pathname] ? (
+                      <Check className="h-4 w-4 text-white" />
+                    ) : (
+                      <div className="h-2 w-2 rounded-full bg-white" />
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="border border-violet-200 bg-white/80 text-black">
+                  <p>
+                    {index === 0
+                      ? "Exam Type"
+                      : index === 1
+                        ? "Builder"
+                        : "Preview"}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+
+              {index < STEPS - 1 && <div className="h-1 w-20 bg-gray-200" />}
             </div>
-            {index < STEPS - 1 && <div className="h-1 w-20 bg-gray-200" />}
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </TooltipProvider>
 
       {status === "blocked" && (
         <RefreshBlockerModal
