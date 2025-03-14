@@ -64,7 +64,7 @@ const QuestionBuilder = ({ examId }: Props) => {
     from: "/_auth/builder/$examId",
   }) as { needPreselection: boolean };
 
-  const [isModalOpen, setIsModalOpen] = useState(needPreselection === true);
+  const [isModalOpen, setIsModalOpen] = useState(needPreselection);
 
   const form = useForm<PrerequisitesForm>({
     resolver: zodResolver(prequisitesFormSchema),

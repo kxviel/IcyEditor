@@ -2,7 +2,7 @@ import {
   CategoryItem,
   useQuestionBuilderStore,
 } from "@/store/useQuestionBuilderStore";
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Select,
@@ -47,6 +47,8 @@ function Preview() {
   const childRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
 
+  const navigate = useNavigate();
+
   const fields = useQuestionBuilderStore((state) => state.fields);
   const setFontSize = usePageSettingsStore((state) => state.setFontSize);
 
@@ -61,6 +63,26 @@ function Preview() {
   };
 
   const [pageArray, setPageArray] = useState<CategoryItem[][]>([[]]);
+
+  useEffect(() => {
+    window.addEventListener(
+      "popstate",
+      function (event) {
+        event.preventDefault();
+        navigate({
+          to: "/builder/$examId",
+          params: { examId: "manual-selection" },
+          search: { needPreselection: false },
+          replace: true,
+        });
+      },
+      false,
+    );
+
+    return () => {
+      window.removeEventListener("popstate", () => {});
+    };
+  }, [navigate]);
 
   useEffect(() => {
     let totalPageHeight: number = 0;
