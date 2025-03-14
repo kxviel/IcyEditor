@@ -22,18 +22,12 @@ const Stepper = () => {
       const nextPath = next.pathname;
 
       // Navigation rules
-      if (currentPath === "/exam-type") {
-        // No restrictions from exam-type
-        return false;
-      } else if (currentPath.includes("/builder/")) {
-        // No restrictions from builder
-        return false;
-      } else if (currentPath === "/preview") {
-        // In preview: can go to builder but block exam-type
+      if (currentPath.includes("/builder/") || currentPath === "/preview") {
+        // Block navigation to exam-type from both builder and preview
         return nextPath === "/exam-type";
       }
 
-      // Allow navigation for any other cases
+      // Allow all other navigation
       return false;
     },
     withResolver: true,
