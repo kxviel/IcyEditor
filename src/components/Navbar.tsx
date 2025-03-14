@@ -13,12 +13,19 @@ import Logo from "@/assets/Logo.svg";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import SavePaper from "@/features/Builder/SavePaper";
 import { useAuth } from "@/hooks/useAuth";
-import Stepper from "./ui/stepper";
+import Stepper from "@/components/ui/stepper";
+
+const allowedStepperRoutes = [
+  "/builder/manual-selection",
+  "/builder/auto-selection",
+  "/preview",
+];
 
 const Navbar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  console.log(pathname);
 
   return (
     <header className="h-[72px] w-full border border-b border-gray-200">
@@ -29,6 +36,13 @@ const Navbar = () => {
         >
           <img src={Logo} alt="logo" />
         </div>
+
+        {allowedStepperRoutes.includes(pathname) && (
+          <div className="flex flex-1 justify-center">
+            <Stepper />
+          </div>
+        )}
+
         {!["/builder", "/preview"].includes(pathname) && (
           <div className="flex items-center space-x-4">
             <Button
@@ -55,12 +69,6 @@ const Navbar = () => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          </div>
-        )}
-
-        {pathname === "/builder" && (
-          <div className="flex flex-1 justify-center">
-            <Stepper />
           </div>
         )}
 
