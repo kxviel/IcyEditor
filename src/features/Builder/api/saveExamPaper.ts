@@ -52,7 +52,7 @@ export const useSaveExamPaper = () => {
       resetBuilder();
       resetPageSettings();
 
-      navigate({ to: "/" });
+      navigate({ to: "/", search: { page: 1 } });
     },
     onError: (err: string) => {
       toast.error(err);

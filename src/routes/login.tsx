@@ -17,6 +17,7 @@ export const Route = createFileRoute("/login")({
     if (isLogged()) {
       throw redirect({
         to: "/",
+        search: { page: 1 },
       });
     }
   },

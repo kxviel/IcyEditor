@@ -17,32 +17,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DataTablePagination } from "../Home/DataTablePagination";
+import { useNavigate, useSearch } from "@tanstack/react-router";
+import Pagination from "@/components/ui/pagination";
 
 const UserList = () => {
-  const [pagination, setPagination] = useState({
-    pageIndex: 0, //initial page index
-    pageSize: 10, //default page size
-  });
+  const navigate = useNavigate();
+  const { page } = useSearch({
+    from: "/_auth",
+  }) as { page: number };
+
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 300);
 
-  const { data } = useGetUsers({
-    page: pagination.pageIndex + 1,
+  const { data, isPending } = useGetUsers({
+    page,
     search: debouncedSearch,
   });
+
+  const rowCount = data?.total || 0;
 
   const table = useReactTable({
     data: data?.data || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
-    onPaginationChange: setPagination,
-    manualPagination: true,
-    rowCount: data?.total || 0,
-    state: {
-      pagination,
-    },
   });
+
+  const handlePageChange = (page: number) => {
+    navigate({ to: "/users", search: { page } });
+  };
 
   return (
     <div className="flex h-full flex-col items-center gap-6 pt-6">
@@ -74,20 +76,27 @@ const UserList = () => {
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody className="bg-white/50">
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id}>
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
+        <TableBody className="min-h-full bg-white/50">
+          {isPending ? (
+            <p>Loading...</p>
+          ) : (
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
 
-      <DataTablePagination table={table} />
+      <Pagination
+        totalPages={Math.ceil(rowCount / 10)}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };

@@ -82,7 +82,7 @@ export const useLoginWithGoogle = () => {
           if (isExistingUser.data.data) {
             setIsPending(false);
             saveUser(isExistingUser.data.data as ExistingUserData);
-            navigate({ to: "/" });
+            navigate({ to: "/", search: { page: 1 } });
           } else {
             const registerResponse = await registerFn({
               name: googleData.name,

@@ -32,7 +32,7 @@ const Navbar = () => {
       <nav className="mx-auto flex h-full max-w-screen-xl items-center justify-between px-8">
         <div
           className="hover:cursor-pointer"
-          onClick={() => navigate({ to: "/" })}
+          onClick={() => navigate({ to: "/", search: { page: 1 } })}
         >
           <img src={Logo} alt="logo" />
         </div>
@@ -48,7 +48,7 @@ const Navbar = () => {
             <Button
               variant="outline"
               className="px-3"
-              onClick={() => navigate({ to: "/users" })}
+              onClick={() => navigate({ to: "/users", search: { page: 1 } })}
             >
               View Users
             </Button>

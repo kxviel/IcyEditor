@@ -13,18 +13,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { IconInput } from "@/components/ui/IconInput";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useGetPapers } from "./api/getPapers";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,9 +29,14 @@ import { useDeletePaper } from "./api/deletePaper";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
+import Pagination from "@/components/ui/pagination";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { page } = useSearch({
+    from: "/_auth",
+  }) as { page: number };
+
   const { getUser } = useAuth();
   const deleteFn = useDeletePaper();
   const userData = getUser();
@@ -48,7 +44,6 @@ const Home = () => {
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
 
-  const [page, setPage] = useState(1);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -67,6 +62,8 @@ const Home = () => {
     date,
   });
 
+  const rowCount = data?.total || 0;
+
   useEffect(() => {
     resetHeader();
     resetBuilder();
@@ -78,9 +75,7 @@ const Home = () => {
   };
 
   const handlePageChange = (page: number) => {
-    if (data?.total && page >= 1 && page <= data.total) {
-      setPage(page);
-    }
+    navigate({ to: "/users", search: { page } });
   };
 
   return (
@@ -200,44 +195,10 @@ const Home = () => {
         </div>
       )}
 
-      {!!data?.total && data.total > 10 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={() => handlePageChange(page - 1)}
-                className={page === 1 ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-            {[...Array(data.total)].map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  href="#"
-                  onClick={() => handlePageChange(index + 1)}
-                  className={page === index + 1 ? "font-bold" : ""}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            {data.total > 5 && (
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-            )}
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={() => handlePageChange(page + 1)}
-                className={
-                  page === data.total ? "pointer-events-none opacity-50" : ""
-                }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
+      <Pagination
+        totalPages={Math.ceil(rowCount / 10)}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };

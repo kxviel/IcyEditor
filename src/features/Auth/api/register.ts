@@ -32,6 +32,7 @@ export const useRegisterFn = () => {
       saveUser(data.data);
       navigate({
         to: "/",
+        search: { page: 1 },
       });
     },
     onError: (err: string) => {
