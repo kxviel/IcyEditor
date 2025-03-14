@@ -21,6 +21,12 @@ type Props = {
     // STATUS: boolean;
     // PAGE_COUNT: number;
     // TYPE: string;
+    PUBLICATIONS: string;
+    SERIES: string;
+    BOOK: string;
+    CHAPTER_IDS: string[];
+    CLASS: string;
+    SUBJECT: string;
   };
 };
 

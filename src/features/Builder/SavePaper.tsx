@@ -23,9 +23,17 @@ const SavePaper = () => {
   const navigate = useNavigate();
   const saveManualPaper = useSaveExamPaper();
 
+  const {
+    fields,
+    publicationId,
+    seriesId,
+    classId,
+    subjectId,
+    bookId,
+    chapterIds,
+  } = useQuestionBuilderStore();
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
   const fontSize = usePageSettingsStore((state) => state.currentFontSize);
-  const fields = useQuestionBuilderStore((state) => state.fields);
   const headerData = useHeaderStore((state) => state.headerData);
 
   const handleSaveManualPaper = () => {
@@ -34,6 +42,12 @@ const SavePaper = () => {
     if (userId) {
       saveManualPaper.mutate({
         body: {
+          PUBLICATIONS: publicationId,
+          SERIES: seriesId,
+          CLASS: classId,
+          SUBJECT: subjectId,
+          BOOK: bookId,
+          CHAPTER_IDS: chapterIds,
           SCHOOL_NAME: headerData.schoolName.value,
           CLASS_NAME: headerData.className.value,
           DURATION_MINS: headerData.duration.value,
