@@ -15,6 +15,9 @@ import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
 import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
 import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
+import { Button } from "@/components/ui/button";
+import { WandSparkles } from "lucide-react";
+import { toast } from "sonner";
 
 const pageDimensions: Record<string, string> = {
   A3: "h-[420mm] w-[297mm]",
@@ -57,6 +60,7 @@ function Preview() {
   );
 
   const [pageSize, setPageSize] = useState("A4");
+  const [showOptimizer, setShowOptimizer] = useState(false);
 
   const calcFontSize = (value: string) => {
     setFontSize(value);
@@ -85,20 +89,34 @@ function Preview() {
   }, [navigate]);
 
   useEffect(() => {
-    let totalPageHeight: number = 0;
     let currentChildHeight: number = 0;
     let currentPageIndex: number = 0;
 
     const tempPageArray: CategoryItem[][] = [[]];
+    const pagePadding = 24; //p-6
+    const pageMargin = 12; //mb-3
+    const headerPadding = 8; //p-2
 
     if (pageRef.current) {
-      totalPageHeight =
-        pageRef.current.getBoundingClientRect().height - 12 - 24;
+      const parentTop = pageRef.current.getBoundingClientRect().top;
+      let totalPageHeight =
+        pageRef.current.getBoundingClientRect().height -
+        pagePadding -
+        pageMargin;
+
       if (currentPageIndex === 0 && headerRef.current) {
-        totalPageHeight -= headerRef.current.getBoundingClientRect().height - 8;
+        totalPageHeight -=
+          headerRef.current.getBoundingClientRect().height - headerPadding;
       }
 
       if (childRef.current) {
+        // Show Optimizer
+        const lastContent =
+          childRef.current.lastElementChild?.getBoundingClientRect().bottom;
+        const heightToLastContent = (lastContent || 0) - parentTop;
+        setShowOptimizer(heightToLastContent < 0.5 * totalPageHeight);
+
+        // Calculate Height of Each Field
         [...childRef.current.children].forEach((child, index) => {
           currentChildHeight += child.getBoundingClientRect().height;
 
@@ -153,6 +171,16 @@ function Preview() {
             <SelectItem value="6">28</SelectItem>
           </SelectContent>
         </Select>
+
+        {showOptimizer && (
+          <Button
+            onClick={() => {
+              toast.info("Under Development");
+            }}
+          >
+            Optimize <WandSparkles />
+          </Button>
+        )}
       </div>
 
       <div
