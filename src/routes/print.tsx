@@ -65,7 +65,8 @@ const RenderedPage = () => {
                 className="ml-auto whitespace-nowrap text-sm leading-6"
                 style={{ fontSize: 14 + Number(currentFontSize) }}
               >
-                (1 x {field.questions.length}) = 5
+                ({field.questions.length} x {field.categoryMarks}) ={" "}
+                {field.questions.length * Number(field.categoryMarks) || 1}
               </p>
             </div>
 
