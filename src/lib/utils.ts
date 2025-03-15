@@ -52,6 +52,7 @@ export function parseExamDataResponse(response: ExamData): ReturnProps {
     fields.set(category.categoryId, {
       categoryId: category.categoryId,
       categoryName: category.categoryName,
+      categoryMarks: "1",
       categoryIndex,
       questions: category.questions.map((question, questionIndex) => ({
         questionId: question.id,
@@ -73,6 +74,7 @@ export function parseAutoGenResponse(
     fields.set(category.categoryId, {
       categoryId: category.categoryId,
       categoryName: category.categoryName,
+      categoryMarks: "1",
       categoryIndex,
       questions: category.questions.map((question, questionIndex) => ({
         questionId: question.id,
@@ -109,6 +111,7 @@ export const tempFields: Fieldtype = new Map([
     {
       categoryId: "50",
       categoryName: "Tick (✔) the correct option.",
+      categoryMarks: "1",
       questions: [
         {
           questionId: 2665,
@@ -155,6 +158,7 @@ export const tempFields: Fieldtype = new Map([
     {
       categoryId: "472",
       categoryName: "Write `T` for true and `F` for false statements.",
+      categoryMarks: "1",
       questions: [
         {
           questionId: 2676,
@@ -191,6 +195,7 @@ export const tempFields: Fieldtype = new Map([
       categoryId: "473",
       categoryName:
         "Correct and rewrite the wrong statements in your notebook. In case of no change, mark the statement with(Х)",
+      categoryMarks: "1",
       questions: [
         {
           questionId: 2681,
@@ -229,6 +234,7 @@ export const tempFields: Fieldtype = new Map([
     {
       categoryId: "839",
       categoryName: "Answer the Following Questions :",
+      categoryMarks: "1",
       questions: [
         {
           questionId: 2671,

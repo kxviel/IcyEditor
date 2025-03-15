@@ -7,6 +7,7 @@ export interface CategoryItem {
   categoryId: string;
   categoryName: string;
   questions: QuestionItem[];
+  categoryMarks: string;
   categoryIndex?: number;
 }
 
@@ -36,6 +37,7 @@ interface HeaderStore {
   setIds: (idKey: IdKey, value: string | string[]) => void;
   setChapterNames: (names: string[]) => void;
   presetFields: (fields: Fieldtype) => void;
+  addCategoryMarks: (categoryId: string, categoryMarks: string) => void;
   addQuestion: (
     categoryId: string,
     categoryName: string,
@@ -60,6 +62,22 @@ export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
   setIds: (idKey, value) => set(() => ({ [idKey]: value })),
   setChapterNames: (names) => set(() => ({ chapterNames: names })),
   presetFields: (fields) => set(() => ({ fields })),
+  addCategoryMarks: (categoryId, categoryMarks) =>
+    set((state) => {
+      const newFields = new Map(state.fields);
+
+      if (newFields.has(categoryId)) {
+        const currentCategory = newFields.get(categoryId)!;
+
+        // Add Question to Existing Category
+        newFields.set(categoryId, {
+          ...currentCategory,
+          categoryMarks,
+        });
+      }
+
+      return { fields: newFields };
+    }),
   addQuestion: (categoryId, categoryName, addedQuestion) =>
     set((state) => {
       const newFields = new Map(state.fields);
@@ -103,6 +121,7 @@ export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
         newFields.set(categoryId, {
           categoryId,
           categoryName,
+          categoryMarks: "1",
           questions: [addedQuestion],
         });
       }

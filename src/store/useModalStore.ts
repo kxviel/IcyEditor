@@ -1,6 +1,10 @@
 import { create } from "zustand";
 
-export type ModalType = "COMPLETE_PROFILE" | "EDIT_QUESTION" | "";
+export type ModalType =
+  | "COMPLETE_PROFILE"
+  | "EDIT_QUESTION"
+  | "EDIT_CATEGORY_MARKS"
+  | "";
 
 interface ModalState {
   modalType: ModalType;

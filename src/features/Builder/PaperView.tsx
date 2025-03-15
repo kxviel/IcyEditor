@@ -1,25 +1,25 @@
 import { Button } from "@/components/ui/button";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useNavigate } from "@tanstack/react-router";
-import { useModalStore } from "@/store/useModalStore";
 import { toast } from "sonner";
 import PaperHeaderOne from "./PaperHeaders/PaperHeaderOne";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import PaperHeaderTwo from "./PaperHeaders/PaperHeaderTwo";
 import PaperHeaderThree from "./PaperHeaders/PaperHeaderThree";
+import { useModalStore } from "@/store/useModalStore";
 
 const PaperView = () => {
+  const navigate = useNavigate();
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
   const fields = useQuestionBuilderStore((state) => state.fields);
+  const setModal = useModalStore((state) => state.setModal);
   const setHeaderLayout = usePageSettingsStore(
     (state) => state.setHeaderLayout,
   );
   const sanitizeFields = useQuestionBuilderStore(
     (state) => state.sanitizeFields,
   );
-  const navigate = useNavigate();
-  const setModal = useModalStore((state) => state.setModal);
 
   const handleBack = () => {
     navigate({ to: "/exam-type" });
@@ -88,15 +88,25 @@ const PaperView = () => {
                     {field.categoryName}
                   </p>
 
-                  <p className="ml-auto whitespace-nowrap text-sm leading-6">
-                    (1 x {field.questions.length}) = 5
+                  <p
+                    className="ml-auto whitespace-nowrap rounded-md text-sm leading-6 hover:cursor-pointer hover:bg-gray-100"
+                    onClick={() => {
+                      setModal("EDIT_CATEGORY_MARKS", {
+                        isOpen: true,
+                        categoryId: field.categoryId,
+                        currentMarks: field.categoryMarks,
+                      });
+                    }}
+                  >
+                    ({field.questions.length} x {field.categoryMarks}) ={" "}
+                    {field.questions.length * Number(field.categoryMarks) || 1}
                   </p>
                 </div>
 
                 {field.questions.map((question, index) => (
                   <div
                     key={question.questionId}
-                    className="my-3 flex gap-2 whitespace-pre py-1 hover:cursor-pointer hover:bg-gray-50"
+                    className="my-3 flex gap-2 whitespace-pre rounded-md py-1 hover:cursor-pointer hover:bg-gray-100"
                     onClick={() => {
                       setModal("EDIT_QUESTION", {
                         isOpen: true,

@@ -14,12 +14,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootComponent() {
   return (
-    <>
+    <main>
       <Toaster position="top-right" richColors theme="light" closeButton />
+      <Outlet />
       <RootModal />
-      <main>
-        <Outlet />
-      </main>
-    </>
+    </main>
   );
 }
