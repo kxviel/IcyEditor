@@ -48,8 +48,8 @@ const UserList = () => {
 
   return (
     <div className="flex h-full flex-col items-center gap-6 pt-6">
-      <div className="flex items-center gap-4">
-        <h3>Manage Users</h3>
+      <div className="flex w-full items-center gap-4">
+        <h3 className="text-xl font-semibold">Manage Users</h3>
         <IconInput
           placeholder="Search"
           className="w-[320px]"
@@ -78,7 +78,7 @@ const UserList = () => {
         </TableHeader>
         <TableBody className="min-h-full bg-white/50">
           {isPending ? (
-            <p>Loading...</p>
+            <span>Loading...</span>
           ) : (
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id}>
