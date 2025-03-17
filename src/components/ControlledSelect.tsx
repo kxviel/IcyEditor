@@ -27,7 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { queryClient } from "@/main";
@@ -95,23 +95,6 @@ export const ControlledSelect = ({
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [pendingValue, setPendingValue] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      // Check if there are unsaved changes
-      if (pendingValue !== null) {
-        // Standard way to show a confirmation dialog before leaving
-        e.preventDefault();
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    // Clean up the event listener
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [pendingValue]);
 
   const handleValueChange = (value: string) => {
     if (isModal || fields.size === 0) {
