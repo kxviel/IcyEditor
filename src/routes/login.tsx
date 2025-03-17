@@ -45,11 +45,6 @@ function RouteComponent() {
             ? "Log in to your account"
             : "Create an Account"}
         </p>
-        <p className="text-gray-500">
-          {activeTab === "login"
-            ? "Welcome back! Enter your details."
-            : "Start your 30-day free trial."}
-        </p>
 
         <Tabs
           defaultValue="login"

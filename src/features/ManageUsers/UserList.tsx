@@ -48,8 +48,8 @@ const UserList = () => {
 
   return (
     <div className="flex h-full flex-col items-center gap-6 pt-6">
-      <div>
-        <h6>Manage Users</h6>
+      <div className="flex items-center gap-4">
+        <h3>Manage Users</h3>
         <IconInput
           placeholder="Search"
           className="w-[320px]"

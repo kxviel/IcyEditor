@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  ArrowUpRight,
-  Download,
-  MoreVertical,
-  Plus,
-  Search,
-} from "lucide-react";
+import { ArrowUpRight, MoreVertical, Plus, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
   DropdownMenu,
@@ -88,9 +82,6 @@ const Home = () => {
         </div>
 
         <div className="flex space-x-4">
-          <Button variant={"outline"}>
-            <Download /> Export All
-          </Button>
           <Button onClick={() => navigate({ to: "/exam-type" })}>
             <Plus /> Add Question Paper
           </Button>
