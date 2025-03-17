@@ -4,7 +4,6 @@ import { useSaveExamPaper } from "./api/saveExamPaper";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "@tanstack/react-router";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { IPatch, patchDocument, PatchType } from "docx";
 import { generateDocFromFields } from "@/lib/docxParser";
@@ -24,7 +23,6 @@ import {
 
 const SavePaper = () => {
   const { getUser } = useAuth();
-  const navigate = useNavigate();
   const saveManualPaper = useSaveExamPaper();
 
   const {
@@ -121,7 +119,7 @@ const SavePaper = () => {
   };
 
   const handleDownloadPDF = async () => {
-    navigate({ to: "/print" });
+    window.open("/print", "_blank", "noopener,noreferrer");
   };
 
   return (
