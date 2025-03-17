@@ -12,6 +12,8 @@ export const Route = createFileRoute("/print")({
 
 const RenderedPage = () => {
   const navigate = useNavigate();
+  const optimized = localStorage.getItem("optimized") === "true";
+
   const fields = useQuestionBuilderStore((state) => state.fields);
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
   const currentFontSize = usePageSettingsStore(

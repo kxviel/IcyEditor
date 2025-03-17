@@ -9,7 +9,7 @@ const PaperHeaderFour = ({
 }) => {
   return (
     <div
-      className="mb-3 flex w-full gap-2 border-b border-black"
+      className="mb-1 flex w-full gap-2 border-b border-black"
       ref={headerRef}
     >
       <div className="flex h-full w-1/4 flex-col justify-evenly gap-1 p-4 leading-5">

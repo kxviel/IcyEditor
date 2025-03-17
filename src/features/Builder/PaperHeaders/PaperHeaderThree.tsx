@@ -9,7 +9,7 @@ const PaperHeaderThree = ({
 }) => {
   return (
     <div
-      className="mb-3 flex w-full flex-col items-center gap-4"
+      className="mb-1 flex w-full flex-col items-center gap-4"
       ref={headerRef}
     >
       <EditableField
@@ -25,7 +25,7 @@ const PaperHeaderThree = ({
         isPreview={isPreview}
       />
 
-      <div className="relative flex w-full items-center justify-between">
+      <div className="relative flex w-full items-center justify-between px-2">
         <EditableField
           headerId="duration"
           prefix="Duration: "
@@ -50,7 +50,7 @@ const PaperHeaderThree = ({
         />
       </div>
 
-      <div className="flex w-full items-center justify-between border-y-[2px] border-black px-2 py-4">
+      <div className="flex w-full items-center justify-between border-y-[2px] border-black px-3 py-4">
         <p>Name: ____________________</p>
         <p>Class: __________________</p>
         <p>Roll No.: _______________</p>

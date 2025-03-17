@@ -18,7 +18,6 @@ import {
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { Button } from "@/components/ui/button";
 import { WandSparkles } from "lucide-react";
-import { toast } from "sonner";
 
 const pageDimensions: Record<string, string> = {
   A3: "h-[420mm] w-[297mm]",
@@ -78,6 +77,7 @@ function Preview() {
 
   const [pageSize, setPageSize] = useState("A4");
   const [showOptimizer, setShowOptimizer] = useState(false);
+  const [showDuplicate, setShowDuplicate] = useState(false);
 
   const calcFontSize = (value: string) => {
     setFontSize(value);
@@ -110,8 +110,8 @@ function Preview() {
     let currentPageIndex: number = 0;
 
     const tempPageArray: CategoryItem[][] = [[]];
-    const pagePadding = 24; //p-6
-    const pageMargin = 12; //mb-3
+    const pagePadding = 8; //p-2
+    const pageMargin = 4; //mb-1
     const headerPadding = 8; //p-2
 
     if (pageRef.current) {
@@ -152,6 +152,7 @@ function Preview() {
 
     // Check if there's only one page and content fills less than 50% of page
     setTimeout(() => {
+      localStorage.removeItem("optimized");
       if (tempPageArray.length === 1 && pageRef.current && contentRef.current) {
         const totalPageHeight = pageRef.current.getBoundingClientRect().height;
         let contentHeight = 0;
@@ -176,6 +177,18 @@ function Preview() {
       }
     }, 300); // Small delay to ensure DOM measurements are accurate
   }, [fields, currentFontSize, pageSize]);
+
+  const handleOptimize = () => {
+    setShowDuplicate((prev) => {
+      if (prev) {
+        localStorage.removeItem("optimized");
+      } else {
+        localStorage.setItem("optimized", "true");
+      }
+
+      return !prev;
+    });
+  };
 
   return (
     <div className="flex h-full flex-col items-center gap-6 pt-6">
@@ -209,12 +222,8 @@ function Preview() {
         </Select>
 
         {showOptimizer && (
-          <Button
-            onClick={() => {
-              toast.info("Under Development");
-            }}
-          >
-            Optimize <WandSparkles />
+          <Button onClick={handleOptimize}>
+            {showDuplicate ? "Revert" : "Optimize"} <WandSparkles />
           </Button>
         )}
       </div>
@@ -223,18 +232,35 @@ function Preview() {
         className="relative h-full w-full overflow-auto bg-black/70 p-2"
         ref={parentRef}
       >
-        {pageArray.map((pageValue, pageIndex) => (
-          <RenderedPage
-            key={pageIndex}
-            pageRef={pageRef}
-            childRef={childRef}
-            pageIndex={pageIndex}
-            pageSize={pageSize}
-            pageValue={pageValue}
-            headerRef={headerRef}
-            contentRef={contentRef}
-          />
-        ))}
+        {pageArray.map((pageValue, pageIndex) => {
+          if (showDuplicate) {
+            return (
+              <OptimizedPage
+                key={pageIndex}
+                pageRef={pageRef}
+                childRef={childRef}
+                pageIndex={pageIndex}
+                pageSize={pageSize}
+                pageValue={pageValue}
+                headerRef={headerRef}
+                contentRef={contentRef}
+              />
+            );
+          } else {
+            return (
+              <RenderedPage
+                key={pageIndex}
+                pageRef={pageRef}
+                childRef={childRef}
+                pageIndex={pageIndex}
+                pageSize={pageSize}
+                pageValue={pageValue}
+                headerRef={headerRef}
+                contentRef={contentRef}
+              />
+            );
+          }
+        })}
       </div>
     </div>
   );
@@ -258,7 +284,7 @@ const RenderedPage = ({
   return (
     <div
       ref={pageRef}
-      className={`${pageDimensions[pageSize]} mx-auto mb-3 border border-gray-300 bg-white box-decoration-clone p-6 shadow-md transition-transform duration-100 ease-in-out`}
+      className={`${pageDimensions[pageSize]} mx-auto mb-3 border border-gray-300 bg-white box-decoration-clone px-6 py-2 shadow-md transition-transform duration-100 ease-in-out`}
     >
       {pageIndex === 0 && layoutDict(headerRef, headerLayout)}
 
@@ -311,6 +337,138 @@ const RenderedPage = ({
             );
         })}
       </div>
+
+      <div className="invisible flex w-full flex-col gap-3" ref={childRef}>
+        {Array.from(fields.values()).map((field) => (
+          <div className="w-full" key={field.categoryId}>
+            <div className="my-3 flex gap-2">
+              <p
+                className="whitespace-nowrap font-semibold leading-6 text-gray-800"
+                style={{ fontSize: 16 + Number(currentFontSize) }}
+              >
+                Q{field.categoryIndex! + 1}.
+              </p>
+              <p
+                className="font-semibold text-gray-800"
+                style={{ fontSize: 16 + Number(currentFontSize) }}
+              >
+                {field.categoryName}
+              </p>
+
+              <p
+                className="ml-auto whitespace-nowrap text-sm leading-6"
+                style={{ fontSize: 14 + Number(currentFontSize) }}
+              >
+                ({field.questions.length} x {field.categoryMarks}) ={" "}
+                {field.questions.length * Number(field.categoryMarks) || 1}
+              </p>
+            </div>
+
+            {field.questions.map((question) => (
+              <div key={question.questionId} className="my-3 flex gap-2">
+                <p
+                  className="font-semibold text-gray-800"
+                  style={{ fontSize: 14 + Number(currentFontSize) }}
+                >
+                  {question.questionIndex! + 1}.
+                </p>
+                <p
+                  className="whitespace-pre text-gray-700"
+                  style={{ fontSize: 14 + Number(currentFontSize) }}
+                  dangerouslySetInnerHTML={{
+                    __html: question.questionText,
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const OptimizedPage = ({
+  pageIndex,
+  pageSize,
+  pageRef,
+  childRef,
+  pageValue,
+  headerRef,
+  contentRef,
+}: RenderedPageProps) => {
+  const fields = useQuestionBuilderStore((state) => state.fields);
+  const headerLayout = usePageSettingsStore((state) => state.headerLayout);
+  const currentFontSize = usePageSettingsStore(
+    (state) => state.currentFontSize,
+  );
+
+  return (
+    <div
+      ref={pageRef}
+      className={`${pageDimensions[pageSize]} mx-auto border border-gray-300 bg-white box-decoration-clone px-6 py-2 shadow-md transition-transform duration-100 ease-in-out`}
+    >
+      {[1, 2].map((sigh) => (
+        <div key={sigh} className="w-full">
+          {pageIndex === 0 && layoutDict(headerRef, headerLayout)}
+
+          <div className="flex w-full flex-col gap-3" ref={contentRef}>
+            {pageValue.map((field) => {
+              if (
+                pageValue.find((item) => item.categoryId === field.categoryId)
+              )
+                return (
+                  <div className="w-full" key={field.categoryId}>
+                    <div className="my-3 flex gap-2">
+                      <p
+                        className="whitespace-nowrap font-semibold leading-6 text-gray-800"
+                        style={{ fontSize: 16 + Number(currentFontSize) }}
+                      >
+                        Q{field.categoryIndex! + 1}.
+                      </p>
+                      <p
+                        className="font-semibold text-gray-800"
+                        style={{ fontSize: 16 + Number(currentFontSize) }}
+                      >
+                        {field.categoryName}
+                      </p>
+
+                      <p
+                        className="ml-auto whitespace-nowrap text-sm leading-6"
+                        style={{ fontSize: 14 + Number(currentFontSize) }}
+                      >
+                        ({field.questions.length} x {field.categoryMarks}) ={" "}
+                        {field.questions.length * Number(field.categoryMarks) ||
+                          1}
+                      </p>
+                    </div>
+
+                    {field.questions.map((question) => (
+                      <div
+                        key={question.questionId}
+                        className="my-3 flex gap-2"
+                      >
+                        <p
+                          className="font-semibold text-gray-800"
+                          style={{ fontSize: 14 + Number(currentFontSize) }}
+                        >
+                          {question.questionIndex! + 1}.
+                        </p>
+                        <p
+                          className="whitespace-pre text-gray-700"
+                          style={{ fontSize: 14 + Number(currentFontSize) }}
+                          dangerouslySetInnerHTML={{
+                            __html: question.questionText,
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                );
+            })}
+          </div>
+        </div>
+      ))}
 
       <div className="invisible flex w-full flex-col gap-3" ref={childRef}>
         {Array.from(fields.values()).map((field) => (

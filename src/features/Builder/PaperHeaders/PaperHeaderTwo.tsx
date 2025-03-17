@@ -9,7 +9,7 @@ const PaperHeaderTwo = ({
 }) => {
   return (
     <div
-      className="mb-3 flex w-full flex-col items-center gap-4 border-[3px] border-black p-4"
+      className="mb-1 flex w-full flex-col items-center gap-4 border-[3px] border-black p-4"
       ref={headerRef}
     >
       <EditableField

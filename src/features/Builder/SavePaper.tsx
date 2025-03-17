@@ -119,7 +119,7 @@ const SavePaper = () => {
   };
 
   const handleDownloadPDF = async () => {
-    window.open("/print", "_blank", "noopener,noreferrer");
+    window.open("/print", "Print", "fullscreen=yes,noopener,noreferrer");
   };
 
   return (
