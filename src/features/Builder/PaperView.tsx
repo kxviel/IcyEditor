@@ -12,27 +12,49 @@ import { useModalStore } from "@/store/useModalStore";
 const PaperView = () => {
   const navigate = useNavigate();
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
-  const fields = useQuestionBuilderStore((state) => state.fields);
   const setModal = useModalStore((state) => state.setModal);
   const setHeaderLayout = usePageSettingsStore(
     (state) => state.setHeaderLayout,
   );
-  const sanitizeFields = useQuestionBuilderStore(
-    (state) => state.sanitizeFields,
-  );
+
+  const {
+    fields,
+    publicationId,
+    seriesId,
+    classId,
+    subjectId,
+    bookId,
+    chapterIds,
+    sanitizeFields,
+  } = useQuestionBuilderStore();
 
   const handleBack = () => {
     navigate({ to: "/exam-type" });
   };
 
+  const conditionsToProceed = () => {
+    const isFieldsEmpty = Array.from(fields.entries()).length === 0;
+    const allIdsPresent =
+      [publicationId, seriesId, classId, subjectId, bookId].every(
+        (id) => id !== "",
+      ) && chapterIds.length > 0;
+
+    if (!allIdsPresent) {
+      toast.warning("Please select all necessary fields");
+    }
+    if (isFieldsEmpty) {
+      toast.warning("Please add at least one question");
+    }
+
+    return !isFieldsEmpty && allIdsPresent;
+  };
+
   const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
 
-    if (Array.from(fields.entries()).length > 0) {
+    if (conditionsToProceed()) {
       sanitizeFields();
       navigate({ to: "/preview" });
-    } else {
-      toast.warning("Please add at least one question");
     }
   };
 

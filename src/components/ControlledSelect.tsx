@@ -27,7 +27,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useHeaderStore } from "@/store/useHeaderStore";
+import { usePageSettingsStore } from "@/store/usePageSettingsStore";
+import { queryClient } from "@/main";
 
 const FIELD_DEPENDENCIES: Record<
   string,
@@ -83,13 +86,32 @@ export const ControlledSelect = ({
 }: Props) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const setIds = useQuestionBuilderStore((state) => state.setIds);
-  const reset = useQuestionBuilderStore((state) => state.reset);
+  const resetHeader = useHeaderStore((state) => state.reset);
+  const resetBuilder = useQuestionBuilderStore((state) => state.reset);
+  const resetPageSettings = usePageSettingsStore((state) => state.reset);
   const setChapterNames = useQuestionBuilderStore(
     (state) => state.setChapterNames,
   );
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [pendingValue, setPendingValue] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // Check if there are unsaved changes
+      if (pendingValue !== null) {
+        // Standard way to show a confirmation dialog before leaving
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Clean up the event listener
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [pendingValue]);
 
   const handleValueChange = (value: string) => {
     if (isModal || fields.size === 0) {
@@ -100,11 +122,24 @@ export const ControlledSelect = ({
     }
   };
 
+  const invalidateQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ["GetPublication"] });
+    queryClient.invalidateQueries({ queryKey: ["GetSeries"] });
+    queryClient.invalidateQueries({ queryKey: ["GetClass"] });
+    queryClient.invalidateQueries({ queryKey: ["GetSubject"] });
+    queryClient.invalidateQueries({ queryKey: ["GetBook"] });
+    queryClient.invalidateQueries({ queryKey: ["GetChapter"] });
+  };
+
   const applyValueChange = (value: string) => {
     FIELD_DEPENDENCIES[label].forEach(({ idKey, resetValue }) => {
       form.resetField(idKey);
       setIds(idKey, resetValue);
-      reset();
+
+      resetHeader();
+      resetBuilder();
+      resetPageSettings();
+      invalidateQueries();
 
       if (idKey === "chapterIds") {
         setChapterNames([]);
