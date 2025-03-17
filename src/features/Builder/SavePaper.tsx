@@ -67,16 +67,29 @@ const SavePaper = () => {
     }
   };
 
+  const layoutDict: Record<
+    string,
+    { path: string; patchContent: Record<string, IPatch> }
+  > = {
+    "1": {
+      path: "./src/assets/headers/layout_one.docx",
+      patchContent: docxHeaderOne(headerData, fontSize),
+    },
+    "2": {
+      path: "./src/assets/headers/layout_two.docx",
+      patchContent: docxHeaderOne(headerData, fontSize),
+    },
+    "3": {
+      path: "./src/assets/headers/layout_three.docx",
+      patchContent: docxHeaderOne(headerData, fontSize),
+    },
+  };
+
   const handleDownloadDOCX = async () => {
-    const response = await fetch("./src/assets/headers/layout_one.docx");
+    const response = await fetch(layoutDict[headerLayout].path);
     const responseBlob = await response.blob();
 
     const docxBlob = generateDocFromFields(fields, Number(fontSize));
-    const layoutDict: Record<string, Record<string, IPatch>> = {
-      "1": docxHeaderOne(headerData, fontSize),
-      "2": docxHeaderOne(headerData, fontSize),
-      "3": docxHeaderOne(headerData, fontSize),
-    };
 
     if (docxBlob && responseBlob) {
       patchDocument({
@@ -88,7 +101,7 @@ const SavePaper = () => {
             type: PatchType.DOCUMENT,
             children: docxBlob,
           },
-          ...layoutDict[headerLayout],
+          ...layoutDict[headerLayout].patchContent,
         },
       }).then((formattedDoc) => {
         saveAs(
