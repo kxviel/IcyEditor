@@ -1,3 +1,7 @@
+import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
+import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
+import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
+import PaperHeaderFour from "@/features/Builder/PaperHeaders/PaperHeaderFour";
 import {
   CategoryItem,
   useQuestionBuilderStore,
@@ -12,9 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
-import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
-import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
-import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
 import { Button } from "@/components/ui/button";
 import { WandSparkles } from "lucide-react";
 import { toast } from "sonner";
@@ -23,6 +24,20 @@ const pageDimensions: Record<string, string> = {
   A3: "h-[420mm] w-[297mm]",
   A4: "h-[297mm] w-[210mm]",
   A5: "h-[210mm] w-[148mm]",
+};
+
+const layoutDict = (
+  headerRef: React.RefObject<HTMLDivElement>,
+  headerLayout: string,
+) => {
+  const dict: Record<string, React.ReactNode> = {
+    "1": <PaperHeaderOne isPreview={true} headerRef={headerRef} />,
+    "2": <PaperHeaderTwo isPreview={true} headerRef={headerRef} />,
+    "3": <PaperHeaderThree isPreview={true} headerRef={headerRef} />,
+    "4": <PaperHeaderFour isPreview={true} headerRef={headerRef} />,
+  };
+
+  return dict[headerLayout];
 };
 
 export const Route = createLazyFileRoute("/_auth/preview")({
@@ -222,14 +237,7 @@ const RenderedPage = ({
       ref={pageRef}
       className={`${pageDimensions[pageSize]} mx-auto mb-3 border border-gray-300 bg-white box-decoration-clone p-6 shadow-md transition-transform duration-100 ease-in-out`}
     >
-      {pageIndex === 0 &&
-        (headerLayout === "1" ? (
-          <PaperHeaderOne isPreview={true} headerRef={headerRef} />
-        ) : headerLayout === "2" ? (
-          <PaperHeaderTwo isPreview={true} headerRef={headerRef} />
-        ) : (
-          <PaperHeaderThree isPreview={true} headerRef={headerRef} />
-        ))}
+      {pageIndex === 0 && layoutDict(headerRef, headerLayout)}
 
       <div className="flex w-full flex-col gap-3">
         {pageValue.map((field) => {

@@ -10,7 +10,11 @@ import { IPatch, patchDocument, PatchType } from "docx";
 import { generateDocFromFields } from "@/lib/docxParser";
 import { saveAs } from "file-saver";
 import { format } from "date-fns";
-import { docxHeaderOne } from "@/lib/docxHeaders";
+import {
+  docxHeaderFour,
+  docxHeaderOne,
+  docxHeaderTwo,
+} from "@/lib/docxHeaders";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -77,11 +81,15 @@ const SavePaper = () => {
     },
     "2": {
       path: "./src/assets/headers/layout_two.docx",
-      patchContent: docxHeaderOne(headerData, fontSize),
+      patchContent: docxHeaderTwo(headerData, fontSize),
     },
     "3": {
       path: "./src/assets/headers/layout_three.docx",
-      patchContent: docxHeaderOne(headerData, fontSize),
+      patchContent: docxHeaderTwo(headerData, fontSize),
+    },
+    "4": {
+      path: "./src/assets/headers/layout_four.docx",
+      patchContent: docxHeaderFour(headerData, fontSize),
     },
   };
 

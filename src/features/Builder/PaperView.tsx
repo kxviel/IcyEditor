@@ -1,13 +1,21 @@
+import PaperHeaderOne from "./PaperHeaders/PaperHeaderOne";
+import PaperHeaderTwo from "./PaperHeaders/PaperHeaderTwo";
+import PaperHeaderThree from "./PaperHeaders/PaperHeaderThree";
+import PaperHeaderFour from "./PaperHeaders/PaperHeaderFour";
 import { Button } from "@/components/ui/button";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import PaperHeaderOne from "./PaperHeaders/PaperHeaderOne";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
-import PaperHeaderTwo from "./PaperHeaders/PaperHeaderTwo";
-import PaperHeaderThree from "./PaperHeaders/PaperHeaderThree";
 import { useModalStore } from "@/store/useModalStore";
+
+const layoutDict: Record<string, React.ReactNode> = {
+  "1": <PaperHeaderOne isPreview={false} />,
+  "2": <PaperHeaderTwo isPreview={false} />,
+  "3": <PaperHeaderThree isPreview={false} />,
+  "4": <PaperHeaderFour isPreview={false} />,
+};
 
 const PaperView = () => {
   const navigate = useNavigate();
@@ -71,7 +79,7 @@ const PaperView = () => {
           onValueChange={setHeaderLayout}
           className="flex flex-col items-center justify-center"
         >
-          <TabsList className="w-[632px]">
+          <TabsList className="w-full">
             <TabsTrigger value="1" className="w-full">
               Layout 1
             </TabsTrigger>
@@ -81,23 +89,15 @@ const PaperView = () => {
             <TabsTrigger value="3" className="w-full">
               Layout 3
             </TabsTrigger>
-            {/* <TabsTrigger value="4" className="w-full">
+            <TabsTrigger value="4" className="w-full">
               Layout 4
             </TabsTrigger>
-            <TabsTrigger value="5" className="w-full">
-              Layout 5
-            </TabsTrigger> */}
           </TabsList>
         </Tabs>
 
         <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white shadow-md">
-          {headerLayout === "1" ? (
-            <PaperHeaderOne isPreview={false} />
-          ) : headerLayout === "2" ? (
-            <PaperHeaderTwo isPreview={false} />
-          ) : (
-            <PaperHeaderThree isPreview={false} />
-          )}
+          {/* Header */}
+          {layoutDict[headerLayout]}
 
           <div className="flex w-full flex-col gap-3 p-3">
             {Array.from(fields.values()).map((field, fieldIndex) => (
