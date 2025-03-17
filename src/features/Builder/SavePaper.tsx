@@ -131,7 +131,7 @@ const SavePaper = () => {
       </Button>
 
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <Button>
             Download <Printer />
           </Button>

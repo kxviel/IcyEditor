@@ -25,7 +25,6 @@ const Navbar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  console.log(pathname);
 
   return (
     <header className="h-[72px] w-full border border-b border-gray-200">

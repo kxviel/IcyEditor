@@ -54,6 +54,7 @@ type RenderedPageProps = {
   pageRef: React.RefObject<HTMLDivElement>;
   childRef: React.RefObject<HTMLDivElement>;
   headerRef: React.RefObject<HTMLDivElement>;
+  contentRef: React.RefObject<HTMLDivElement>;
   pageIndex: number;
   pageSize: string;
   pageValue: CategoryItem[];
@@ -64,6 +65,7 @@ function Preview() {
   const pageRef = useRef<HTMLDivElement>(null);
   const childRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
 
@@ -113,7 +115,6 @@ function Preview() {
     const headerPadding = 8; //p-2
 
     if (pageRef.current) {
-      const parentTop = pageRef.current.getBoundingClientRect().top;
       let totalPageHeight =
         pageRef.current.getBoundingClientRect().height -
         pagePadding -
@@ -125,12 +126,6 @@ function Preview() {
       }
 
       if (childRef.current) {
-        // Show Optimizer
-        const lastContent =
-          childRef.current.lastElementChild?.getBoundingClientRect().bottom;
-        const heightToLastContent = (lastContent || 0) - parentTop;
-        setShowOptimizer(heightToLastContent < 0.5 * totalPageHeight);
-
         // Calculate Height of Each Field
         [...childRef.current.children].forEach((child, index) => {
           currentChildHeight += child.getBoundingClientRect().height;
@@ -154,6 +149,32 @@ function Preview() {
     }
 
     setPageArray(tempPageArray);
+
+    // Check if there's only one page and content fills less than 50% of page
+    setTimeout(() => {
+      if (tempPageArray.length === 1 && pageRef.current && contentRef.current) {
+        const totalPageHeight = pageRef.current.getBoundingClientRect().height;
+        let contentHeight = 0;
+
+        // Calculate header height if exists
+        const headerHeight = headerRef.current
+          ? headerRef.current.getBoundingClientRect().height
+          : 0;
+
+        // Calculate content area height
+        if (contentRef.current) {
+          contentHeight = contentRef.current.getBoundingClientRect().height;
+        }
+
+        const totalContentHeight = headerHeight + contentHeight;
+        const fillPercentage = (totalContentHeight / totalPageHeight) * 100;
+
+        // Show optimizer if content fills less than 50%
+        setShowOptimizer(fillPercentage < 50);
+      } else {
+        setShowOptimizer(false);
+      }
+    }, 300); // Small delay to ensure DOM measurements are accurate
   }, [fields, currentFontSize, pageSize]);
 
   return (
@@ -211,6 +232,7 @@ function Preview() {
             pageSize={pageSize}
             pageValue={pageValue}
             headerRef={headerRef}
+            contentRef={contentRef}
           />
         ))}
       </div>
@@ -225,6 +247,7 @@ const RenderedPage = ({
   childRef,
   pageValue,
   headerRef,
+  contentRef,
 }: RenderedPageProps) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
@@ -239,7 +262,7 @@ const RenderedPage = ({
     >
       {pageIndex === 0 && layoutDict(headerRef, headerLayout)}
 
-      <div className="flex w-full flex-col gap-3">
+      <div className="flex w-full flex-col gap-3" ref={contentRef}>
         {pageValue.map((field) => {
           if (pageValue.find((item) => item.categoryId === field.categoryId))
             return (
