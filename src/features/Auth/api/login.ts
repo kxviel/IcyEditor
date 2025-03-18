@@ -32,9 +32,8 @@ export const useLoginFn = () => {
     onSuccess: ({ data }: { data: LoginResponse }) => {
       toast.success(data.message);
       saveUser(data.data);
-
-      saveUser(data.data);
       navigate({ to: "/", search: { page: 1 } });
+
       if (!data.data.isProfileCompleted) {
         setModal("COMPLETE_PROFILE", {
           isOpen: true,
