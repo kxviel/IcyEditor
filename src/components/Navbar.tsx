@@ -6,14 +6,21 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import Logo from "@/assets/Logo.svg";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import SavePaper from "@/features/Builder/SavePaper";
 import { useAuth } from "@/hooks/useAuth";
 import Stepper from "@/components/ui/stepper";
+import AvatarPlaceholder from "@/assets/avatarImg.svg";
+import { useState } from "react";
 
 const allowedStepperRoutes = [
   "/builder/manual-selection",
@@ -22,9 +29,12 @@ const allowedStepperRoutes = [
 ];
 
 const Navbar = () => {
-  const { logout } = useAuth();
+  const { logout, getUser } = useAuth();
+  const userData = getUser();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+
+  const [showAlert, setShowAlert] = useState(false);
 
   return (
     <header className="h-[72px] w-full border border-b border-gray-200">
@@ -42,36 +52,51 @@ const Navbar = () => {
           </div>
         )}
 
-        {!["/builder", "/preview"].includes(pathname) && (
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              className="px-3"
-              onClick={() => navigate({ to: "/users", search: { page: 1 } })}
-            >
-              View Users
-            </Button>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button className="px-3">Logout</Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Do you want to logout?</AlertDialogTitle>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={logout}>
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        )}
-
         {pathname === "/preview" && <SavePaper />}
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar>
+              <AvatarImage src={AvatarPlaceholder} alt="@kxviel" />
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {!userData?.isProfileCompleted && (
+              <DropdownMenuItem>Complete Profile</DropdownMenuItem>
+            )}
+            {userData?.IS_SUPER_ADMIN > 0 && (
+              <DropdownMenuItem>View Users</DropdownMenuItem>
+            )}
+
+            <DropdownMenuItem
+              className="text-red-300"
+              onClick={() => setShowAlert(true)}
+            >
+              Logout
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {showAlert && (
+          <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Do you want to logout?</AlertDialogTitle>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    setShowAlert(false);
+                    logout();
+                  }}
+                >
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </nav>
     </header>
   );
