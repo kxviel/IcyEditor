@@ -54,7 +54,6 @@ type RenderedPageProps = {
   pageRef: React.RefObject<HTMLDivElement>;
   childRef: React.RefObject<HTMLDivElement>;
   headerRef: React.RefObject<HTMLDivElement>;
-  renderedContentRef: React.RefObject<HTMLDivElement>;
   pageIndex: number;
   pageSize: string;
   pageValue: CategoryItem[];
@@ -65,7 +64,6 @@ function Preview() {
   const pageRef = useRef<HTMLDivElement>(null);
   const childRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const renderedContentRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
 
@@ -153,24 +151,17 @@ function Preview() {
 
     // Check if there's only one page and content fills less than 50% of page
     setTimeout(() => {
-      if (
-        tempPageArray.length === 1 &&
-        pageRef.current &&
-        renderedContentRef.current
-      ) {
+      if (tempPageArray.length === 1 && pageRef.current && childRef.current) {
         let contentHeight = 0;
-        let totalPageHeight =
+        const totalPageHeight =
           pageRef.current.getBoundingClientRect().height - headerGap;
 
-        // Calculate header height if exists
-        if (headerRef.current) {
-          totalPageHeight -= headerRef.current.getBoundingClientRect().height;
-        }
-
-        // Calculate content area height
-        if (renderedContentRef.current) {
+        // Calculate header & content area height
+        if (childRef.current && headerRef.current) {
           contentHeight =
-            renderedContentRef.current.getBoundingClientRect().height;
+            childRef.current.getBoundingClientRect().height +
+            headerRef.current.getBoundingClientRect().height +
+            headerGap;
         }
 
         console.log("TOTAL PAGE HEIGHT: ", totalPageHeight);
@@ -255,7 +246,6 @@ function Preview() {
                 pageSize={pageSize}
                 pageValue={pageValue}
                 headerRef={headerRef}
-                renderedContentRef={renderedContentRef}
               />
             );
           } else {
@@ -268,7 +258,6 @@ function Preview() {
                 pageSize={pageSize}
                 pageValue={pageValue}
                 headerRef={headerRef}
-                renderedContentRef={renderedContentRef}
               />
             );
           }
@@ -285,7 +274,6 @@ const RenderedPage = ({
   childRef,
   pageValue,
   headerRef,
-  renderedContentRef,
 }: RenderedPageProps) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
@@ -297,10 +285,7 @@ const RenderedPage = ({
     >
       {pageIndex === 0 && layoutDict(headerRef, headerLayout)}
 
-      <div
-        className="flex w-full flex-col gap-3 px-6 py-2"
-        ref={renderedContentRef}
-      >
+      <div className="flex w-full flex-col gap-3 px-6 py-2">
         {pageValue.map((field) => (
           <div className="w-full" key={field.categoryId}>
             <CategoryWrapper
@@ -355,7 +340,6 @@ const OptimizedPage = ({
   childRef,
   pageValue,
   headerRef,
-  renderedContentRef,
 }: RenderedPageProps) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
@@ -369,10 +353,7 @@ const OptimizedPage = ({
         <div key={isThisAButterfly} className="w-full">
           {pageIndex === 0 && layoutDict(headerRef, headerLayout)}
 
-          <div
-            className="flex w-full flex-col gap-3 px-6 py-2"
-            ref={renderedContentRef}
-          >
+          <div className="flex w-full flex-col gap-3 px-6 py-2">
             {pageValue.map((field) => (
               <div className="w-full" key={field.categoryId}>
                 <CategoryWrapper
