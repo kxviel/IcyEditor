@@ -18,7 +18,7 @@ import {
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { Button } from "@/components/ui/button";
 import { WandSparkles } from "lucide-react";
-import { CategoryWrapper } from "@/components/DisplayComp";
+import { CategoryWrapper, QuestionWrapper } from "@/components/DisplayComp";
 
 const pageDimensions: Record<string, string> = {
   A3: "h-[420mm] w-[297mm]",
@@ -54,7 +54,7 @@ type RenderedPageProps = {
   pageRef: React.RefObject<HTMLDivElement>;
   childRef: React.RefObject<HTMLDivElement>;
   headerRef: React.RefObject<HTMLDivElement>;
-  contentRef: React.RefObject<HTMLDivElement>;
+  renderedContentRef: React.RefObject<HTMLDivElement>;
   pageIndex: number;
   pageSize: string;
   pageValue: CategoryItem[];
@@ -65,7 +65,7 @@ function Preview() {
   const pageRef = useRef<HTMLDivElement>(null);
   const childRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const renderedContentRef = useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
 
@@ -107,23 +107,23 @@ function Preview() {
   }, [navigate]);
 
   useEffect(() => {
+    setShowOptimizer(false);
+    setShowDuplicate(false);
+    localStorage.removeItem("optimized");
+
     let currentChildHeight: number = 0;
     let currentPageIndex: number = 0;
 
     const tempPageArray: CategoryItem[][] = [[]];
-    const pagePadding = 8; //p-2
-    const pageMargin = 4; //mb-1
-    const headerPadding = 8; //p-2
+    const headerGap = 4; //mb-1
 
     if (pageRef.current) {
       let totalPageHeight =
-        pageRef.current.getBoundingClientRect().height -
-        pagePadding -
-        pageMargin;
+        pageRef.current.getBoundingClientRect().height - headerGap;
 
+      // Calculate header height if exists
       if (currentPageIndex === 0 && headerRef.current) {
-        totalPageHeight -=
-          headerRef.current.getBoundingClientRect().height - headerPadding;
+        totalPageHeight -= headerRef.current.getBoundingClientRect().height;
       }
 
       if (childRef.current) {
@@ -153,23 +153,34 @@ function Preview() {
 
     // Check if there's only one page and content fills less than 50% of page
     setTimeout(() => {
-      localStorage.removeItem("optimized");
-      if (tempPageArray.length === 1 && pageRef.current && contentRef.current) {
-        const totalPageHeight = pageRef.current.getBoundingClientRect().height;
+      if (
+        tempPageArray.length === 1 &&
+        pageRef.current &&
+        renderedContentRef.current
+      ) {
         let contentHeight = 0;
+        let totalPageHeight =
+          pageRef.current.getBoundingClientRect().height - headerGap;
 
         // Calculate header height if exists
-        const headerHeight = headerRef.current
-          ? headerRef.current.getBoundingClientRect().height
-          : 0;
-
-        // Calculate content area height
-        if (contentRef.current) {
-          contentHeight = contentRef.current.getBoundingClientRect().height;
+        if (headerRef.current) {
+          totalPageHeight -= headerRef.current.getBoundingClientRect().height;
         }
 
-        const totalContentHeight = headerHeight + contentHeight;
-        const fillPercentage = (totalContentHeight / totalPageHeight) * 100;
+        // Calculate content area height
+        if (renderedContentRef.current) {
+          contentHeight =
+            renderedContentRef.current.getBoundingClientRect().height;
+        }
+
+        console.log("TOTAL PAGE HEIGHT: ", totalPageHeight);
+        console.log("CONTENT HEIGHT: ", contentHeight);
+        console.log(
+          "fillPercentage: ",
+          (contentHeight / totalPageHeight) * 100,
+        );
+
+        const fillPercentage = (contentHeight / totalPageHeight) * 100;
 
         // Show optimizer if content fills less than 50%
         setShowOptimizer(fillPercentage < 50);
@@ -244,7 +255,7 @@ function Preview() {
                 pageSize={pageSize}
                 pageValue={pageValue}
                 headerRef={headerRef}
-                contentRef={contentRef}
+                renderedContentRef={renderedContentRef}
               />
             );
           } else {
@@ -257,7 +268,7 @@ function Preview() {
                 pageSize={pageSize}
                 pageValue={pageValue}
                 headerRef={headerRef}
-                contentRef={contentRef}
+                renderedContentRef={renderedContentRef}
               />
             );
           }
@@ -274,55 +285,46 @@ const RenderedPage = ({
   childRef,
   pageValue,
   headerRef,
-  contentRef,
+  renderedContentRef,
 }: RenderedPageProps) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
-  const currentFontSize = usePageSettingsStore(
-    (state) => state.currentFontSize,
-  );
 
   return (
     <div
       ref={pageRef}
-      className={`${pageDimensions[pageSize]} mx-auto mb-3 border border-gray-300 bg-white box-decoration-clone px-6 py-2 shadow-md transition-transform duration-100 ease-in-out`}
+      className={`${pageDimensions[pageSize]} mx-auto mb-3 border border-gray-200 bg-white shadow-md`}
     >
       {pageIndex === 0 && layoutDict(headerRef, headerLayout)}
 
-      <div className="flex w-full flex-col gap-3" ref={contentRef}>
-        {pageValue.map((field) => {
-          return (
-            <div className="w-full" key={field.categoryId}>
-              <CategoryWrapper
-                categoryIndex={field.categoryIndex!}
-                categoryName={field.categoryName}
-                questionLength={field.questions.length}
-                categoryMarks={field.categoryMarks}
-              />
+      <div
+        className="flex w-full flex-col gap-3 px-6 py-2"
+        ref={renderedContentRef}
+      >
+        {pageValue.map((field) => (
+          <div className="w-full" key={field.categoryId}>
+            <CategoryWrapper
+              categoryIndex={field.categoryIndex!}
+              categoryName={field.categoryName}
+              questionLength={field.questions.length}
+              categoryMarks={field.categoryMarks}
+            />
 
-              {field.questions.map((question) => (
-                <div key={question.questionId} className="my-3 flex gap-2">
-                  <p
-                    className="font-semibold text-gray-800"
-                    style={{ fontSize: 14 + Number(currentFontSize) }}
-                  >
-                    {question.questionIndex! + 1}.
-                  </p>
-                  <p
-                    className="whitespace-pre text-gray-700"
-                    style={{ fontSize: 14 + Number(currentFontSize) }}
-                    dangerouslySetInnerHTML={{
-                      __html: question.questionText,
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          );
-        })}
+            {field.questions.map((question) => (
+              <QuestionWrapper
+                key={question.questionId}
+                questionIndex={question.questionIndex!}
+                questionContent={question.questionText}
+              />
+            ))}
+          </div>
+        ))}
       </div>
 
-      <div className="invisible flex w-full flex-col gap-3" ref={childRef}>
+      <div
+        className="invisible flex w-full flex-col gap-3 px-6 py-2"
+        ref={childRef}
+      >
         {Array.from(fields.values()).map((field) => (
           <div className="w-full" key={field.categoryId}>
             <CategoryWrapper
@@ -333,21 +335,11 @@ const RenderedPage = ({
             />
 
             {field.questions.map((question) => (
-              <div key={question.questionId} className="my-3 flex gap-2">
-                <p
-                  className="font-semibold text-gray-800"
-                  style={{ fontSize: 14 + Number(currentFontSize) }}
-                >
-                  {question.questionIndex! + 1}.
-                </p>
-                <p
-                  className="whitespace-pre text-gray-700"
-                  style={{ fontSize: 14 + Number(currentFontSize) }}
-                  dangerouslySetInnerHTML={{
-                    __html: question.questionText,
-                  }}
-                />
-              </div>
+              <QuestionWrapper
+                key={question.questionId}
+                questionIndex={question.questionIndex!}
+                questionContent={question.questionText}
+              />
             ))}
           </div>
         ))}
@@ -363,123 +355,65 @@ const OptimizedPage = ({
   childRef,
   pageValue,
   headerRef,
-  contentRef,
+  renderedContentRef,
 }: RenderedPageProps) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
-  const currentFontSize = usePageSettingsStore(
-    (state) => state.currentFontSize,
-  );
 
   return (
     <div
       ref={pageRef}
-      className={`${pageDimensions[pageSize]} mx-auto border border-gray-300 bg-white box-decoration-clone px-6 py-2 shadow-md transition-transform duration-100 ease-in-out`}
+      className={`${pageDimensions[pageSize]} mx-auto mb-3 border border-gray-200 bg-white shadow-md`}
     >
-      {[1, 2].map((sigh) => (
-        <div key={sigh} className="w-full">
+      {[1, 2].map((isThisAButterfly) => (
+        <div key={isThisAButterfly} className="w-full">
           {pageIndex === 0 && layoutDict(headerRef, headerLayout)}
 
-          <div className="flex w-full flex-col gap-3" ref={contentRef}>
-            {pageValue.map((field) => {
-              if (
-                pageValue.find((item) => item.categoryId === field.categoryId)
-              )
-                return (
-                  <div className="w-full" key={field.categoryId}>
-                    <div className="my-3 flex gap-2">
-                      <p
-                        className="whitespace-nowrap font-semibold leading-6 text-gray-800"
-                        style={{ fontSize: 16 + Number(currentFontSize) }}
-                      >
-                        Q{field.categoryIndex! + 1}.
-                      </p>
-                      <p
-                        className="font-semibold text-gray-800"
-                        style={{ fontSize: 16 + Number(currentFontSize) }}
-                      >
-                        {field.categoryName}
-                      </p>
+          <div
+            className="flex w-full flex-col gap-3 px-6 py-2"
+            ref={renderedContentRef}
+          >
+            {pageValue.map((field) => (
+              <div className="w-full" key={field.categoryId}>
+                <CategoryWrapper
+                  categoryIndex={field.categoryIndex!}
+                  categoryName={field.categoryName}
+                  questionLength={field.questions.length}
+                  categoryMarks={field.categoryMarks}
+                />
 
-                      <p
-                        className="ml-auto whitespace-nowrap text-sm leading-6"
-                        style={{ fontSize: 14 + Number(currentFontSize) }}
-                      >
-                        ({field.questions.length} x {field.categoryMarks}) ={" "}
-                        {field.questions.length * Number(field.categoryMarks) ||
-                          1}
-                      </p>
-                    </div>
-
-                    {field.questions.map((question) => (
-                      <div
-                        key={question.questionId}
-                        className="my-3 flex gap-2"
-                      >
-                        <p
-                          className="font-semibold text-gray-800"
-                          style={{ fontSize: 14 + Number(currentFontSize) }}
-                        >
-                          {question.questionIndex! + 1}.
-                        </p>
-                        <p
-                          className="whitespace-pre text-gray-700"
-                          style={{ fontSize: 14 + Number(currentFontSize) }}
-                          dangerouslySetInnerHTML={{
-                            __html: question.questionText,
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                );
-            })}
+                {field.questions.map((question) => (
+                  <QuestionWrapper
+                    key={question.questionId}
+                    questionIndex={question.questionIndex!}
+                    questionContent={question.questionText}
+                  />
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       ))}
 
-      <div className="invisible flex w-full flex-col gap-3" ref={childRef}>
+      <div
+        className="invisible flex w-full flex-col gap-3 px-6 py-2"
+        ref={childRef}
+      >
         {Array.from(fields.values()).map((field) => (
           <div className="w-full" key={field.categoryId}>
-            <div className="my-3 flex gap-2">
-              <p
-                className="whitespace-nowrap font-semibold leading-6 text-gray-800"
-                style={{ fontSize: 16 + Number(currentFontSize) }}
-              >
-                Q{field.categoryIndex! + 1}.
-              </p>
-              <p
-                className="font-semibold text-gray-800"
-                style={{ fontSize: 16 + Number(currentFontSize) }}
-              >
-                {field.categoryName}
-              </p>
-
-              <p
-                className="ml-auto whitespace-nowrap text-sm leading-6"
-                style={{ fontSize: 14 + Number(currentFontSize) }}
-              >
-                ({field.questions.length} x {field.categoryMarks}) ={" "}
-                {field.questions.length * Number(field.categoryMarks) || 1}
-              </p>
-            </div>
+            <CategoryWrapper
+              categoryIndex={field.categoryIndex!}
+              categoryName={field.categoryName}
+              questionLength={field.questions.length}
+              categoryMarks={field.categoryMarks}
+            />
 
             {field.questions.map((question) => (
-              <div key={question.questionId} className="my-3 flex gap-2">
-                <p
-                  className="font-semibold text-gray-800"
-                  style={{ fontSize: 14 + Number(currentFontSize) }}
-                >
-                  {question.questionIndex! + 1}.
-                </p>
-                <p
-                  className="whitespace-pre text-gray-700"
-                  style={{ fontSize: 14 + Number(currentFontSize) }}
-                  dangerouslySetInnerHTML={{
-                    __html: question.questionText,
-                  }}
-                />
-              </div>
+              <QuestionWrapper
+                key={question.questionId}
+                questionIndex={question.questionIndex!}
+                questionContent={question.questionText}
+              />
             ))}
           </div>
         ))}

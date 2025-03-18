@@ -25,7 +25,7 @@ const PaperHeaderOne = ({
         isPreview={isPreview}
       />
 
-      <div className="relative flex w-full items-center justify-between">
+      <div className="relative flex w-full items-center justify-between px-2">
         <EditableField
           headerId="duration"
           prefix="Duration: "

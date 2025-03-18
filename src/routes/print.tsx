@@ -1,4 +1,4 @@
-import { CategoryWrapper } from "@/components/DisplayComp";
+import { CategoryWrapper, QuestionWrapper } from "@/components/DisplayComp";
 import PaperHeaderFour from "@/features/Builder/PaperHeaders/PaperHeaderFour";
 import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
 import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
@@ -25,9 +25,6 @@ const RenderedPage = () => {
 
   const fields = useQuestionBuilderStore((state) => state.fields);
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
-  const currentFontSize = usePageSettingsStore(
-    (state) => state.currentFontSize,
-  );
 
   useEffect(() => {
     window.print();
@@ -49,38 +46,30 @@ const RenderedPage = () => {
     <>
       {optimized ? (
         <div id="section-to-print" className={`w-full`}>
-          {[1, 2].map((sigh) => (
-            <div key={sigh} className="w-full">
+          {[1, 2].map((isThisAButterfly) => (
+            <div key={isThisAButterfly} className="w-full">
               {layoutDict[headerLayout]}
 
-              {Array.from(fields.values()).map((field) => (
-                <div className="w-full" key={field.categoryId}>
-                  <CategoryWrapper
-                    categoryIndex={field.categoryIndex!}
-                    categoryName={field.categoryName}
-                    questionLength={field.questions.length}
-                    categoryMarks={field.categoryMarks}
-                  />
+              <div className="flex w-full flex-col gap-3 px-6 py-2">
+                {Array.from(fields.values()).map((field) => (
+                  <div className="w-full" key={field.categoryId}>
+                    <CategoryWrapper
+                      categoryIndex={field.categoryIndex!}
+                      categoryName={field.categoryName}
+                      questionLength={field.questions.length}
+                      categoryMarks={field.categoryMarks}
+                    />
 
-                  {field.questions.map((question) => (
-                    <div key={question.questionId} className="my-2 flex gap-2">
-                      <p
-                        className="font-semibold text-gray-800"
-                        style={{ fontSize: 14 + Number(currentFontSize) }}
-                      >
-                        {question.questionIndex! + 1}.
-                      </p>
-                      <p
-                        className="whitespace-pre text-gray-700"
-                        style={{ fontSize: 14 + Number(currentFontSize) }}
-                        dangerouslySetInnerHTML={{
-                          __html: question.questionText,
-                        }}
+                    {field.questions.map((question) => (
+                      <QuestionWrapper
+                        key={question.questionId}
+                        questionIndex={question.questionIndex!}
+                        questionContent={question.questionText}
                       />
-                    </div>
-                  ))}
-                </div>
-              ))}
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
@@ -88,7 +77,7 @@ const RenderedPage = () => {
         <div id="section-to-print" className={`w-full`}>
           {layoutDict[headerLayout]}
 
-          <div className="flex w-full flex-col gap-3">
+          <div className="flex w-full flex-col gap-3 px-6 py-2">
             {Array.from(fields.values()).map((field) => (
               <div className="w-full" key={field.categoryId}>
                 <CategoryWrapper
@@ -99,21 +88,11 @@ const RenderedPage = () => {
                 />
 
                 {field.questions.map((question) => (
-                  <div key={question.questionId} className="my-3 flex gap-2">
-                    <p
-                      className="font-semibold text-gray-800"
-                      style={{ fontSize: 14 + Number(currentFontSize) }}
-                    >
-                      {question.questionIndex! + 1}.
-                    </p>
-                    <p
-                      className="whitespace-pre text-gray-700"
-                      style={{ fontSize: 14 + Number(currentFontSize) }}
-                      dangerouslySetInnerHTML={{
-                        __html: question.questionText,
-                      }}
-                    />
-                  </div>
+                  <QuestionWrapper
+                    key={question.questionId}
+                    questionIndex={question.questionIndex!}
+                    questionContent={question.questionText}
+                  />
                 ))}
               </div>
             ))}

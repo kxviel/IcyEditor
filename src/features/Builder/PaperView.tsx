@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { useModalStore } from "@/store/useModalStore";
-import { CategoryWrapper } from "@/components/DisplayComp";
+import { CategoryWrapper, QuestionWrapper } from "@/components/DisplayComp";
 
 const layoutDict: Record<string, React.ReactNode> = {
   "1": <PaperHeaderOne isPreview={false} />,
@@ -96,11 +96,11 @@ const PaperView = () => {
           </TabsList>
         </Tabs>
 
-        <div className="custom_scrollbar h-full w-full overflow-y-auto bg-white shadow-md">
+        <div className="custom_scrollbar h-full w-full overflow-y-auto border border-gray-200 bg-white shadow-md">
           {/* Header */}
           {layoutDict[headerLayout]}
 
-          <div className="flex w-full flex-col gap-3 p-3">
+          <div className="flex w-full flex-col gap-3 px-6 py-2">
             {Array.from(fields.values()).map((field, fieldIndex) => (
               <div className="w-full" key={field.categoryId}>
                 <CategoryWrapper
@@ -117,27 +117,18 @@ const PaperView = () => {
                   }}
                 />
 
-                {field.questions.map((question, index) => (
-                  <div
+                {field.questions.map((question, questionIndex) => (
+                  <QuestionWrapper
                     key={question.questionId}
-                    className="my-3 flex gap-2 whitespace-pre rounded-md py-1 hover:cursor-pointer hover:bg-gray-100"
-                    onClick={() => {
+                    questionIndex={questionIndex}
+                    questionContent={question.questionText}
+                    editQuestionContent={() => {
                       setModal("EDIT_QUESTION", {
                         isOpen: true,
                         content: question.questionText,
                       });
                     }}
-                  >
-                    <p className="text-sm font-semibold text-gray-800">
-                      {index + 1}.
-                    </p>
-                    <p
-                      className="text-sm text-gray-700"
-                      dangerouslySetInnerHTML={{
-                        __html: question.questionText,
-                      }}
-                    />
-                  </div>
+                  />
                 ))}
               </div>
             ))}
