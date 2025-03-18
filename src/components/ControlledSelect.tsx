@@ -108,6 +108,7 @@ export const ControlledSelect = ({
   };
 
   const applyValueChange = (value: string) => {
+    // Reset dependent fields
     FIELD_DEPENDENCIES[label].forEach(({ idKey, resetValue }) => {
       form.resetField(idKey);
       setIds(idKey, resetValue);
@@ -123,6 +124,8 @@ export const ControlledSelect = ({
       }
     });
 
+    // Set selected value
+    setIds(label, value);
     form.setValue(label, value);
   };
 

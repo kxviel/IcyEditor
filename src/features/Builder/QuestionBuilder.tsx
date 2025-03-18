@@ -26,7 +26,8 @@ import {
 import { Button } from "@/components/ui/button";
 import QuestionSelect from "./QuestionSelect";
 import ChapterList from "./ChapterList";
-import { useSearch } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -48,6 +49,7 @@ type Props = {
 
 const QuestionBuilder = ({ examId }: Props) => {
   const {
+    fields,
     publicationId,
     seriesId,
     classId,
@@ -57,8 +59,10 @@ const QuestionBuilder = ({ examId }: Props) => {
     chapterNames,
     setIds,
     presetFields,
+    sanitizeFields,
     setChapterNames,
   } = useQuestionBuilderStore();
+  const navigate = useNavigate();
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
   const { needPreselection } = useSearch({
     from: "/_auth/builder/$examId",
@@ -127,6 +131,22 @@ const QuestionBuilder = ({ examId }: Props) => {
     setIds("chapterIds", selectedChapterIds);
 
     setIsModalOpen(false);
+  };
+
+  const onPaperViewNext: SubmitHandler<PrerequisitesForm> = (data) => {
+    setIds("publicationId", data.publicationId);
+    setIds("seriesId", data.seriesId);
+    setIds("classId", data.classId);
+    setIds("subjectId", data.subjectId);
+    setIds("bookId", data.bookId);
+    setIds("chapterIds", selectedChapterIds);
+
+    if (Array.from(fields.entries()).length === 0) {
+      toast.error("Please add at least one question");
+    } else {
+      sanitizeFields();
+      navigate({ to: "/preview" });
+    }
   };
 
   return (
@@ -271,7 +291,7 @@ const QuestionBuilder = ({ examId }: Props) => {
           {examId === "auto-selection" ? (
             <QuestionSelect chapterIds={selectedChapterIds} />
           ) : (
-            <PaperView />
+            <PaperView form={form} onPaperViewNext={onPaperViewNext} />
           )}
         </div>
       )}

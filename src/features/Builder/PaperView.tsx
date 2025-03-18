@@ -5,11 +5,12 @@ import PaperHeaderFour from "./PaperHeaders/PaperHeaderFour";
 import { Button } from "@/components/ui/button";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { useModalStore } from "@/store/useModalStore";
 import { CategoryWrapper, QuestionWrapper } from "@/components/DisplayComp";
+import { PrerequisitesForm } from "./QuestionBuilder";
+import { UseFormReturn } from "react-hook-form";
 
 const layoutDict: Record<string, React.ReactNode> = {
   "1": <PaperHeaderOne isPreview={false} />,
@@ -18,7 +19,12 @@ const layoutDict: Record<string, React.ReactNode> = {
   "4": <PaperHeaderFour isPreview={false} />,
 };
 
-const PaperView = () => {
+type Props = {
+  form: UseFormReturn<PrerequisitesForm, any, undefined>;
+  onPaperViewNext: (data: PrerequisitesForm) => void;
+};
+
+const PaperView = ({ form, onPaperViewNext }: Props) => {
   const navigate = useNavigate();
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
   const setModal = useModalStore((state) => state.setModal);
@@ -26,45 +32,10 @@ const PaperView = () => {
     (state) => state.setHeaderLayout,
   );
 
-  const {
-    fields,
-    publicationId,
-    seriesId,
-    classId,
-    subjectId,
-    bookId,
-    chapterIds,
-    sanitizeFields,
-  } = useQuestionBuilderStore();
+  const { fields } = useQuestionBuilderStore();
 
   const handleBack = () => {
     navigate({ to: "/exam-type" });
-  };
-
-  const conditionsToProceed = () => {
-    const isFieldsEmpty = Array.from(fields.entries()).length === 0;
-    const allIdsPresent =
-      [publicationId, seriesId, classId, subjectId, bookId].every(
-        (id) => id !== "",
-      ) && chapterIds.length > 0;
-
-    if (!allIdsPresent) {
-      toast.warning("Please select all necessary fields");
-    }
-    if (isFieldsEmpty) {
-      toast.warning("Please add at least one question");
-    }
-
-    return !isFieldsEmpty && allIdsPresent;
-  };
-
-  const handleNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-
-    if (conditionsToProceed()) {
-      sanitizeFields();
-      navigate({ to: "/preview" });
-    }
   };
 
   return (
@@ -141,7 +112,7 @@ const PaperView = () => {
           Back
         </Button>
 
-        <Button className="w-full" onClick={handleNext}>
+        <Button className="w-full" onClick={form.handleSubmit(onPaperViewNext)}>
           Next
         </Button>
       </div>

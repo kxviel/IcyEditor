@@ -38,7 +38,7 @@ const Navbar = () => {
 
   return (
     <header className="h-[72px] w-full border border-b border-gray-200">
-      <nav className="mx-auto flex h-full max-w-screen-xl items-center justify-between px-8">
+      <nav className="mx-auto flex h-full max-w-screen-xl items-center justify-between gap-2 px-8">
         <div
           className="hover:cursor-pointer"
           onClick={() => navigate({ to: "/", search: { page: 1 } })}
