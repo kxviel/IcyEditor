@@ -45,8 +45,8 @@ export const getPapersFn = (props: Props): Promise<AxiosResponse<Root>> => {
   if (order) params.order = order;
   if (searchTerm) params.searchTerm = searchTerm;
   if (date && date.from && date.to) {
-    params.fromDate = date.from.toISOString();
-    params.toDate = date.to.toISOString();
+    params.startDate = date.from.toISOString();
+    params.endDate = date.to.toISOString();
   }
 
   return http.get(`/questionbank/getUserExamPaperDetails/${userId}`, {
