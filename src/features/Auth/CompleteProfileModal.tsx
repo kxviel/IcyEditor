@@ -360,13 +360,25 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
               </div>
             </div>
 
-            <Button
-              className="w-96"
-              type="submit"
-              disabled={updateUser.isPending}
-            >
-              {updateUser.isPending ? "Saving..." : "Save Profile"}
-            </Button>
+            <div className="flex w-full items-center gap-4">
+              <Button
+                className="w-full"
+                variant={"outline"}
+                onClick={(e) => {
+                  e.preventDefault();
+                  hideModal();
+                }}
+              >
+                Complete Later
+              </Button>
+              <Button
+                className="w-full"
+                type="submit"
+                disabled={updateUser.isPending}
+              >
+                {updateUser.isPending ? "Saving..." : "Save Profile"}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>
