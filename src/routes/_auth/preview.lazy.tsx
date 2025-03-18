@@ -163,18 +163,15 @@ function Preview() {
             headerRef.current.getBoundingClientRect().height +
             headerGap;
         }
-
-        console.log("TOTAL PAGE HEIGHT: ", totalPageHeight);
-        console.log("CONTENT HEIGHT: ", contentHeight);
-        console.log(
-          "fillPercentage: ",
-          (contentHeight / totalPageHeight) * 100,
-        );
-
         const fillPercentage = (contentHeight / totalPageHeight) * 100;
 
         // Show optimizer if content fills less than 50%
         setShowOptimizer(fillPercentage < 50);
+
+        console.log("Logging for Proof: ");
+        console.log("Total Page Height: ", totalPageHeight);
+        console.log("Content Height: ", contentHeight);
+        console.log("Filled Percentage: ", fillPercentage);
       } else {
         setShowOptimizer(false);
       }
