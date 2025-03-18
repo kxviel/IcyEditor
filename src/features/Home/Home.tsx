@@ -73,6 +73,7 @@ const Home = () => {
     resetHeader();
     resetBuilder();
     resetPageSettings();
+    localStorage.removeItem("optimized");
   }, [resetBuilder, resetHeader, resetPageSettings]);
 
   const handleSort = () => {

@@ -30,7 +30,7 @@ import { useGetCities } from "./api/getCities";
 import { useGetPublication } from "../Builder/api/getPublication";
 import { useGetSeries } from "../Builder/api/getSeries";
 import { useUpdateUser } from "./api/updateUser";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, User } from "@/hooks/useAuth";
 
 const registerSchema = z
   .object({
@@ -74,10 +74,7 @@ type RegisterSchemaTypes = z.infer<typeof registerSchema>;
 
 type Props = {
   isOpen: boolean;
-  data: {
-    EMAIL: string;
-    UNAME: string;
-  };
+  data: User;
 };
 
 const CompleteProfileModal = ({ isOpen, data }: Props) => {
@@ -87,14 +84,16 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
   const form = useForm<RegisterSchemaTypes>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: data.UNAME,
-      email: data.EMAIL,
-      password: "",
-      confirmPassword: "",
-      phone: "",
-      // city: "",
-      state: "",
-      school: "",
+      name: data.UNAME || "",
+      email: data.EMAIL || "",
+      password: data.PASSWORD || "",
+      confirmPassword: data.PASSWORD || "",
+      phone: data.MOBILE || "",
+      city: data.city || "",
+      state: data.state || "",
+      school: data.school || "",
+      publicationId: data.PUBLICATION_ID || "",
+      seriesId: data.SERIES_ID || "",
     },
   });
 
@@ -104,7 +103,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
   const series = useGetSeries(form.watch("publicationId"));
 
   const onSubmit = (data: RegisterSchemaTypes) => {
-    console.log(data);
     updateUser.mutate({
       body: {
         userId: getUser()?.id,
@@ -134,7 +132,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 <FormField
                   control={form.control}
                   name="name"
-                  defaultValue=""
                   disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
@@ -153,7 +150,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 <FormField
                   control={form.control}
                   name="phone"
-                  defaultValue=""
                   disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
@@ -172,7 +168,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 <FormField
                   control={form.control}
                   name="state"
-                  defaultValue=""
                   disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
@@ -204,7 +199,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 <FormField
                   control={form.control}
                   name="password"
-                  defaultValue=""
                   disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
@@ -223,7 +217,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 <FormField
                   control={form.control}
                   name="publicationId"
-                  defaultValue=""
                   disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
@@ -254,7 +247,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 <FormField
                   control={form.control}
                   name="email"
-                  defaultValue=""
                   disabled={true}
                   render={({ field }) => (
                     <FormItem>
@@ -273,7 +265,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 <FormField
                   control={form.control}
                   name="school"
-                  defaultValue=""
                   disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
@@ -292,7 +283,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 <FormField
                   control={form.control}
                   name="city"
-                  defaultValue=""
                   disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
@@ -324,7 +314,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 <FormField
                   control={form.control}
                   name="confirmPassword"
-                  defaultValue=""
                   disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
@@ -343,7 +332,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 <FormField
                   control={form.control}
                   name="seriesId"
-                  defaultValue=""
                   disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
