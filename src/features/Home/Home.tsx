@@ -24,6 +24,7 @@ import { useHeaderStore } from "@/store/useHeaderStore";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import Pagination from "@/components/ui/pagination";
+import { useModalStore } from "@/store/useModalStore";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ const Home = () => {
   const { getUser } = useAuth();
   const deleteFn = useDeletePaper();
   const userData = getUser();
+  const setModal = useModalStore((state) => state.setModal);
   const resetHeader = useHeaderStore((state) => state.reset);
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
@@ -57,6 +59,15 @@ const Home = () => {
   });
 
   const rowCount = data?.total || 0;
+
+  useEffect(() => {
+    if (userData && !userData.isProfileCompleted) {
+      setModal("COMPLETE_PROFILE", {
+        isOpen: true,
+        data: userData,
+      });
+    }
+  }, [setModal, userData]);
 
   useEffect(() => {
     resetHeader();

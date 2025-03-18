@@ -42,12 +42,11 @@ interface Question {
 }
 
 type Props = {
-  chapterIds: number[];
-  questionCount: number;
+  categories: Record<string, number>;
 };
 
 const mutationFn = (body: Props): Promise<AxiosResponse<Root>> => {
-  return http.post("/questionbank/auto", body);
+  return http.post("/questionbank/auto/v2", body);
 };
 
 export const useGenerateQuestions = () => {
