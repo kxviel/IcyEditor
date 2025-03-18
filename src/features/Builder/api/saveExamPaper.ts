@@ -43,6 +43,9 @@ export const useSaveExamPaper = () => {
   const resetHeader = useHeaderStore((state) => state.reset);
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
+  const invalidateRelatedQueries = useQuestionBuilderStore(
+    (state) => state.invalidateRelatedQueries,
+  );
 
   return useMutation({
     mutationFn,
@@ -51,6 +54,8 @@ export const useSaveExamPaper = () => {
       resetHeader();
       resetBuilder();
       resetPageSettings();
+      invalidateRelatedQueries();
+      localStorage.removeItem("optimized");
 
       navigate({ to: "/", search: { page: 1 } });
     },

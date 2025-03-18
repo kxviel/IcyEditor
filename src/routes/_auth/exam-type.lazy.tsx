@@ -3,6 +3,10 @@ import { Contact } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "@tanstack/react-router";
 import Stepper from "@/components/ui/stepper";
+import { useHeaderStore } from "@/store/useHeaderStore";
+import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
+import { usePageSettingsStore } from "@/store/usePageSettingsStore";
+import { useEffect } from "react";
 
 export const Route = createLazyFileRoute("/_auth/exam-type")({
   component: () => (
@@ -16,6 +20,20 @@ export const Route = createLazyFileRoute("/_auth/exam-type")({
 
 function ExamType() {
   const navigate = useNavigate();
+  const resetHeader = useHeaderStore((state) => state.reset);
+  const resetBuilder = useQuestionBuilderStore((state) => state.reset);
+  const resetPageSettings = usePageSettingsStore((state) => state.reset);
+  const invalidateRelatedQueries = useQuestionBuilderStore(
+    (state) => state.invalidateRelatedQueries,
+  );
+
+  useEffect(() => {
+    resetHeader();
+    resetBuilder();
+    resetPageSettings();
+    invalidateRelatedQueries();
+    localStorage.removeItem("optimized");
+  }, [invalidateRelatedQueries, resetBuilder, resetHeader, resetPageSettings]);
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-6">

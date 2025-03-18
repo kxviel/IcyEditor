@@ -30,7 +30,6 @@ import {
 import { useState } from "react";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
-import { queryClient } from "@/main";
 
 const FIELD_DEPENDENCIES: Record<
   string,
@@ -89,6 +88,9 @@ export const ControlledSelect = ({
   const resetHeader = useHeaderStore((state) => state.reset);
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
+  const invalidateRelatedQueries = useQuestionBuilderStore(
+    (state) => state.invalidateRelatedQueries,
+  );
   const setChapterNames = useQuestionBuilderStore(
     (state) => state.setChapterNames,
   );
@@ -105,15 +107,6 @@ export const ControlledSelect = ({
     }
   };
 
-  const invalidateQueries = () => {
-    queryClient.invalidateQueries({ queryKey: ["GetPublication"] });
-    queryClient.invalidateQueries({ queryKey: ["GetSeries"] });
-    queryClient.invalidateQueries({ queryKey: ["GetClass"] });
-    queryClient.invalidateQueries({ queryKey: ["GetSubject"] });
-    queryClient.invalidateQueries({ queryKey: ["GetBook"] });
-    queryClient.invalidateQueries({ queryKey: ["GetChapter"] });
-  };
-
   const applyValueChange = (value: string) => {
     FIELD_DEPENDENCIES[label].forEach(({ idKey, resetValue }) => {
       form.resetField(idKey);
@@ -122,7 +115,8 @@ export const ControlledSelect = ({
       resetHeader();
       resetBuilder();
       resetPageSettings();
-      invalidateQueries();
+      invalidateRelatedQueries();
+      localStorage.removeItem("optimized");
 
       if (idKey === "chapterIds") {
         setChapterNames([]);
@@ -178,7 +172,7 @@ export const ControlledSelect = ({
           </FormItem>
         )}
       />
-      {!isModal && (
+      {!isModal && isConfirmOpen && (
         <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>

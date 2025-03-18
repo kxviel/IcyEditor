@@ -1,4 +1,5 @@
 import { addIndexesToFields } from "@/lib/utils";
+import { queryClient } from "@/main";
 import { create } from "zustand";
 
 export type Fieldtype = Map<string, CategoryItem>;
@@ -47,6 +48,7 @@ interface HeaderStore {
     },
   ) => void;
   sanitizeFields: () => void;
+  invalidateRelatedQueries: () => void;
   reset: () => void;
 }
 
@@ -141,5 +143,13 @@ export const useQuestionBuilderStore = create<HeaderStore>()((set) => ({
       bookId: "",
       chapterIds: [],
     });
+  },
+  invalidateRelatedQueries: () => {
+    queryClient.invalidateQueries({ queryKey: ["GetPublication"] });
+    queryClient.invalidateQueries({ queryKey: ["GetSeries"] });
+    queryClient.invalidateQueries({ queryKey: ["GetClass"] });
+    queryClient.invalidateQueries({ queryKey: ["GetSubject"] });
+    queryClient.invalidateQueries({ queryKey: ["GetBook"] });
+    queryClient.invalidateQueries({ queryKey: ["GetChapter"] });
   },
 }));

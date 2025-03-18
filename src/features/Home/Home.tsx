@@ -37,6 +37,9 @@ const Home = () => {
   const resetHeader = useHeaderStore((state) => state.reset);
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
+  const invalidateRelatedQueries = useQuestionBuilderStore(
+    (state) => state.invalidateRelatedQueries,
+  );
 
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [searchTerm, setSearchTerm] = useState("");
@@ -62,8 +65,9 @@ const Home = () => {
     resetHeader();
     resetBuilder();
     resetPageSettings();
+    invalidateRelatedQueries();
     localStorage.removeItem("optimized");
-  }, [resetBuilder, resetHeader, resetPageSettings]);
+  }, [invalidateRelatedQueries, resetBuilder, resetHeader, resetPageSettings]);
 
   const handleSort = () => {
     setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
