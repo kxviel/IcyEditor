@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { useModalStore } from "@/store/useModalStore";
+import { CategoryWrapper } from "@/components/DisplayComp";
 
 const layoutDict: Record<string, React.ReactNode> = {
   "1": <PaperHeaderOne isPreview={false} />,
@@ -102,28 +103,19 @@ const PaperView = () => {
           <div className="flex w-full flex-col gap-3 p-3">
             {Array.from(fields.values()).map((field, fieldIndex) => (
               <div className="w-full" key={field.categoryId}>
-                <div className="my-3 flex gap-2">
-                  <p className="whitespace-nowrap font-semibold leading-6 text-gray-800">
-                    Q{fieldIndex + 1}.
-                  </p>
-                  <p className="font-semibold text-gray-800">
-                    {field.categoryName}
-                  </p>
-
-                  <p
-                    className="ml-auto whitespace-nowrap rounded-md text-sm leading-6 hover:cursor-pointer hover:bg-gray-100"
-                    onClick={() => {
-                      setModal("EDIT_CATEGORY_MARKS", {
-                        isOpen: true,
-                        categoryId: field.categoryId,
-                        currentMarks: field.categoryMarks,
-                      });
-                    }}
-                  >
-                    ({field.questions.length} x {field.categoryMarks}) ={" "}
-                    {field.questions.length * Number(field.categoryMarks) || 1}
-                  </p>
-                </div>
+                <CategoryWrapper
+                  categoryIndex={fieldIndex}
+                  categoryName={field.categoryName}
+                  questionLength={field.questions.length}
+                  categoryMarks={field.categoryMarks}
+                  editCategoryMarks={() => {
+                    setModal("EDIT_CATEGORY_MARKS", {
+                      isOpen: true,
+                      categoryId: field.categoryId,
+                      currentMarks: field.categoryMarks,
+                    });
+                  }}
+                />
 
                 {field.questions.map((question, index) => (
                   <div

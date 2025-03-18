@@ -18,6 +18,7 @@ import {
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { Button } from "@/components/ui/button";
 import { WandSparkles } from "lucide-react";
+import { CategoryWrapper } from "@/components/DisplayComp";
 
 const pageDimensions: Record<string, string> = {
   A3: "h-[420mm] w-[297mm]",
@@ -290,79 +291,46 @@ const RenderedPage = ({
 
       <div className="flex w-full flex-col gap-3" ref={contentRef}>
         {pageValue.map((field) => {
-          if (pageValue.find((item) => item.categoryId === field.categoryId))
-            return (
-              <div className="w-full" key={field.categoryId}>
-                <div className="my-3 flex gap-2">
-                  <p
-                    className="whitespace-nowrap font-semibold leading-6 text-gray-800"
-                    style={{ fontSize: 16 + Number(currentFontSize) }}
-                  >
-                    Q{field.categoryIndex! + 1}.
-                  </p>
+          return (
+            <div className="w-full" key={field.categoryId}>
+              <CategoryWrapper
+                categoryIndex={field.categoryIndex!}
+                categoryName={field.categoryName}
+                questionLength={field.questions.length}
+                categoryMarks={field.categoryMarks}
+              />
+
+              {field.questions.map((question) => (
+                <div key={question.questionId} className="my-3 flex gap-2">
                   <p
                     className="font-semibold text-gray-800"
-                    style={{ fontSize: 16 + Number(currentFontSize) }}
-                  >
-                    {field.categoryName}
-                  </p>
-
-                  <p
-                    className="ml-auto whitespace-nowrap text-sm leading-6"
                     style={{ fontSize: 14 + Number(currentFontSize) }}
                   >
-                    ({field.questions.length} x {field.categoryMarks}) ={" "}
-                    {field.questions.length * Number(field.categoryMarks) || 1}
+                    {question.questionIndex! + 1}.
                   </p>
+                  <p
+                    className="whitespace-pre text-gray-700"
+                    style={{ fontSize: 14 + Number(currentFontSize) }}
+                    dangerouslySetInnerHTML={{
+                      __html: question.questionText,
+                    }}
+                  />
                 </div>
-
-                {field.questions.map((question) => (
-                  <div key={question.questionId} className="my-3 flex gap-2">
-                    <p
-                      className="font-semibold text-gray-800"
-                      style={{ fontSize: 14 + Number(currentFontSize) }}
-                    >
-                      {question.questionIndex! + 1}.
-                    </p>
-                    <p
-                      className="whitespace-pre text-gray-700"
-                      style={{ fontSize: 14 + Number(currentFontSize) }}
-                      dangerouslySetInnerHTML={{
-                        __html: question.questionText,
-                      }}
-                    />
-                  </div>
-                ))}
-              </div>
-            );
+              ))}
+            </div>
+          );
         })}
       </div>
 
       <div className="invisible flex w-full flex-col gap-3" ref={childRef}>
         {Array.from(fields.values()).map((field) => (
           <div className="w-full" key={field.categoryId}>
-            <div className="my-3 flex gap-2">
-              <p
-                className="whitespace-nowrap font-semibold leading-6 text-gray-800"
-                style={{ fontSize: 16 + Number(currentFontSize) }}
-              >
-                Q{field.categoryIndex! + 1}.
-              </p>
-              <p
-                className="font-semibold text-gray-800"
-                style={{ fontSize: 16 + Number(currentFontSize) }}
-              >
-                {field.categoryName}
-              </p>
-
-              <p
-                className="ml-auto whitespace-nowrap text-sm leading-6"
-                style={{ fontSize: 14 + Number(currentFontSize) }}
-              >
-                ({field.questions.length} x {field.categoryMarks}) ={" "}
-                {field.questions.length * Number(field.categoryMarks) || 1}
-              </p>
-            </div>
+            <CategoryWrapper
+              categoryIndex={field.categoryIndex!}
+              categoryName={field.categoryName}
+              questionLength={field.questions.length}
+              categoryMarks={field.categoryMarks}
+            />
 
             {field.questions.map((question) => (
               <div key={question.questionId} className="my-3 flex gap-2">

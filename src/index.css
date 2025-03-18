@@ -94,7 +94,7 @@
   @page {
     size: auto;
     margin: 0;
-    padding: 24px;
+    padding: 8px 24px;
   }
   body {
     visibility: hidden;
