@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { toast } from "sonner";
 import http from "@/config/https";
 import { useNavigate } from "@tanstack/react-router";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, User } from "@/hooks/useAuth";
 import { useModalStore } from "@/store/useModalStore";
 import { useState } from "react";
 
@@ -12,27 +12,7 @@ interface ExistingUser {
   message: string;
   statusCode: number;
   success: boolean;
-  data: ExistingUserData | boolean;
-}
-
-interface ExistingUserData {
-  id: number;
-  STATUS: any;
-  DEALER_ID: any;
-  EMAIL: string;
-  PASSWORD: string;
-  MOBILE: string;
-  SCHOOL_ID: string;
-  UNAME: string;
-  school: string;
-  city: string;
-  state: string;
-  PUBLICATION_ID: any;
-  SERIES_ID: any;
-  IS_SUPER_ADMIN: number;
-  RESTRICTED_ACCESS: number;
-  token: string;
-  status: string;
+  data: User | boolean;
 }
 
 export type GoogleRes = {
@@ -81,7 +61,7 @@ export const useLoginWithGoogle = () => {
 
           if (isExistingUser.data.data) {
             setIsPending(false);
-            saveUser(isExistingUser.data.data as ExistingUserData);
+            saveUser(isExistingUser.data.data as User);
             navigate({ to: "/", search: { page: 1 } });
           } else {
             const registerResponse = await registerFn({
@@ -91,6 +71,7 @@ export const useLoginWithGoogle = () => {
 
             if (registerResponse.data.data) {
               setIsPending(false);
+              navigate({ to: "/", search: { page: 1 } });
               setModal("COMPLETE_PROFILE", {
                 isOpen: true,
                 data: registerResponse.data.data,

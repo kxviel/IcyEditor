@@ -16,6 +16,7 @@ export type User = {
   RESTRICTED_ACCESS: number;
   token: string;
   status: string;
+  isProfileCompleted: boolean;
 };
 
 export const useAuth = () => {

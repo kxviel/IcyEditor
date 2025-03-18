@@ -59,7 +59,7 @@ const registerSchema = z
       .trim()
       .min(1, { message: "Phone is required" })
       .regex(/^\d{10}$/, { message: "Phone must be a valid 10-digit number" }),
-    // city: z.string().trim().min(1, { message: "City is required" }),
+    city: z.string().trim().min(1, { message: "City is required" }),
     state: z.string().trim().min(1, { message: "State is required" }),
     school: z.string().trim().min(1, { message: "School is required" }),
     publicationId: z.string().min(1, { message: "Publication is required" }),
@@ -289,7 +289,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                     </FormItem>
                   )}
                 />
-                {/* <FormField
+                <FormField
                   control={form.control}
                   name="city"
                   defaultValue=""
@@ -320,8 +320,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
-
+                />
                 <FormField
                   control={form.control}
                   name="confirmPassword"
