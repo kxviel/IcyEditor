@@ -43,7 +43,7 @@ const RenderedPage = () => {
   }, [navigate]);
 
   return (
-    <>
+    <div className="h-full w-full">
       {optimized ? (
         <div id="section-to-print" className={`w-full`}>
           {[1, 2].map((isThisAButterfly) => (
@@ -99,6 +99,6 @@ const RenderedPage = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };

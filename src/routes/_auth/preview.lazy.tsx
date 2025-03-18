@@ -116,12 +116,14 @@ function Preview() {
     const headerGap = 4; //mb-1
 
     if (pageRef.current) {
-      let totalPageHeight =
-        pageRef.current.getBoundingClientRect().height - headerGap;
+      let totalPageHeight = pageRef.current.getBoundingClientRect().height;
 
       // Calculate header height if exists
       if (currentPageIndex === 0 && headerRef.current) {
-        totalPageHeight -= headerRef.current.getBoundingClientRect().height;
+        totalPageHeight =
+          totalPageHeight -
+          headerRef.current.getBoundingClientRect().height -
+          headerGap;
       }
 
       if (childRef.current) {
