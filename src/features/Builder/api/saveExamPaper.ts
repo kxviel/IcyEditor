@@ -25,8 +25,8 @@ type Props = {
     SERIES: string;
     BOOK: string;
     CHAPTER_IDS: string[];
-    CLASS: string;
-    SUBJECT: string;
+    examClassId: string;
+    subjectId: string;
   };
 };
 

@@ -89,11 +89,11 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
       password: data.PASSWORD || "",
       confirmPassword: data.PASSWORD || "",
       phone: data.MOBILE || "",
-      city: data.city || "",
-      state: data.state || "",
+      city: data.city?.toString() || "",
+      state: data.state?.toString() || "",
       schoolName: data.school || "",
-      publicationId: data.PUBLICATION_ID || "",
-      seriesId: data.SERIES_ID || "",
+      publicationId: data.PUBLICATION_ID?.toString() || "",
+      seriesId: data.SERIES_ID?.toString() || "",
     },
   });
 
@@ -112,6 +112,20 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
       data: modifiedData as UpdateUserProps,
     });
   };
+
+  console.log({
+    name: data.UNAME || "",
+    email: data.EMAIL || "",
+    password: data.PASSWORD || "",
+    confirmPassword: data.PASSWORD || "",
+    phone: data.MOBILE || "",
+    city: data.city || "",
+    state: data.state || "",
+    schoolName: data.school || "",
+    publicationId: data.PUBLICATION_ID || "",
+    seriesId: data.SERIES_ID || "",
+  });
+
   return (
     <Dialog open={isOpen} onOpenChange={hideModal}>
       <DialogContent

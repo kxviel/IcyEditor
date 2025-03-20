@@ -102,8 +102,47 @@ const QuestionBuilder = ({ examId }: Props) => {
       if (parsedObject.headerData) {
         presetHeaderData(parsedObject.headerData);
       }
+      if (parsedObject.ids) {
+        console.log(parsedObject.ids);
+
+        setIds("publicationId", parsedObject.ids.publicationId);
+        form.setValue("publicationId", parsedObject.ids.publicationId);
+
+        setIds("seriesId", parsedObject.ids.seriesId);
+        form.setValue("seriesId", parsedObject.ids.seriesId);
+
+        setIds("classId", parsedObject.ids.classId);
+        form.setValue("classId", parsedObject.ids.classId);
+
+        setIds("subjectId", parsedObject.ids.subjectId);
+        form.setValue("subjectId", parsedObject.ids.subjectId);
+
+        setIds("bookId", parsedObject.ids.bookId);
+        form.setValue("bookId", parsedObject.ids.bookId);
+
+        setIds("chapterIds", parsedObject.ids.chapterIds);
+        form.setValue("chapterIds", parsedObject.ids.chapterIds);
+
+        const chapterNameArray: string[] = [];
+        chapters.data?.forEach((chapter) => {
+          if (parsedObject.ids.chapterIds.includes(chapter.id.toString())) {
+            chapterNameArray.push(chapter.NAME);
+          }
+        });
+
+        setChapterNames(chapterNameArray);
+      }
     }
-  }, [examData, examId, presetFields, presetHeaderData]);
+  }, [
+    chapters.data,
+    examData,
+    examId,
+    form,
+    presetFields,
+    presetHeaderData,
+    setChapterNames,
+    setIds,
+  ]);
 
   const handleChapters = (chapterId: string, chapterName: string) => {
     const currentIds = [...(selectedChapterIds || [])];

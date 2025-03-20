@@ -17,8 +17,10 @@ export interface ExamData {
   selectedQuestions: number;
   categories: Category[];
   originalData: OriginalData;
+  examClassId: number;
+  subjectId: number;
   id: number;
-  STATUS: any;
+  STATUS: boolean;
   CLASS_NAME: string;
   DURATION_MINS: number;
   EXAM_NAME: string;
@@ -31,9 +33,13 @@ export interface ExamData {
   LAYOUT: string;
   PAGE_COUNT: any;
   TYPE: any;
-  FONT: any;
+  FONT: string;
   MARKS: number;
   MARKS_DISTRIBUTION: string;
+  PUBLICATIONS: string;
+  SERIES: string;
+  BOOK: number;
+  CHAPTER_IDS: string[];
 }
 
 export interface Category {

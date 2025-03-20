@@ -46,8 +46,8 @@ const SavePaper = () => {
         body: {
           PUBLICATIONS: publicationId,
           SERIES: seriesId,
-          CLASS: classId,
-          SUBJECT: subjectId,
+          examClassId: classId,
+          subjectId: subjectId,
           BOOK: bookId,
           CHAPTER_IDS: chapterIds,
           SCHOOL_NAME: headerData.schoolName.value,

@@ -12,6 +12,14 @@ export function cn(...inputs: ClassValue[]) {
 type ReturnProps = {
   fields: Fieldtype;
   headerData: HeaderData;
+  ids: {
+    publicationId: string;
+    seriesId: string;
+    classId: string;
+    subjectId: string;
+    bookId: string;
+    chapterIds: string[];
+  };
 };
 export function parseExamDataResponse(response: ExamData): ReturnProps {
   const fields: Fieldtype = new Map();
@@ -48,6 +56,15 @@ export function parseExamDataResponse(response: ExamData): ReturnProps {
     },
   };
 
+  const ids = {
+    publicationId: response.PUBLICATIONS.toString(),
+    seriesId: response.SERIES.toString(),
+    classId: response.examClassId.toString(),
+    subjectId: response.subjectId.toString(),
+    bookId: response.BOOK.toString(),
+    chapterIds: response.CHAPTER_IDS,
+  };
+
   response.categories.forEach((category, categoryIndex) => {
     fields.set(category.categoryId, {
       categoryId: category.categoryId,
@@ -62,12 +79,12 @@ export function parseExamDataResponse(response: ExamData): ReturnProps {
     });
   });
 
-  return { fields, headerData };
+  return { fields, headerData, ids };
 }
 
-export function parseAutoGenResponse(
-  response: AutoGenData,
-): Omit<ReturnProps, "headerData"> {
+export function parseAutoGenResponse(response: AutoGenData): {
+  fields: Fieldtype;
+} {
   const fields: Fieldtype = new Map();
 
   response.categories.forEach((category, categoryIndex) => {

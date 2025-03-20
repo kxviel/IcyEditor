@@ -21,6 +21,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Stepper from "@/components/ui/stepper";
 import AvatarPlaceholder from "@/assets/avatarImg.svg";
 import { useState } from "react";
+import { useModalStore } from "@/store/useModalStore";
 
 const allowedStepperRoutes = [
   "/builder/manual-selection",
@@ -33,7 +34,7 @@ const Navbar = () => {
   const userData = getUser();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-
+  const setModal = useModalStore((state) => state.setModal);
   const [showAlert, setShowAlert] = useState(false);
 
   return (
@@ -62,7 +63,16 @@ const Navbar = () => {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             {!userData?.isProfileCompleted && (
-              <DropdownMenuItem>Complete Profile</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  setModal("COMPLETE_PROFILE", {
+                    isOpen: true,
+                    data: userData,
+                  })
+                }
+              >
+                Complete Profile
+              </DropdownMenuItem>
             )}
             {userData?.IS_SUPER_ADMIN > 0 && (
               <DropdownMenuItem>View Users</DropdownMenuItem>
