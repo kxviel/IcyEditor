@@ -55,7 +55,7 @@ const registerSchema = z
       }),
     city: z.string().trim().min(1, { message: "City is required" }),
     state: z.string().trim().min(1, { message: "State is required" }),
-    school: z.string().trim().min(1, { message: "School is required" }),
+    schoolName: z.string().trim().min(1, { message: "School is required" }),
     publicationId: z.string().min(1, { message: "Publication is required" }),
     seriesId: z.string().min(1, { message: "Series is required" }),
   })
@@ -78,7 +78,10 @@ const Register = () => {
   const series = useGetSeries(form.watch("publicationId"));
 
   const onSubmit = (data: RegisterSchemaTypes) => {
-    registerFn.mutate({ ...data });
+    const modifiedData: any = { ...data };
+    delete modifiedData.confirmPassword;
+
+    registerFn.mutate({ ...modifiedData });
   };
 
   return (
@@ -226,7 +229,7 @@ const Register = () => {
               />
               <FormField
                 control={form.control}
-                name="school"
+                name="schoolName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>School Name</FormLabel>

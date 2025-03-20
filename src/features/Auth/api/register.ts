@@ -12,7 +12,7 @@ type Props = {
   phone?: string;
   city?: string;
   state?: string;
-  school?: string;
+  schoolName?: string;
   publicationId?: string;
   seriesId?: string;
 };

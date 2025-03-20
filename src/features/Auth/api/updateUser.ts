@@ -5,23 +5,25 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 type Props = {
-  body: {
-    userId: number;
-    data: {
-      name: string;
-      email: string;
-      password: string;
-      confirmPassword: string;
-      phone: string;
-      // city: string;
-      state: string;
-      school: string;
-    };
-  };
+  userId: number;
+  data: UpdateUserProps;
 };
 
-const mutationFn = ({ body }: Props) => {
-  return http.put(`/auth/update-details/${body.userId}`, body);
+export type UpdateUserProps = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  state: string;
+  city: string;
+  schoolName: string;
+  publicationId: string;
+  seriesId: string;
+  restrictedAccess: boolean;
+};
+
+const mutationFn = ({ userId, data }: Props) => {
+  return http.put(`/auth/update-details/${userId}`, data);
 };
 
 export const useUpdateUser = () => {

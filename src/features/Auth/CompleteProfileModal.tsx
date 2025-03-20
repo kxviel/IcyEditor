@@ -29,7 +29,7 @@ import { useModalStore } from "@/store/useModalStore";
 import { useGetCities } from "./api/getCities";
 import { useGetPublication } from "../Builder/api/getPublication";
 import { useGetSeries } from "../Builder/api/getSeries";
-import { useUpdateUser } from "./api/updateUser";
+import { UpdateUserProps, useUpdateUser } from "./api/updateUser";
 import { useAuth, User } from "@/hooks/useAuth";
 
 const registerSchema = z
@@ -61,7 +61,7 @@ const registerSchema = z
       .regex(/^\d{10}$/, { message: "Phone must be a valid 10-digit number" }),
     city: z.string().trim().min(1, { message: "City is required" }),
     state: z.string().trim().min(1, { message: "State is required" }),
-    school: z.string().trim().min(1, { message: "School is required" }),
+    schoolName: z.string().trim().min(1, { message: "School is required" }),
     publicationId: z.string().min(1, { message: "Publication is required" }),
     seriesId: z.string().min(1, { message: "Series is required" }),
   })
@@ -91,7 +91,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
       phone: data.MOBILE || "",
       city: data.city || "",
       state: data.state || "",
-      school: data.school || "",
+      schoolName: data.school || "",
       publicationId: data.PUBLICATION_ID || "",
       seriesId: data.SERIES_ID || "",
     },
@@ -103,11 +103,13 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
   const series = useGetSeries(form.watch("publicationId"));
 
   const onSubmit = (data: RegisterSchemaTypes) => {
+    const modifiedData: any = { ...data };
+    delete modifiedData.confirmPassword;
+    modifiedData.restrictedAccess = !!getUser()?.RESTRICTED_ACCESS;
+
     updateUser.mutate({
-      body: {
-        userId: getUser()?.id,
-        data,
-      },
+      userId: getUser()?.id,
+      data: modifiedData as UpdateUserProps,
     });
   };
   return (
@@ -264,7 +266,7 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                 />
                 <FormField
                   control={form.control}
-                  name="school"
+                  name="schoolName"
                   disabled={updateUser.isPending}
                   render={({ field }) => (
                     <FormItem>
