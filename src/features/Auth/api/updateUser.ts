@@ -20,6 +20,7 @@ export type UpdateUserProps = {
   publicationId: string;
   seriesId: string;
   restrictedAccess: boolean;
+  isProfileCompleted: boolean;
 };
 
 const mutationFn = ({ userId, data }: Props) => {

@@ -61,7 +61,7 @@ const Navbar = () => {
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {getUser()?.isProfileCompleted && (
+            {!getUser()?.isProfileCompleted && (
               <DropdownMenuItem
                 onClick={() => {
                   setModal("COMPLETE_PROFILE", {
@@ -78,7 +78,7 @@ const Navbar = () => {
             )}
 
             <DropdownMenuItem
-              className="text-red-300"
+              className="text-red-600"
               onClick={() => setShowAlert(true)}
             >
               Logout
