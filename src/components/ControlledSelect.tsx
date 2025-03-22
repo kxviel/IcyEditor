@@ -153,6 +153,7 @@ export const ControlledSelect = ({
             <Select
               onValueChange={handleValueChange}
               defaultValue={field.value}
+              value={field.value}
               disabled={isDisabled}
             >
               <FormControl>

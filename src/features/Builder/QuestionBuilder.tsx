@@ -82,8 +82,6 @@ const QuestionBuilder = ({ examId }: Props) => {
     },
   });
 
-  console.log(form);
-
   const selectedChapterIds = form.watch("chapterIds") || [];
   const publication = useGetPublication();
   const series = useGetSeries(form.watch("publicationId"));
@@ -101,12 +99,12 @@ const QuestionBuilder = ({ examId }: Props) => {
       if (parsedObject.fields) {
         presetFields(parsedObject.fields);
       }
+
       if (parsedObject.headerData) {
         presetHeaderData(parsedObject.headerData);
       }
-      if (parsedObject.ids) {
-        console.log(parsedObject.ids);
 
+      if (parsedObject.ids) {
         setIds("publicationId", parsedObject.ids.publicationId);
         form.setValue("publicationId", parsedObject.ids.publicationId);
 

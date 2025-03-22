@@ -10,7 +10,6 @@ const http = axios.create({
 http.interceptors.request.use((req) => {
   const user = localStorage.getItem(env.LOCALSTORAGE_IDENTIFIER);
   const token = user ? JSON.parse(user).token : "";
-  console.log("TOKEN: ", token);
 
   req.headers.Authorization = token ? `Bearer ${token}` : "";
 
