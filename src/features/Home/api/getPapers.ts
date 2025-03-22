@@ -41,7 +41,7 @@ export const getPapersFn = (props: Props): Promise<AxiosResponse<Root>> => {
 
   const { page, userId, order, searchTerm, date } = props;
 
-  if (page) params.page = page;
+  params.page = page || 1;
   if (order) params.order = order;
   if (searchTerm) params.searchTerm = searchTerm;
   if (date && date.from && date.to) {

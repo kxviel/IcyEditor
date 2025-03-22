@@ -82,6 +82,8 @@ const QuestionBuilder = ({ examId }: Props) => {
     },
   });
 
+  console.log(form);
+
   const selectedChapterIds = form.watch("chapterIds") || [];
   const publication = useGetPublication();
   const series = useGetSeries(form.watch("publicationId"));
