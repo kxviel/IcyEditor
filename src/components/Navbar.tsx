@@ -31,7 +31,6 @@ const allowedStepperRoutes = [
 
 const Navbar = () => {
   const { logout, getUser } = useAuth();
-  const userData = getUser();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const setModal = useModalStore((state) => state.setModal);
@@ -62,19 +61,19 @@ const Navbar = () => {
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {!userData?.isProfileCompleted && (
+            {getUser()?.isProfileCompleted && (
               <DropdownMenuItem
-                onClick={() =>
+                onClick={() => {
                   setModal("COMPLETE_PROFILE", {
                     isOpen: true,
-                    data: userData,
-                  })
-                }
+                    data: getUser(),
+                  });
+                }}
               >
                 Complete Profile
               </DropdownMenuItem>
             )}
-            {userData?.IS_SUPER_ADMIN > 0 && (
+            {getUser()?.IS_SUPER_ADMIN > 0 && (
               <DropdownMenuItem>View Users</DropdownMenuItem>
             )}
 
