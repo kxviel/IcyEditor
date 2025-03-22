@@ -1,3 +1,5 @@
+import { env } from "@/config/env";
+
 export type User = {
   id: number;
   STATUS: any;
@@ -21,14 +23,16 @@ export type User = {
 
 export const useAuth = () => {
   const getUser = (): User => {
-    return JSON.parse(localStorage.getItem("user") || "{}");
+    return JSON.parse(
+      localStorage.getItem(env.LOCALSTORAGE_IDENTIFIER) || "{}",
+    );
   };
 
   const saveUser = (user: User) => {
     console.log(user);
 
     localStorage.setItem("isAuthenticated", "true");
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem(env.LOCALSTORAGE_IDENTIFIER, JSON.stringify(user));
   };
 
   const logout = () => {
