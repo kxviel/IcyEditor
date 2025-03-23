@@ -82,6 +82,9 @@ const QuestionBuilder = ({ examId }: Props) => {
     },
   });
 
+  // Just for the sake of the useEffect dependency
+  const { setValue } = form;
+
   const selectedChapterIds = form.watch("chapterIds") || [];
   const publication = useGetPublication();
   const series = useGetSeries(form.watch("publicationId"));
@@ -106,22 +109,22 @@ const QuestionBuilder = ({ examId }: Props) => {
 
       if (parsedObject.ids) {
         setIds("publicationId", parsedObject.ids.publicationId);
-        form.setValue("publicationId", parsedObject.ids.publicationId);
+        setValue("publicationId", parsedObject.ids.publicationId);
 
         setIds("seriesId", parsedObject.ids.seriesId);
-        form.setValue("seriesId", parsedObject.ids.seriesId);
+        setValue("seriesId", parsedObject.ids.seriesId);
 
         setIds("classId", parsedObject.ids.classId);
-        form.setValue("classId", parsedObject.ids.classId);
+        setValue("classId", parsedObject.ids.classId);
 
         setIds("subjectId", parsedObject.ids.subjectId);
-        form.setValue("subjectId", parsedObject.ids.subjectId);
+        setValue("subjectId", parsedObject.ids.subjectId);
 
         setIds("bookId", parsedObject.ids.bookId);
-        form.setValue("bookId", parsedObject.ids.bookId);
+        setValue("bookId", parsedObject.ids.bookId);
 
         setIds("chapterIds", parsedObject.ids.chapterIds);
-        form.setValue("chapterIds", parsedObject.ids.chapterIds);
+        setValue("chapterIds", parsedObject.ids.chapterIds);
 
         const chapterNameArray: string[] = [];
         chapters.data?.forEach((chapter) => {
@@ -137,7 +140,7 @@ const QuestionBuilder = ({ examId }: Props) => {
     chapters.data,
     examData,
     examId,
-    form,
+    setValue,
     presetFields,
     presetHeaderData,
     setChapterNames,

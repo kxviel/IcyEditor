@@ -43,13 +43,12 @@ type Props = {
 };
 
 const getUsersFn = (props: Props): Promise<AxiosResponse<Root>> => {
+  const { page, mobile, email, search } = props;
   const params: any = {
     pageSize: 10,
+    page,
   };
 
-  const { page, mobile, email, search } = props;
-
-  if (page) params.page = page;
   if (search) params.search = search;
   if (mobile) params.mobile = mobile;
   if (email) params.email = email;
