@@ -1,5 +1,5 @@
 import http from "@/config/https";
-import { useAuth, User } from "@/hooks/useAuth";
+import { useAuthStore, User } from "@/store/useAuthStore";
 import { useModalStore } from "@/store/useModalStore";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -24,7 +24,7 @@ const mutationFn = (body: Props) => {
 
 export const useLoginFn = () => {
   const navigate = useNavigate();
-  const { saveUser } = useAuth();
+  const saveUser = useAuthStore((state) => state.saveUser);
   const setModal = useModalStore((state) => state.setModal);
 
   return useMutation({

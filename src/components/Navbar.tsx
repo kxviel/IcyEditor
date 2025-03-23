@@ -17,11 +17,11 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import Logo from "@/assets/Logo.svg";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import SavePaper from "@/features/Builder/SavePaper";
-import { useAuth } from "@/hooks/useAuth";
 import Stepper from "@/components/ui/stepper";
 import AvatarPlaceholder from "@/assets/avatarImg.svg";
 import { useState } from "react";
 import { useModalStore } from "@/store/useModalStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const allowedStepperRoutes = [
   "/builder/manual-selection",
@@ -30,11 +30,16 @@ const allowedStepperRoutes = [
 ];
 
 const Navbar = () => {
-  const { logout, getUser } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+
+  const getUser = useAuthStore((state) => state.getUser);
+  const logout = useAuthStore((state) => state.logout);
   const setModal = useModalStore((state) => state.setModal);
+
   const [showAlert, setShowAlert] = useState(false);
+
+  const user = getUser();
 
   return (
     <header className="h-[72px] w-full border border-b border-gray-200">
@@ -61,7 +66,7 @@ const Navbar = () => {
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {!getUser()?.isProfileCompleted && (
+            {user && !user.isProfileCompleted && (
               <DropdownMenuItem
                 onClick={() => {
                   setModal("COMPLETE_PROFILE", {
@@ -73,7 +78,7 @@ const Navbar = () => {
                 Complete Profile
               </DropdownMenuItem>
             )}
-            {getUser()?.IS_SUPER_ADMIN > 0 && (
+            {user && user.IS_SUPER_ADMIN > 0 && (
               <DropdownMenuItem>View Users</DropdownMenuItem>
             )}
 

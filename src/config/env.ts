@@ -4,6 +4,8 @@ const createEnv = () => {
   const EnvSchema = z.object({
     API_URL: z.string(),
     LOCALSTORAGE_IDENTIFIER: z.string(),
+    AUTH_STATUS_IDENTIFIER: z.string(),
+    TOKEN_IDENTIFIER: z.string(),
     GOOGLE_CLIENT_ID: z.string(),
   });
 

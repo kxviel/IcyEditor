@@ -1,5 +1,5 @@
 import http from "@/config/https";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useModalStore } from "@/store/useModalStore";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -28,7 +28,7 @@ const mutationFn = ({ userId, data }: Props) => {
 };
 
 export const useUpdateUser = () => {
-  const { saveUser } = useAuth();
+  const saveUser = useAuthStore((state) => state.saveUser);
   const hideModal = useModalStore((state) => state.hideModal);
 
   return useMutation({

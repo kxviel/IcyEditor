@@ -1,4 +1,5 @@
 import http from "@/config/https";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosResponse } from "axios";
 import { DateRange } from "react-day-picker";
@@ -27,21 +28,20 @@ interface ExamDaum {
 
 type Props = {
   page: number;
-  userId: number;
+  userId?: number;
   order?: string;
   searchTerm?: string;
   date?: DateRange | undefined;
 };
 
 export const getPapersFn = (props: Props): Promise<AxiosResponse<Root>> => {
+  const { page, userId, order, searchTerm, date } = props;
   const params: any = {
+    page,
     pageSize: 10,
     sortBy: "EXAM_NAME",
   };
 
-  const { page, userId, order, searchTerm, date } = props;
-
-  params.page = page || 1;
   if (order) params.order = order;
   if (searchTerm) params.searchTerm = searchTerm;
   if (date && date.from && date.to) {
@@ -55,9 +55,12 @@ export const getPapersFn = (props: Props): Promise<AxiosResponse<Root>> => {
 };
 
 export const useGetPapers = (props: Props) => {
+  const getUser = useAuthStore((state) => state.getUser);
+  const user = getUser();
+
   return useQuery({
-    queryKey: ["GetPapers", props],
-    queryFn: () => getPapersFn(props),
+    queryKey: ["GetPapers", props, user?.id],
+    queryFn: () => getPapersFn({ ...props, userId: user?.id }),
     select: ({ data }) => data.data,
   });
 };

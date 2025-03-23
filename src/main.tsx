@@ -4,7 +4,6 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useAuth } from "./hooks/useAuth";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { env } from "./config/env";
 
@@ -12,9 +11,7 @@ import { env } from "./config/env";
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
-  context: {
-    auth: undefined!, // This will be set after we wrap the app in an AuthProvider
-  },
+  scrollRestoration: true,
 });
 
 // Create a new QueryClient
@@ -27,12 +24,6 @@ declare module "@tanstack/react-router" {
   }
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-function App() {
-  const auth = useAuth();
-  return <RouterProvider router={router} context={{ auth }} />;
-}
-
 const rootElement = document.getElementById("app")!;
 
 if (!rootElement.innerHTML) {
@@ -40,7 +31,7 @@ if (!rootElement.innerHTML) {
   root.render(
     <GoogleOAuthProvider clientId={env.GOOGLE_CLIENT_ID}>
       <QueryClientProvider client={queryClient}>
-        <App />
+        <RouterProvider router={router} />
       </QueryClientProvider>
     </GoogleOAuthProvider>,
   );

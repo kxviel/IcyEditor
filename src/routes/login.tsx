@@ -8,13 +8,15 @@ import Logo from "@/assets/Logo.svg";
 import Grid_Bg from "@/assets/Grid_Bg.svg";
 import { Button } from "@/components/ui/button";
 import GoogleIcon from "@/assets/Icons/GoogleIcon";
+import { env } from "@/config/env";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
-  beforeLoad: ({ context }) => {
-    const { isLogged } = context.auth;
+  beforeLoad: () => {
+    const isLogged =
+      localStorage.getItem(env.AUTH_STATUS_IDENTIFIER) === "true";
 
-    if (isLogged()) {
+    if (isLogged) {
       throw redirect({
         to: "/",
         search: { page: 1 },

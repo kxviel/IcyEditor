@@ -45,8 +45,8 @@ type Props = {
 const getUsersFn = (props: Props): Promise<AxiosResponse<Root>> => {
   const { page, mobile, email, search } = props;
   const params: any = {
-    pageSize: 10,
     page,
+    pageSize: 10,
   };
 
   if (search) params.search = search;

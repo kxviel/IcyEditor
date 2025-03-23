@@ -3,7 +3,6 @@ import { Printer, Save } from "lucide-react";
 import { useSaveExamPaper } from "./api/saveExamPaper";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
-import { useAuth } from "@/hooks/useAuth";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { IPatch, patchDocument, PatchType } from "docx";
 import { generateDocFromFields } from "@/lib/docxParser";
@@ -20,9 +19,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const SavePaper = () => {
-  const { getUser } = useAuth();
+  const getUser = useAuthStore((state) => state.getUser);
   const saveManualPaper = useSaveExamPaper();
 
   const {
@@ -39,9 +39,9 @@ const SavePaper = () => {
   const headerData = useHeaderStore((state) => state.headerData);
 
   const handleSaveManualPaper = () => {
-    const userId = getUser()?.id;
+    const user = getUser();
 
-    if (userId) {
+    if (user) {
       saveManualPaper.mutate({
         body: {
           PUBLICATIONS: publicationId,
@@ -56,7 +56,7 @@ const SavePaper = () => {
           EXAM_NAME: headerData.examName.value,
           SUBJECT_NAME: headerData.subjectName.value,
           MARKS: headerData.totalMarks.value,
-          USER_ID: userId,
+          USER_ID: user.id,
           LAYOUT: headerLayout,
           FONT: (16 + Number(fontSize)).toString(),
           DATA_STRING: {

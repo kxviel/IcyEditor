@@ -30,7 +30,7 @@ import { useGetCities } from "./api/getCities";
 import { useGetPublication } from "../Builder/api/getPublication";
 import { useGetSeries } from "../Builder/api/getSeries";
 import { UpdateUserProps, useUpdateUser } from "./api/updateUser";
-import { useAuth, User } from "@/hooks/useAuth";
+import { useAuthStore, User } from "@/store/useAuthStore";
 
 const registerSchema = z
   .object({
@@ -78,9 +78,10 @@ type Props = {
 };
 
 const CompleteProfileModal = ({ isOpen, data }: Props) => {
-  const hideModal = useModalStore((state) => state.hideModal);
   const updateUser = useUpdateUser();
-  const { getUser } = useAuth();
+  const getUser = useAuthStore((state) => state.getUser);
+  const hideModal = useModalStore((state) => state.hideModal);
+
   const form = useForm<RegisterSchemaTypes>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -103,14 +104,16 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
   const series = useGetSeries(form.watch("publicationId"));
 
   const onSubmit = (data: RegisterSchemaTypes) => {
+    const user = getUser();
     const modifiedData: any = { ...data };
     delete modifiedData.confirmPassword;
-    modifiedData.restrictedAccess = !!getUser()?.RESTRICTED_ACCESS;
 
-    updateUser.mutate({
-      userId: getUser()?.id,
-      data: modifiedData as UpdateUserProps,
-    });
+    if (user) {
+      updateUser.mutate({
+        userId: user.id,
+        data: modifiedData as UpdateUserProps,
+      });
+    }
   };
 
   console.log({

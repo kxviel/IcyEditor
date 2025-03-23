@@ -1,6 +1,6 @@
 import axios from "axios";
-import { env } from "./env";
 import { toast } from "sonner";
+import { env } from "./env";
 
 const http = axios.create({
   baseURL: env.API_URL,
@@ -8,8 +8,7 @@ const http = axios.create({
 
 // Request Interceptor
 http.interceptors.request.use((req) => {
-  const user = localStorage.getItem(env.LOCALSTORAGE_IDENTIFIER);
-  const token = user ? JSON.parse(user).token : "";
+  const token = localStorage.getItem(env.TOKEN_IDENTIFIER) || "";
 
   req.headers.Authorization = token ? `Bearer ${token}` : "";
 

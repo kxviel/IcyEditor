@@ -1,6 +1,6 @@
 import http from "@/config/https";
-import { useAuth } from "@/hooks/useAuth";
 import { queryClient } from "@/main";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -13,7 +13,7 @@ const mutationFn = (body: Props) => {
 };
 
 export const useEditRestriction = () => {
-  const { saveUser } = useAuth();
+  const saveUser = useAuthStore((state) => state.saveUser);
 
   return useMutation({
     mutationFn,

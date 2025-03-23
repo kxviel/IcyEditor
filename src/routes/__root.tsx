@@ -1,14 +1,8 @@
-import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
+import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
-
-import { AuthContext } from "@/hooks/useAuth";
 import RootModal from "@/components/RootModal";
 
-interface MyRouterContext {
-  auth: AuthContext;
-}
-
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+export const Route = createRootRoute({
   component: RootComponent,
 });
 

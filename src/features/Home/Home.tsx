@@ -12,7 +12,6 @@ import { IconInput } from "@/components/ui/IconInput";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useGetPapers } from "./api/getPapers";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import useDebounce from "@/hooks/useDebounce";
 import SortAscIcon from "@/assets/Icons/SortAscIcon";
 import SortDescIcon from "@/assets/Icons/SortDescIcon";
@@ -31,9 +30,7 @@ const Home = () => {
     from: "/_auth",
   }) as { page: number };
 
-  const { getUser } = useAuth();
   const deleteFn = useDeletePaper();
-  const userData = getUser();
   const resetHeader = useHeaderStore((state) => state.reset);
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
@@ -43,10 +40,9 @@ const Home = () => {
 
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [searchTerm, setSearchTerm] = useState("");
-
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-    to: new Date(), // today
+    to: new Date(),
   });
 
   const debouncedSearch = useDebounce(searchTerm, 300);
@@ -54,7 +50,6 @@ const Home = () => {
   const { data, isPending } = useGetPapers({
     page,
     order,
-    userId: userData?.id,
     searchTerm: debouncedSearch,
     date,
   });

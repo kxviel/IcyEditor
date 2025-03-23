@@ -31,7 +31,7 @@ export const useAuth = () => {
   const saveUser = (user: User) => {
     console.log(user);
 
-    localStorage.setItem("isAuthenticated", "true");
+    localStorage.setItem(env.AUTH_STATUS_IDENTIFIER, "true");
     localStorage.setItem(env.LOCALSTORAGE_IDENTIFIER, JSON.stringify(user));
   };
 
@@ -40,7 +40,8 @@ export const useAuth = () => {
     window.location.href = "/login";
   };
 
-  const isLogged = () => localStorage.getItem("isAuthenticated") === "true";
+  const isLogged = () =>
+    localStorage.getItem(env.AUTH_STATUS_IDENTIFIER) === "true";
 
   return { saveUser, logout, isLogged, getUser };
 };

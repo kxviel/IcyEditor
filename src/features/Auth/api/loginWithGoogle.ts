@@ -3,9 +3,9 @@ import axios, { AxiosResponse } from "axios";
 import { toast } from "sonner";
 import http from "@/config/https";
 import { useNavigate } from "@tanstack/react-router";
-import { useAuth, User } from "@/hooks/useAuth";
 import { useModalStore } from "@/store/useModalStore";
 import { useState } from "react";
+import { useAuthStore, User } from "@/store/useAuthStore";
 
 interface ExistingUser {
   code: string;
@@ -42,7 +42,7 @@ const isExistingUserFn = (
 
 export const useLoginWithGoogle = () => {
   const navigate = useNavigate();
-  const { saveUser } = useAuth();
+  const saveUser = useAuthStore((state) => state.saveUser);
   const setModal = useModalStore((state) => state.setModal);
 
   const [isPending, setIsPending] = useState(false);

@@ -28,8 +28,7 @@ import QuestionSelect from "./QuestionSelect";
 import ChapterList from "./ChapterList";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { useAuth, User } from "@/hooks/useAuth";
-import { env } from "@/config/env";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -64,7 +63,7 @@ const QuestionBuilder = ({ examId }: Props) => {
     sanitizeFields,
     setChapterNames,
   } = useQuestionBuilderStore();
-  const { getUser } = useAuth();
+  const getUser = useAuthStore((state) => state.getUser);
   const navigate = useNavigate();
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
   const { needPreselection } = useSearch({
@@ -85,9 +84,6 @@ const QuestionBuilder = ({ examId }: Props) => {
     },
   });
 
-  // Just for the sake of the useEffect dependency
-  const { setValue } = form;
-
   const selectedChapterIds = form.watch("chapterIds") || [];
   const publication = useGetPublication();
   const series = useGetSeries(form.watch("publicationId"));
@@ -96,21 +92,21 @@ const QuestionBuilder = ({ examId }: Props) => {
   const books = useGetBook(form.watch("subjectId"));
   const chapters = useGetChapter(form.watch("bookId"));
 
+  const user = getUser();
   const { data: examData } = useGetExamById(examId);
+  const { setValue } = form; // Just for the sake of the useEffect dependency
 
   useEffect(() => {
-    const user = JSON.parse(
-      localStorage.getItem(env.LOCALSTORAGE_IDENTIFIER) || "{}",
-    ) as User;
-    const isUserRestricted = user?.RESTRICTED_ACCESS > 0;
+    const user = getUser();
+    const isUserRestricted = user && user.RESTRICTED_ACCESS === 0;
 
     // For restricted users, always set publication and series IDs
     if (isUserRestricted) {
-      setIds("publicationId", user?.PUBLICATION_ID?.toString());
-      setValue("publicationId", user?.PUBLICATION_ID?.toString());
+      setIds("publicationId", user.PUBLICATION_ID?.toString());
+      setValue("publicationId", user.PUBLICATION_ID?.toString());
 
-      setIds("seriesId", user?.SERIES_ID?.toString());
-      setValue("seriesId", user?.SERIES_ID?.toString());
+      setIds("seriesId", user.SERIES_ID?.toString());
+      setValue("seriesId", user.SERIES_ID?.toString());
     }
 
     // Process exam data for both restricted and non-restricted users
@@ -169,6 +165,7 @@ const QuestionBuilder = ({ examId }: Props) => {
     presetHeaderData,
     setChapterNames,
     setIds,
+    getUser,
   ]);
 
   const handleChapters = (chapterId: string, chapterName: string) => {
@@ -236,7 +233,8 @@ const QuestionBuilder = ({ examId }: Props) => {
                         : []
                     }
                     isDisabled={
-                      getUser()?.RESTRICTED_ACCESS > 0 || publication.isPending
+                      (user && user.RESTRICTED_ACCESS > 0) ||
+                      publication.isPending
                     }
                   />
 
@@ -252,7 +250,7 @@ const QuestionBuilder = ({ examId }: Props) => {
                         : []
                     }
                     isDisabled={
-                      getUser()?.RESTRICTED_ACCESS > 0 ||
+                      (user && user.RESTRICTED_ACCESS > 0) ||
                       series.isPending ||
                       !form.watch("publicationId")
                     }
