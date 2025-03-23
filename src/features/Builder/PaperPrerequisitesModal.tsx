@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
+import { useAuth } from "@/hooks/useAuth";
 
 type Props = {
   isModalOpen: boolean;
@@ -49,6 +50,7 @@ const PaperPrerequisitesModal = ({
   handleChapters,
 }: Props) => {
   const navigate = useNavigate();
+  const { getUser } = useAuth();
   const selectedChapterIds = form.watch("chapterIds");
   const chapterNames = useQuestionBuilderStore((state) => state.chapterNames);
 
@@ -87,7 +89,9 @@ const PaperPrerequisitesModal = ({
                         }))
                       : []
                   }
-                  isDisabled={publication.isPending}
+                  isDisabled={
+                    getUser()?.RESTRICTED_ACCESS > 0 || publication.isPending
+                  }
                   isModal={true}
                 />
                 <ControlledSelect
@@ -101,7 +105,11 @@ const PaperPrerequisitesModal = ({
                         }))
                       : []
                   }
-                  isDisabled={series.isPending || !form.watch("publicationId")}
+                  isDisabled={
+                    getUser()?.RESTRICTED_ACCESS > 0 ||
+                    series.isPending ||
+                    !form.watch("publicationId")
+                  }
                   isModal={true}
                 />
                 <ControlledSelect

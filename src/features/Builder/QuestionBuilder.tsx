@@ -28,6 +28,8 @@ import QuestionSelect from "./QuestionSelect";
 import ChapterList from "./ChapterList";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { useAuth, User } from "@/hooks/useAuth";
+import { env } from "@/config/env";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -62,6 +64,7 @@ const QuestionBuilder = ({ examId }: Props) => {
     sanitizeFields,
     setChapterNames,
   } = useQuestionBuilderStore();
+  const { getUser } = useAuth();
   const navigate = useNavigate();
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
   const { needPreselection } = useSearch({
@@ -96,9 +99,25 @@ const QuestionBuilder = ({ examId }: Props) => {
   const { data: examData } = useGetExamById(examId);
 
   useEffect(() => {
+    const user = JSON.parse(
+      localStorage.getItem(env.LOCALSTORAGE_IDENTIFIER) || "{}",
+    ) as User;
+    const isUserRestricted = user?.RESTRICTED_ACCESS > 0;
+
+    // For restricted users, always set publication and series IDs
+    if (isUserRestricted) {
+      setIds("publicationId", user?.PUBLICATION_ID?.toString());
+      setValue("publicationId", user?.PUBLICATION_ID?.toString());
+
+      setIds("seriesId", user?.SERIES_ID?.toString());
+      setValue("seriesId", user?.SERIES_ID?.toString());
+    }
+
+    // Process exam data for both restricted and non-restricted users
     if (!["manual-selection", "auto-selection"].includes(examId) && examData) {
       const parsedObject = parseExamDataResponse(examData);
 
+      // Handle fields and header data
       if (parsedObject.fields) {
         presetFields(parsedObject.fields);
       }
@@ -108,12 +127,16 @@ const QuestionBuilder = ({ examId }: Props) => {
       }
 
       if (parsedObject.ids) {
-        setIds("publicationId", parsedObject.ids.publicationId);
-        setValue("publicationId", parsedObject.ids.publicationId);
+        if (!isUserRestricted) {
+          // For non-restricted users, use parsed data for publication and series
+          setIds("publicationId", parsedObject.ids.publicationId);
+          setValue("publicationId", parsedObject.ids.publicationId);
 
-        setIds("seriesId", parsedObject.ids.seriesId);
-        setValue("seriesId", parsedObject.ids.seriesId);
+          setIds("seriesId", parsedObject.ids.seriesId);
+          setValue("seriesId", parsedObject.ids.seriesId);
+        }
 
+        // Common for all users when exam data is present
         setIds("classId", parsedObject.ids.classId);
         setValue("classId", parsedObject.ids.classId);
 
@@ -126,6 +149,7 @@ const QuestionBuilder = ({ examId }: Props) => {
         setIds("chapterIds", parsedObject.ids.chapterIds);
         setValue("chapterIds", parsedObject.ids.chapterIds);
 
+        // Set chapter names
         const chapterNameArray: string[] = [];
         chapters.data?.forEach((chapter) => {
           if (parsedObject.ids.chapterIds.includes(chapter.id.toString())) {
@@ -211,7 +235,9 @@ const QuestionBuilder = ({ examId }: Props) => {
                           }))
                         : []
                     }
-                    isDisabled={publication.isPending}
+                    isDisabled={
+                      getUser()?.RESTRICTED_ACCESS > 0 || publication.isPending
+                    }
                   />
 
                   <ControlledSelect
@@ -226,7 +252,9 @@ const QuestionBuilder = ({ examId }: Props) => {
                         : []
                     }
                     isDisabled={
-                      series.isPending || !form.watch("publicationId")
+                      getUser()?.RESTRICTED_ACCESS > 0 ||
+                      series.isPending ||
+                      !form.watch("publicationId")
                     }
                   />
 
@@ -339,19 +367,21 @@ const QuestionBuilder = ({ examId }: Props) => {
       )}
 
       {/* Prerequisites Modal */}
-      <PaperPrerequisitesModal
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
-        publication={publication}
-        series={series}
-        classes={classes}
-        subjects={subjects}
-        books={books}
-        chapters={chapters}
-        form={form}
-        onPrequisitesSubmit={onPrequisitesSubmit}
-        handleChapters={handleChapters}
-      />
+      {isModalOpen && (
+        <PaperPrerequisitesModal
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
+          publication={publication}
+          series={series}
+          classes={classes}
+          subjects={subjects}
+          books={books}
+          chapters={chapters}
+          form={form}
+          onPrequisitesSubmit={onPrequisitesSubmit}
+          handleChapters={handleChapters}
+        />
+      )}
     </div>
   );
 };
