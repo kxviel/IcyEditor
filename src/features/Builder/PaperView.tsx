@@ -29,6 +29,7 @@ type Props = {
 
 const PaperView = ({ form, onPaperViewNext }: Props) => {
   const navigate = useNavigate();
+  const addQuestion = useQuestionBuilderStore((state) => state.addQuestion);
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
   const setModal = useModalStore((state) => state.setModal);
   const setHeaderLayout = usePageSettingsStore(
@@ -100,6 +101,12 @@ const PaperView = ({ form, onPaperViewNext }: Props) => {
                       setModal("EDIT_QUESTION", {
                         isOpen: true,
                         content: question.questionText,
+                      });
+                    }}
+                    removeQuestion={() => {
+                      addQuestion(field.categoryId, field.categoryName, {
+                        questionId: question.questionId,
+                        questionText: question.questionText,
                       });
                     }}
                   />
