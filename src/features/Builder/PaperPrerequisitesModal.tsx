@@ -17,6 +17,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
@@ -34,6 +35,7 @@ type Props = {
   form: UseFormReturn<PrerequisitesForm, any, undefined>;
   onPrequisitesSubmit: (data: PrerequisitesForm) => void;
   handleChapters: (chapterId: string, chapterName: string) => void;
+  handleSelectAll: () => void;
 };
 
 const PaperPrerequisitesModal = ({
@@ -48,6 +50,7 @@ const PaperPrerequisitesModal = ({
   form,
   onPrequisitesSubmit,
   handleChapters,
+  handleSelectAll,
 }: Props) => {
   const navigate = useNavigate();
   const getUser = useAuthStore((state) => state.getUser);
@@ -182,6 +185,21 @@ const PaperPrerequisitesModal = ({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent className="custom_scrollbar max-h-56 w-56">
+                          <DropdownMenuCheckboxItem
+                            checked={
+                              selectedChapterIds.length ===
+                              chapters.data?.length
+                            }
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              handleSelectAll();
+                            }}
+                          >
+                            {selectedChapterIds.length === chapters.data?.length
+                              ? "Deselect All"
+                              : "Select All"}
+                          </DropdownMenuCheckboxItem>
+                          <DropdownMenuSeparator />
                           {chapters.data &&
                             chapters.data.map(({ id, NAME }) => (
                               <DropdownMenuCheckboxItem

@@ -21,6 +21,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -38,8 +39,7 @@ const prequisitesFormSchema = z.object({
   bookId: z.string(),
   chapterIds: z
     .array(z.string())
-    .min(1, { message: "Select at least one chapter" })
-    .max(10, { message: "You can select a maximum of 10 chapters" }),
+    .min(1, { message: "Select at least one chapter" }),
 });
 
 export type PrerequisitesForm = z.infer<typeof prequisitesFormSchema>;
@@ -185,6 +185,25 @@ const QuestionBuilder = ({ examId }: Props) => {
     }
   };
 
+  const handleSelectAll = () => {
+    if (selectedChapterIds.length === chapters.data?.length) {
+      //deselect all
+      setChapterNames([]);
+      form.setValue("chapterIds", [], { shouldValidate: true });
+    } else {
+      const neededIds: string[] = [];
+      const neededIdNames: string[] = [];
+
+      chapters.data?.forEach((chapter) => {
+        neededIds.push(chapter.id.toString());
+        neededIdNames.push(chapter.NAME);
+      });
+
+      setChapterNames(neededIdNames);
+      form.setValue("chapterIds", neededIds, { shouldValidate: true });
+    }
+  };
+
   const onPrequisitesSubmit: SubmitHandler<PrerequisitesForm> = (data) => {
     setIds("publicationId", data.publicationId);
     setIds("seriesId", data.seriesId);
@@ -322,6 +341,15 @@ const QuestionBuilder = ({ examId }: Props) => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="custom_scrollbar max-h-56 w-56">
+                            <DropdownMenuCheckboxItem
+                              onSelect={(e) => {
+                                e.preventDefault();
+                                handleSelectAll();
+                              }}
+                            >
+                              Select All
+                            </DropdownMenuCheckboxItem>
+                            <DropdownMenuSeparator />
                             {chapters.data &&
                               chapters.data.map(({ id, NAME }) => (
                                 <DropdownMenuCheckboxItem
@@ -378,6 +406,7 @@ const QuestionBuilder = ({ examId }: Props) => {
           form={form}
           onPrequisitesSubmit={onPrequisitesSubmit}
           handleChapters={handleChapters}
+          handleSelectAll={handleSelectAll}
         />
       )}
     </div>

@@ -37,7 +37,7 @@ type Props = {
 export const getPapersFn = (props: Props): Promise<AxiosResponse<Root>> => {
   const { page, userId, order, searchTerm, date } = props;
   const params: any = {
-    page,
+    page: page || 1,
     pageSize: 10,
     sortBy: "EXAM_NAME",
   };
