@@ -1,7 +1,7 @@
-import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
-import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
-import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
-import PaperHeaderFour from "@/features/Builder/PaperHeaders/PaperHeaderFour";
+import PaperHeaderOne from "@/features/Builder/headers/PaperHeaderOne";
+import PaperHeaderTwo from "@/features/Builder/headers/PaperHeaderTwo";
+import PaperHeaderThree from "@/features/Builder/headers/PaperHeaderThree";
+import PaperHeaderFour from "@/features/Builder/headers/PaperHeaderFour";
 import {
   CategoryItem,
   useQuestionBuilderStore,
@@ -18,7 +18,10 @@ import {
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { Button } from "@/components/ui/button";
 import { WandSparkles } from "lucide-react";
-import { CategoryWrapper, QuestionWrapper } from "@/components/DisplayComp";
+import {
+  CategoryWrapper,
+  QuestionWrapper,
+} from "@/features/Builder/shared/DisplayComp";
 
 const pageDimensions: Record<string, string> = {
   A3: "h-[420mm] w-[297mm]",

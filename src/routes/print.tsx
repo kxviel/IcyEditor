@@ -1,8 +1,11 @@
-import { CategoryWrapper, QuestionWrapper } from "@/components/DisplayComp";
-import PaperHeaderFour from "@/features/Builder/PaperHeaders/PaperHeaderFour";
-import PaperHeaderOne from "@/features/Builder/PaperHeaders/PaperHeaderOne";
-import PaperHeaderThree from "@/features/Builder/PaperHeaders/PaperHeaderThree";
-import PaperHeaderTwo from "@/features/Builder/PaperHeaders/PaperHeaderTwo";
+import {
+  CategoryWrapper,
+  QuestionWrapper,
+} from "@/features/Builder/shared/DisplayComp";
+import PaperHeaderFour from "@/features/Builder/headers/PaperHeaderFour";
+import PaperHeaderOne from "@/features/Builder/headers/PaperHeaderOne";
+import PaperHeaderThree from "@/features/Builder/headers/PaperHeaderThree";
+import PaperHeaderTwo from "@/features/Builder/headers/PaperHeaderTwo";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";

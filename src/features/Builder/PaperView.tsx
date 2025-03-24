@@ -1,14 +1,17 @@
-import PaperHeaderOne from "./PaperHeaders/PaperHeaderOne";
-import PaperHeaderTwo from "./PaperHeaders/PaperHeaderTwo";
-import PaperHeaderThree from "./PaperHeaders/PaperHeaderThree";
-import PaperHeaderFour from "./PaperHeaders/PaperHeaderFour";
+import PaperHeaderOne from "./headers/PaperHeaderOne";
+import PaperHeaderTwo from "./headers/PaperHeaderTwo";
+import PaperHeaderThree from "./headers/PaperHeaderThree";
+import PaperHeaderFour from "./headers/PaperHeaderFour";
 import { Button } from "@/components/ui/button";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useNavigate } from "@tanstack/react-router";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { useModalStore } from "@/store/useModalStore";
-import { CategoryWrapper, QuestionWrapper } from "@/components/DisplayComp";
+import {
+  CategoryWrapper,
+  QuestionWrapper,
+} from "@/features/Builder/shared/DisplayComp";
 import { PrerequisitesForm } from "./QuestionBuilder";
 import { UseFormReturn } from "react-hook-form";
 

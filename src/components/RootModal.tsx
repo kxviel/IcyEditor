@@ -1,7 +1,7 @@
 import CompleteProfileModal from "@/features/Auth/CompleteProfileModal";
 import { ModalType, useModalStore } from "../store/useModalStore";
-import { EditQuestionModal } from "@/features/Builder/EditQuestionModal";
-import { EditCategoryMarksModal } from "@/features/Builder/EditCategoryMarksModal";
+import { EditQuestionModal } from "@/features/Builder/modals/EditQuestionModal";
+import { EditCategoryMarksModal } from "@/features/Builder/modals/EditCategoryMarksModal";
 
 type ModalComponent = {
   [key in ModalType]: (props: any) => JSX.Element | null;

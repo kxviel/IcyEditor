@@ -1,6 +1,6 @@
-import EditableField from "./EditableField";
+import EditableField from "../shared/EditableField";
 
-const PaperHeaderTwo = ({
+const PaperHeaderOne = ({
   isPreview = false,
   headerRef,
 }: {
@@ -9,7 +9,7 @@ const PaperHeaderTwo = ({
 }) => {
   return (
     <div
-      className="mb-1 flex w-full flex-col items-center gap-4 border-[3px] border-black p-4"
+      className="mb-1 flex w-full flex-col items-center gap-3 p-1"
       ref={headerRef}
     >
       <EditableField
@@ -25,7 +25,7 @@ const PaperHeaderTwo = ({
         isPreview={isPreview}
       />
 
-      <div className="relative flex w-full items-center justify-between">
+      <div className="relative flex w-full items-center justify-between px-2">
         <EditableField
           headerId="duration"
           prefix="Duration: "
@@ -50,7 +50,7 @@ const PaperHeaderTwo = ({
         />
       </div>
 
-      <div className="flex w-full items-center justify-between border-t-[3px] border-black px-2 pb-0 pt-3">
+      <div className="flex w-full items-center justify-between bg-slate-200 px-2 py-3">
         <p>Name: ____________________</p>
         <p>Class: ____________________</p>
         <p>Roll No.: ____________________</p>
@@ -59,4 +59,4 @@ const PaperHeaderTwo = ({
   );
 };
 
-export default PaperHeaderTwo;
+export default PaperHeaderOne;

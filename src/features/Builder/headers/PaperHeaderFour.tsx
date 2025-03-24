@@ -1,4 +1,4 @@
-import EditableField from "./EditableField";
+import EditableField from "../shared/EditableField";
 
 const PaperHeaderFour = ({
   isPreview = false,

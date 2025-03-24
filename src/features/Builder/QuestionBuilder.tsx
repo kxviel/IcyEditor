@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useGetBook } from "./api/getBook";
-import PaperPrerequisitesModal from "./PaperPrerequisitesModal";
+import PaperPrerequisitesModal from "./modals/PaperPrerequisitesModal";
 import PaperView from "./PaperView";
 import QuestionList from "./QuestionList";
 import { useGetChapter } from "./api/getChapter";
