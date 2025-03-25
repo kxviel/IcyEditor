@@ -16,7 +16,7 @@ import { useGetExamById } from "./api/getExamById";
 import { parseExamDataResponse } from "@/lib/utils";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useHeaderStore } from "@/store/useHeaderStore";
-import { ControlledSelect } from "@/components/ControlledSelect";
+import { ControlledSelect } from "@/features/Builder/shared/ControlledSelect";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,

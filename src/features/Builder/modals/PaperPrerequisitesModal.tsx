@@ -2,16 +2,16 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "@tanstack/react-router";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Subject } from "./api/getSubject";
-import { Class } from "./api/getClass";
-import { Series } from "./api/getSeries";
-import { Publication } from "./api/getPublication";
+import { Subject } from "../api/getSubject";
+import { Class } from "../api/getClass";
+import { Series } from "../api/getSeries";
+import { Publication } from "../api/getPublication";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { UseQueryResult } from "@tanstack/react-query";
-import { PrerequisitesForm } from "./QuestionBuilder";
-import { Book } from "./api/getBook";
-import { Chapter } from "./api/getChapter";
-import { ControlledSelect } from "@/components/ControlledSelect";
+import { PrerequisitesForm } from "../QuestionBuilder";
+import { Book } from "../api/getBook";
+import { Chapter } from "../api/getChapter";
+import { ControlledSelect } from "@/features/Builder/shared/ControlledSelect";
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import {
   DropdownMenu,
