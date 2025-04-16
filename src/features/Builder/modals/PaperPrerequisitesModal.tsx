@@ -32,7 +32,7 @@ type Props = {
   subjects: UseQueryResult<Subject[], Error>;
   books: UseQueryResult<Book[], Error>;
   chapters: UseQueryResult<Chapter[], Error>;
-  form: UseFormReturn<PrerequisitesForm, any, undefined>;
+  form: UseFormReturn<PrerequisitesForm, any>;
   onPrequisitesSubmit: (data: PrerequisitesForm) => void;
   handleChapters: (chapterId: string, chapterName: string) => void;
   handleSelectAll: () => void;

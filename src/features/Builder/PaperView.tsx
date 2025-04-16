@@ -23,7 +23,7 @@ const layoutDict: Record<string, React.ReactNode> = {
 };
 
 type Props = {
-  form: UseFormReturn<PrerequisitesForm, any, undefined>;
+  form: UseFormReturn<PrerequisitesForm, any>;
   onPaperViewNext: (data: PrerequisitesForm) => void;
 };
 

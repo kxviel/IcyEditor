@@ -69,7 +69,7 @@ const labels = {
 };
 
 type Props = {
-  form: UseFormReturn<PrerequisitesForm, any, undefined>;
+  form: UseFormReturn<PrerequisitesForm, any>;
   label: "publicationId" | "seriesId" | "classId" | "subjectId" | "bookId";
   options: { value: string; label: string }[];
   isDisabled: boolean;
