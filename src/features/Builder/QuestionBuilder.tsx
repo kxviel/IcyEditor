@@ -113,9 +113,6 @@ const QuestionBuilder = ({ examId }: Props) => {
   }, [getUser, getValues, setIds, setValue]);
 
   useEffect(() => {
-    const user = getUser();
-    const isUserRestricted = user && user.RESTRICTED_ACCESS === 0;
-
     // Process exam data for both restricted and non-restricted users
     if (!["manual-selection", "auto-selection"].includes(examId) && examData) {
       const parsedObject = parseExamDataResponse(examData);
@@ -130,16 +127,12 @@ const QuestionBuilder = ({ examId }: Props) => {
       }
 
       if (parsedObject.ids) {
-        if (!isUserRestricted) {
-          // For non-restricted users, use parsed data for publication and series
-          setIds("publicationId", parsedObject.ids.publicationId);
-          setValue("publicationId", parsedObject.ids.publicationId);
+        setIds("publicationId", parsedObject.ids.publicationId);
+        setValue("publicationId", parsedObject.ids.publicationId);
 
-          setIds("seriesId", parsedObject.ids.seriesId);
-          setValue("seriesId", parsedObject.ids.seriesId);
-        }
+        setIds("seriesId", parsedObject.ids.seriesId);
+        setValue("seriesId", parsedObject.ids.seriesId);
 
-        // Common for all users when exam data is present
         setIds("classId", parsedObject.ids.classId);
         setValue("classId", parsedObject.ids.classId);
 
