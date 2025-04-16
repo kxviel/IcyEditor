@@ -94,20 +94,27 @@ const QuestionBuilder = ({ examId }: Props) => {
 
   const user = getUser();
   const { data: examData } = useGetExamById(examId);
-  const { setValue } = form; // Just for the sake of the useEffect dependency
+  const { setValue, getValues } = form; // Just for the sake of the useEffect dependency
 
   useEffect(() => {
     const user = getUser();
     const isUserRestricted = user && user.RESTRICTED_ACCESS === 0;
+    const valuesAlreadySet =
+      getValues("publicationId") && getValues("seriesId");
 
     // For restricted users, always set publication and series IDs
-    if (isUserRestricted) {
+    if (isUserRestricted && !valuesAlreadySet) {
       setIds("publicationId", user.PUBLICATION_ID?.toString());
       setValue("publicationId", user.PUBLICATION_ID?.toString());
 
       setIds("seriesId", user.SERIES_ID?.toString());
       setValue("seriesId", user.SERIES_ID?.toString());
     }
+  }, [getUser, getValues, setIds, setValue]);
+
+  useEffect(() => {
+    const user = getUser();
+    const isUserRestricted = user && user.RESTRICTED_ACCESS === 0;
 
     // Process exam data for both restricted and non-restricted users
     if (!["manual-selection", "auto-selection"].includes(examId) && examData) {

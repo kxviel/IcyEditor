@@ -88,9 +88,9 @@ export const ControlledSelect = ({
   const resetHeader = useHeaderStore((state) => state.reset);
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
-  const invalidateRelatedQueries = useQuestionBuilderStore(
-    (state) => state.invalidateRelatedQueries,
-  );
+  // const invalidateRelatedQueries = useQuestionBuilderStore(
+  //   (state) => state.invalidateRelatedQueries,
+  // );
   const setChapterNames = useQuestionBuilderStore(
     (state) => state.setChapterNames,
   );
