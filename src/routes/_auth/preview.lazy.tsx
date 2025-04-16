@@ -208,7 +208,6 @@ function Preview() {
             <SelectItem value="A5">A5</SelectItem>
           </SelectContent>
         </Select>
-
         <Select value={currentFontSize} onValueChange={calcFontSize}>
           <SelectTrigger className="w-[180px] bg-white">
             <SelectValue placeholder="Font Size" />

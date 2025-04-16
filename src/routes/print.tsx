@@ -25,8 +25,9 @@ const layoutDict: Record<string, React.ReactNode> = {
 const RenderedPage = () => {
   const navigate = useNavigate();
   const optimized = localStorage.getItem("optimized") === "true";
-
   const fields = useQuestionBuilderStore((state) => state.fields);
+  console.log(fields);
+
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
 
   useEffect(() => {
@@ -68,6 +69,7 @@ const RenderedPage = () => {
                         key={question.questionId}
                         questionIndex={question.questionIndex!}
                         questionContent={question.questionText}
+                        isEditable={false}
                       />
                     ))}
                   </div>

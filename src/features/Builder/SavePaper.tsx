@@ -119,11 +119,7 @@ const SavePaper = () => {
   };
 
   const handleDownloadPDF = async () => {
-    window.open(
-      "/print",
-      "Print",
-      "height=1122.85,width=794.44,noopener,noreferrer",
-    );
+    window.open("/print", "_blank", "height=1122.85,width=794.44");
   };
 
   return (

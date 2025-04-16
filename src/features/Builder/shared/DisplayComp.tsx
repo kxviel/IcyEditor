@@ -50,11 +50,13 @@ export const CategoryWrapper = ({
 export const QuestionWrapper = ({
   questionIndex,
   questionContent,
+  isEditable = true,
   editQuestionContent = undefined,
   removeQuestion = undefined,
 }: {
   questionIndex: number;
   questionContent: string;
+  isEditable?: boolean;
   editQuestionContent?: () => void;
   removeQuestion?: () => void;
 }) => {
@@ -71,8 +73,8 @@ export const QuestionWrapper = ({
           ? `relative flex gap-2 py-1 hover:cursor-pointer hover:rounded-md hover:bg-slate-100`
           : "flex gap-2 py-1"
       }
-      onMouseEnter={() => setHoveredQuestion(questionIndex)}
-      onMouseLeave={() => setHoveredQuestion(null)}
+      onMouseEnter={() => isEditable && setHoveredQuestion(questionIndex)}
+      onMouseLeave={() => isEditable && setHoveredQuestion(null)}
     >
       <p
         className="font-semibold text-gray-800"

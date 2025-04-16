@@ -112,77 +112,85 @@ const Home = () => {
         <p>Loading...</p>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {data?.examData.map((card, i) => (
-            <Card key={i} className="group p-5">
-              <div className="mb-4 flex items-start justify-between">
-                <div>
-                  <p className="text-xs text-slate-600">
-                    Last edited{" "}
-                    {formatDistance(card.date, new Date(), {
-                      addSuffix: true,
-                    })}
-                  </p>
+          {data?.examData && data.examData.length > 0 ? (
+            data?.examData.map((card, i) => (
+              <Card key={i} className="group p-5">
+                <div className="mb-4 flex items-start justify-between">
+                  <div>
+                    <p className="text-xs text-slate-600">
+                      Last edited{" "}
+                      {formatDistance(card.date, new Date(), {
+                        addSuffix: true,
+                      })}
+                    </p>
 
-                  <h2 className="mb-4 text-xl font-semibold">
-                    {card.EXAM_NAME}
-                  </h2>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onClick={() =>
-                        navigate({
-                          to: "/builder/$examId",
-                          params: { examId: card.ID.toString() },
-                        })
-                      }
-                    >
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => deleteFn.mutate({ body: { id: card.ID } })}
-                    >
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="bg-purple-50 text-purple-500 hover:bg-purple-50"
-                  >
-                    {card.Class_NAME}
-                  </Badge>
-                  <Badge
-                    variant="secondary"
-                    className="bg-pink-50 text-pink-500 hover:bg-pink-50"
-                  >
-                    {card.Subject_Name}
-                  </Badge>
+                    <h2 className="mb-4 text-xl font-semibold">
+                      {card.EXAM_NAME}
+                    </h2>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() =>
+                          navigate({
+                            to: "/builder/$examId",
+                            params: { examId: card.ID.toString() },
+                          })
+                        }
+                      >
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          deleteFn.mutate({ body: { id: card.ID } })
+                        }
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
-                <Button
-                  variant="ghost"
-                  onClick={() =>
-                    navigate({
-                      to: "/builder/$examId",
-                      params: { examId: card.ID.toString() },
-                    })
-                  }
-                >
-                  <ArrowUpRight />
-                </Button>
-              </div>
-            </Card>
-          ))}
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-2">
+                    <Badge
+                      variant="secondary"
+                      className="bg-purple-50 text-purple-500 hover:bg-purple-50"
+                    >
+                      {card.Class_NAME}
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className="bg-pink-50 text-pink-500 hover:bg-pink-50"
+                    >
+                      {card.Subject_Name}
+                    </Badge>
+                  </div>
+
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      navigate({
+                        to: "/builder/$examId",
+                        params: { examId: card.ID.toString() },
+                      })
+                    }
+                  >
+                    <ArrowUpRight />
+                  </Button>
+                </div>
+              </Card>
+            ))
+          ) : (
+            <div className="">
+              <p className="text-lg">No question papers found</p>
+            </div>
+          )}
         </div>
       )}
 
