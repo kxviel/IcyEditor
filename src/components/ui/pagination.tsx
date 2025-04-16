@@ -73,23 +73,27 @@ const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div className="flex items-center justify-center gap-2">
-      <Button
-        variant={"outline"}
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-      >
-        &lt;
-      </Button>
+      {totalPages > 0 && (
+        <Button
+          variant={"outline"}
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          &lt;
+        </Button>
+      )}
 
       {renderPageNumbers()}
 
-      <Button
-        variant={"outline"}
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-      >
-        &gt;
-      </Button>
+      {totalPages > 0 && (
+        <Button
+          variant={"outline"}
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          &gt;
+        </Button>
+      )}
     </div>
   );
 };
