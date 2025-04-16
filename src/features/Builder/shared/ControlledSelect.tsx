@@ -99,34 +99,38 @@ export const ControlledSelect = ({
   const [pendingValue, setPendingValue] = useState<string | null>(null);
 
   const handleValueChange = (value: string) => {
+    console.log(value);
+
     if (isModal || fields.size === 0) {
+      //if modal OR no fields, no need to confirm changes
       applyValueChange(value);
     } else {
+      // since not modal, confirm changes
       setPendingValue(value);
       setIsConfirmOpen(true);
     }
   };
 
   const applyValueChange = (value: string) => {
-    // Reset dependent fields
+    // Set selected value
+    setIds(label, value);
+    form.setValue(label, value);
+
+    // Reset related fields
     FIELD_DEPENDENCIES[label].forEach(({ idKey, resetValue }) => {
       form.resetField(idKey);
       setIds(idKey, resetValue);
-
-      resetHeader();
-      resetBuilder();
-      resetPageSettings();
-      invalidateRelatedQueries();
-      localStorage.removeItem("optimized");
 
       if (idKey === "chapterIds") {
         setChapterNames([]);
       }
     });
 
-    // Set selected value
-    setIds(label, value);
-    form.setValue(label, value);
+    resetHeader();
+    resetBuilder();
+    resetPageSettings();
+    // invalidateRelatedQueries();
+    localStorage.removeItem("optimized");
   };
 
   const handleConfirm = () => {
