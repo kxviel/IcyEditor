@@ -200,14 +200,19 @@ const extensions = [
 
 type Props = {
   content: string;
+  getContent: (html: string) => void;
 };
 
-const TextEditor = ({ content }: Props) => {
+const TextEditor = ({ content, getContent }: Props) => {
   return (
     <EditorProvider
       slotBefore={<MenuBar />}
       extensions={extensions}
       content={content}
+      onUpdate={({ editor }) => {
+        const html = editor.getHTML();
+        getContent(html);
+      }}
     />
   );
 };

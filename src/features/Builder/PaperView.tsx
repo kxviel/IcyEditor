@@ -100,13 +100,21 @@ const PaperView = ({ form, onPaperViewNext }: Props) => {
                     editQuestionContent={() => {
                       setModal("EDIT_QUESTION", {
                         isOpen: true,
-                        content: question.questionText,
+                        currentQuestion: question,
                       });
                     }}
                     removeQuestion={() => {
                       addQuestion(field.categoryId, field.categoryName, {
                         questionId: question.questionId,
                         questionText: question.questionText,
+                        ANSWER_DATA: question.ANSWER_DATA,
+                        CATEGORY_ID: question.CATEGORY_ID,
+                        CHAPTER_ID: question.CHAPTER_ID,
+                        FILE_ID: question.FILE_ID,
+                        REASON: question.REASON,
+                        REMARKS: question.REMARKS,
+                        STAGE: question.STAGE,
+                        type: question.type,
                       });
                     }}
                   />

@@ -17,6 +17,15 @@ export interface QuestionItem {
   questionId: number;
   questionText: string;
   questionIndex?: number;
+  ANSWER_DATA: string;
+  CATEGORY_ID: string;
+  CHAPTER_ID: number;
+
+  FILE_ID: string;
+  REASON: string | null;
+  REMARKS: string | null;
+  STAGE: string | null;
+  type: string | null;
 }
 
 export type IdKey =
@@ -75,7 +84,22 @@ interface HeaderStore {
     addedQuestion: {
       questionId: number;
       questionText: string;
+      ANSWER_DATA: string;
+      CATEGORY_ID: string;
+      CHAPTER_ID: number;
+
+      FILE_ID: string;
+      REASON: string | null;
+      REMARKS: string | null;
+      STAGE: string | null;
+      type: string | null;
     },
+  ) => void;
+  editQuestion: (
+    categoryId: string,
+    oldQuestionId: number,
+    newQuestionId: number,
+    newQuestionText: string,
   ) => void;
   sanitizeFields: () => void;
   invalidateRelatedQueries: () => void;
@@ -158,6 +182,43 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
               categoryMarks: "1",
               questions: [addedQuestion],
             });
+          }
+
+          return { fields: newFields };
+        }),
+      editQuestion: (
+        categoryId: string,
+        oldQuestionId: number,
+        newQuestionId: number,
+        newQuestionText: string,
+      ) =>
+        set((state) => {
+          const newFields = new Map(state.fields);
+
+          if (newFields.has(categoryId)) {
+            const currentCategory = newFields.get(categoryId)!;
+            const currentQuestions = currentCategory.questions;
+
+            // Find the question to edit
+            const questionIndex = currentQuestions.findIndex(
+              (question) => question.questionId === oldQuestionId,
+            );
+
+            if (questionIndex !== -1) {
+              // Create a new array with the updated question
+              const updatedQuestions = [...currentQuestions];
+              updatedQuestions[questionIndex] = {
+                ...updatedQuestions[questionIndex],
+                questionId: newQuestionId,
+                questionText: newQuestionText,
+              };
+
+              // Update the category with the modified questions array
+              newFields.set(categoryId, {
+                ...currentCategory,
+                questions: updatedQuestions,
+              });
+            }
           }
 
           return { fields: newFields };

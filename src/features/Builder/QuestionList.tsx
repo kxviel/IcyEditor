@@ -49,6 +49,14 @@ const QuestionList = ({ chapterIds }: Props) => {
                       addQuestion(categoryId, categoryName, {
                         questionId: question.id,
                         questionText: question.QUESTION_DATA,
+                        ANSWER_DATA: question.ANSWER_DATA,
+                        CATEGORY_ID: question.CATEGORY_ID,
+                        CHAPTER_ID: question.CHAPTER_ID,
+                        FILE_ID: question.FILE_ID,
+                        REASON: question.REASON,
+                        REMARKS: question.REMARKS,
+                        STAGE: question.STAGE,
+                        type: question.type,
                       })
                     }
                   >
