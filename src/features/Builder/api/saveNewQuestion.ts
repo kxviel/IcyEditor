@@ -9,7 +9,6 @@ type Props = {
   ANSWER_DATA: string;
   CATEGORY_ID: number;
   CHAPTER_ID: number;
-  CHAPTER_IDS: number[];
   FILE_ID: number;
   QUESTION_DATA: string;
   // MARKS_DISTRIBUTION: string;

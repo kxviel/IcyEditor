@@ -22,7 +22,7 @@ type Props = {
 };
 
 export function EditQuestionModal({ isOpen, currentQuestion }: Props) {
-  const { publicationId, seriesId, classId, bookId, chapterIds } =
+  const { publicationId, seriesId, classId, bookId } =
     useQuestionBuilderStore();
 
   const hideModal = useModalStore((state) => state.hideModal);
@@ -47,7 +47,6 @@ export function EditQuestionModal({ isOpen, currentQuestion }: Props) {
       STAGE: currentQuestion.STAGE,
       type: currentQuestion.type,
       BOOK: Number(bookId),
-      CHAPTER_IDS: chapterIds.map((id) => Number(id)),
       CLASS_NAME: classId,
       // MARKS_DISTRIBUTION: "MCQ: 1, FIB: 1, SA: 1, GAP: 1, DRAG: 1",
       PUBLICATIONS: publicationId,
