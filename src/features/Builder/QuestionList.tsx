@@ -17,6 +17,18 @@ const QuestionList = ({ chapterIds }: Props) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const addQuestion = useQuestionBuilderStore((state) => state.addQuestion);
 
+  // const { questionList, setQuestionList } = useQuestionListStore(
+  //   (state) => state,
+  // );
+
+  // const { data: questionResponse } = useGetQuestions(chapterIds);
+
+  // useEffect(() => {
+  //   if (questionResponse) {
+  //     setQuestionList(questionResponse);
+  //   }
+  // }, [questionResponse, setQuestionList]);
+
   const { data: questionList } = useGetQuestions(chapterIds);
 
   return (
