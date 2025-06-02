@@ -22,6 +22,8 @@ import AvatarPlaceholder from "@/assets/avatarImg.svg";
 import { useState } from "react";
 import { useModalStore } from "@/store/useModalStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import { Button } from "./ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const allowedStepperRoutes = [
   "/builder/manual-selection",
@@ -41,31 +43,66 @@ const Navbar = () => {
 
   const user = getUser();
 
+  const isExamTypePage = pathname === "/exam-type";
+
+  const handleBackToDashboard = () => {
+    navigate({ to: "/", search: { page: 1 } });
+  };
+
+  const handleLogoClick = () => {
+    navigate({ to: "/", search: { page: 1 } });
+  };
+
+  const handleLogout = () => {
+    setShowAlert(false);
+    logout();
+  };
+
+  const handleViewUsers = () => {
+    navigate({ to: "/users", search: { page: 1 } });
+  };
+
   return (
-    <header className="h-[72px] w-full border border-b border-gray-200">
+    <header className="h-[72px] w-full border-b border-gray-200 bg-white">
       <nav className="mx-auto flex h-full max-w-screen-xl items-center justify-between gap-2 px-8">
-        <div
-          className="hover:cursor-pointer"
-          onClick={() => navigate({ to: "/", search: { page: 1 } })}
-        >
-          <img src={Logo} alt="logo" />
+        {/* Logo or Back Button */}
+        <div className="flex items-center">
+          {isExamTypePage ? (
+            <Button
+              variant="ghost"
+              onClick={handleBackToDashboard}
+              className="flex items-center gap-2 text-gray-600 text-primary hover:text-gray-900"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Button>
+          ) : (
+            <div className="cursor-pointer" onClick={handleLogoClick}>
+              <img src={Logo} alt="logo" />
+            </div>
+          )}
         </div>
 
+        {/* Stepper - only show on allowed routes */}
         {allowedStepperRoutes.includes(pathname) && (
           <div className="flex flex-1 items-center justify-center">
             <Stepper />
           </div>
         )}
 
+        {/* Save Paper - only show on preview */}
         {pathname === "/preview" && <SavePaper />}
 
+        {/* User Avatar Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Avatar>
-              <AvatarImage src={AvatarPlaceholder} alt="@kxviel" />
-            </Avatar>
+            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={AvatarPlaceholder} alt="User avatar" />
+              </Avatar>
+            </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align="end" className="w-56">
             {user && !user.isProfileCompleted && (
               <DropdownMenuItem
                 onClick={() => {
@@ -79,11 +116,12 @@ const Navbar = () => {
               </DropdownMenuItem>
             )}
             {user && user.IS_SUPER_ADMIN > 0 && (
-              <DropdownMenuItem>View Users</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleViewUsers}>
+                View Users
+              </DropdownMenuItem>
             )}
-
             <DropdownMenuItem
-              className="text-red-600"
+              className="text-red-600 focus:text-red-600"
               onClick={() => setShowAlert(true)}
             >
               Logout
@@ -91,26 +129,20 @@ const Navbar = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {showAlert && (
-          <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Do you want to logout?</AlertDialogTitle>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => {
-                    setShowAlert(false);
-                    logout();
-                  }}
-                >
-                  Continue
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
+        {/* Logout Confirmation Dialog */}
+        <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleLogout}>
+                Logout
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </nav>
     </header>
   );
