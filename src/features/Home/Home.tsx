@@ -26,7 +26,7 @@ import Pagination from "@/components/ui/pagination";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { page } = useSearch({
+  const { page = 1 } = useSearch({
     from: "/_auth",
   }) as { page: number };
 
@@ -69,11 +69,15 @@ const Home = () => {
   };
 
   const handlePageChange = (page: number) => {
-    navigate({ to: "/users", search: { page } });
+    navigate({ to: "/", search: { page } });
   };
 
-  return (
-    <div className="flex h-full flex-col gap-6">
+  const handleDeletePaper = (id: number) => {
+deleteFn.mutate({ body: { id } })
+  };
+
+return (
+<div className="flex h-full flex-col gap-6">
       {/* Header */}
       <div className="flex w-full items-center justify-between space-x-4 pt-20">
         <div>
@@ -83,15 +87,15 @@ const Home = () => {
 
         <div className="flex space-x-4">
           <Button onClick={() => navigate({ to: "/exam-type" })}>
-            <Plus /> Add Question Paper
+            <Plus className="mr-2 h-4 w-4" /> Add Question Paper
           </Button>
         </div>
       </div>
 
-      {/* Search */}
+      {/* Search and Filters */}
       <div className="flex w-full items-center justify-between space-x-4">
         <IconInput
-          placeholder="Search"
+          placeholder="Search question papers..."
           className="w-[320px]"
           startIcon={Search}
           value={searchTerm}
@@ -101,103 +105,124 @@ const Home = () => {
         <div className="flex space-x-4">
           <DatePickerWithRange date={date} setDate={setDate} />
 
-          <Button variant={"outline"} onClick={handleSort}>
-            {order === "asc" ? <SortAscIcon /> : <SortDescIcon />} Sort By
+          <Button variant="outline" onClick={handleSort}>
+            {order === "asc" ? <SortAscIcon /> : <SortDescIcon />} 
+            <span className="ml-2">Sort by Date</span>
           </Button>
         </div>
       </div>
 
-      {/* Cards */}
-      {isPending ? (
-        <p>Loading...</p>
-      ) : (
+      {/* Loading State */}
+      {isPending && (
+        <div className="flex items-center justify-center py-8">
+          <p>Loading question papers...</p>
+        </div>
+      )}
+
+      {/* Cards Grid */}
+      {!isPending && data?.examData && data.examData.length > 0 && (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {data?.examData && data.examData.length > 0 ? (
-            data?.examData.map((card, i) => (
-              <Card key={i} className="group p-5">
-                <div className="mb-4 flex items-start justify-between">
-                  <div>
-                    <p className="text-xs text-slate-600">
-                      Last edited{" "}
-                      {formatDistance(card.date, new Date(), {
-                        addSuffix: true,
-                      })}
-                    </p>
+          {data.examData.map((card) => (
+            <Card key={card.ID} className="group p-5 transition-shadow hover:shadow-md">
+              <div className="mb-4 flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-xs text-slate-600">
+                    Last edited{" "}
+                    {formatDistance(new Date(card.date), new Date(), {
+                      addSuffix: true,
+                    })}
+                  </p>
 
-                    <h2 className="mb-4 text-xl font-semibold">
-                      {card.EXAM_NAME}
-                    </h2>
-                  </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() =>
-                          navigate({
-                            to: "/builder/$examId",
-                            params: { examId: card.ID.toString() },
-                          })
-                        }
-                      >
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() =>
-                          deleteFn.mutate({ body: { id: card.ID } })
-                        }
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <h2 className="mb-4 text-xl font-semibold line-clamp-2">
+                    {card.EXAM_NAME}
+                  </h2>
                 </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-2">
-                    <Badge
-                      variant="secondary"
-                      className="bg-purple-50 text-purple-500 hover:bg-purple-50"
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onClick={() =>
+                        navigate({
+                          to: "/builder/$examId",
+                          params: { examId: card.ID.toString() },
+                        })
+                      }
                     >
-                      {card.Class_NAME}
-                    </Badge>
-                    <Badge
-                      variant="secondary"
-                      className="bg-pink-50 text-pink-500 hover:bg-pink-50"
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="text-red-600 focus:text-red-600"
+                      onClick={() => handleDeletePaper(card.ID)}
                     >
-                      {card.Subject_Name}
-                    </Badge>
-                  </div>
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
 
-                  <Button
-                    variant="ghost"
-                    onClick={() =>
-                      navigate({
-                        to: "/builder/$examId",
-                        params: { examId: card.ID.toString() },
-                      })
-                    }
+              <div className="flex items-center justify-between">
+                <div className="flex gap-2 flex-wrap">
+                  <Badge
+                    variant="secondary"
+                    className="bg-purple-50 text-purple-500 hover:bg-purple-50"
                   >
-                    <ArrowUpRight />
-                  </Button>
+                    {card.Class_NAME}
+                  </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="bg-pink-50 text-pink-500 hover:bg-pink-50"
+                  >
+                    {card.Subject_Name}
+                  </Badge>
                 </div>
-              </Card>
-            ))
-          ) : (
-            <div className="">
-              <p className="text-lg">No question papers found</p>
-            </div>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() =>
+                    navigate({
+                      to: "/builder/$examId",
+                      params: { examId: card.ID.toString() },
+                    })
+                  }
+                >
+                  <ArrowUpRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Empty State - Centered */}
+      {!isPending && (!data?.examData || data.examData.length === 0) && (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <p className="text-lg text-gray-500 mb-2">No question papers found</p>
+          <p className="text-sm text-gray-400 mb-4">
+            {searchTerm || (date?.from && date?.to) ? 
+              "Try adjusting your search or date filters" : 
+              "Create your first question paper to get started"
+            }
+          </p>
+          {!searchTerm && (!date?.from || !date?.to) && (
+            <Button onClick={() => navigate({ to: "/exam-type" })}>
+              <Plus className="mr-2 h-4 w-4" /> Create Question Paper
+            </Button>
           )}
         </div>
       )}
 
+      {/* Pagination */}
+      {data?.examData && data.examData.length > 0 && (
       <Pagination
         totalPages={Math.ceil(rowCount / 10)}
         onPageChange={handlePageChange}
       />
+      )}
     </div>
   );
 };
