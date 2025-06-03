@@ -110,7 +110,8 @@ const QuestionList = ({ chapterIds }: Props) => {
               <AccordionContent className="pb-0">
                 {questions.length === 0 ? (
                   <div className="p-4 text-center text-gray-500">
-                    No questions available in this category
+                    No questions available in this category. Please try a
+                    different combination.
                   </div>
                 ) : (
                   questions.map((question) => {
