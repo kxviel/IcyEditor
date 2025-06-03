@@ -139,43 +139,34 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
       addQuestion: (categoryId, categoryName, addedQuestion) =>
         set((state) => {
           const newFields = new Map(state.fields);
+          const currentCategory = newFields.get(categoryId);
 
-          if (newFields.has(categoryId)) {
-            const currentCategory = newFields.get(categoryId)!;
+          if (currentCategory) {
             const currentQuestions = currentCategory.questions;
-
-            // Check if question already exists in this category
             const questionExists = currentQuestions.some(
-              (currentQuestion) =>
-                currentQuestion.questionId === addedQuestion.questionId,
+              (q) => q.questionId === addedQuestion.questionId,
             );
 
             if (questionExists) {
-              // Remove Existing Question
               const updatedQuestions = currentQuestions.filter(
-                (currentQuestion) =>
-                  currentQuestion.questionId !== addedQuestion.questionId,
+                (q) => q.questionId !== addedQuestion.questionId,
               );
 
-              // Delete Category if Question Array is Empty
               if (updatedQuestions.length === 0) {
                 newFields.delete(categoryId);
               } else {
-                // Update Category with Updated Question Array
                 newFields.set(categoryId, {
                   ...currentCategory,
                   questions: updatedQuestions,
                 });
               }
             } else {
-              // Add Question to Existing Category
               newFields.set(categoryId, {
                 ...currentCategory,
                 questions: [...currentQuestions, addedQuestion],
               });
             }
           } else {
-            // Add Category along with Added Question
             newFields.set(categoryId, {
               categoryId,
               categoryName,
@@ -235,6 +226,7 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
           bookId: "",
           chapterIds: [],
         });
+        useQuestionBuilderStore.persist.clearStorage();
       },
       invalidateRelatedQueries: () => {
         queryClient.invalidateQueries({ queryKey: ["GetPublication"] });
