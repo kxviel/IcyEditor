@@ -30,6 +30,7 @@ import ChapterList from "./ChapterList";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
+import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 
 const prequisitesFormSchema = z.object({
   publicationId: z.string(),
@@ -66,6 +67,14 @@ const QuestionBuilder = ({ examId }: Props) => {
   const getUser = useAuthStore((state) => state.getUser);
   const navigate = useNavigate();
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
+
+  const resetHeader = useHeaderStore((state) => state.reset);
+  const resetBuilder = useQuestionBuilderStore((state) => state.reset);
+  const resetPageSettings = usePageSettingsStore((state) => state.reset);
+  const invalidateRelatedQueries = useQuestionBuilderStore(
+    (state) => state.invalidateRelatedQueries,
+  );
+
   const { needPreselection } = useSearch({
     from: "/_auth/builder/$examId",
   }) as { needPreselection: boolean };
@@ -228,6 +237,18 @@ const QuestionBuilder = ({ examId }: Props) => {
     } else {
       sanitizeFields();
       navigate({ to: "/preview" });
+    }
+  };
+
+  const handleModalState = (open: boolean) => {
+    setIsModalOpen(open);
+
+    if (!open) {
+      resetHeader();
+      resetBuilder();
+      resetPageSettings();
+      invalidateRelatedQueries();
+      localStorage.removeItem("optimized");
     }
   };
 
@@ -396,7 +417,7 @@ const QuestionBuilder = ({ examId }: Props) => {
       {isModalOpen && (
         <PaperPrerequisitesModal
           isModalOpen={isModalOpen}
-          setIsModalOpen={setIsModalOpen}
+          handleModalState={handleModalState}
           publication={publication}
           series={series}
           classes={classes}

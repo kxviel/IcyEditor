@@ -25,7 +25,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 
 type Props = {
   isModalOpen: boolean;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  handleModalState: (open: boolean) => void;
   publication: UseQueryResult<Publication[], Error>;
   series: UseQueryResult<Series[], Error>;
   classes: UseQueryResult<Class[], Error>;
@@ -40,7 +40,7 @@ type Props = {
 
 const PaperPrerequisitesModal = ({
   isModalOpen,
-  setIsModalOpen,
+  handleModalState,
   publication,
   series,
   classes,
@@ -60,7 +60,7 @@ const PaperPrerequisitesModal = ({
   const selectedChapterIds = form.watch("chapterIds");
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+    <Dialog open={isModalOpen} onOpenChange={handleModalState}>
       <DialogContent
         className="md:w-[596px]"
         onEscapeKeyDown={(e) => e.preventDefault()}
@@ -226,7 +226,7 @@ const PaperPrerequisitesModal = ({
                   className="w-full"
                   onClick={() => {
                     navigate({ to: "/exam-type" }).finally(() => {
-                      setIsModalOpen(false);
+                      handleModalState(false);
                     });
                   }}
                 >
