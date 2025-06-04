@@ -50,10 +50,8 @@ interface HeaderStore {
 }
 
 export const useHeaderStore = create<HeaderStore>()((set) => ({
-  // Initial state for all editable fields
   headerData: initialFieldState,
   presetHeaderData: (headerData) => set(() => ({ headerData })),
-  // Set value for any field
   setValue: (headerId, value) =>
     set((state) => ({
       headerData: {
@@ -65,7 +63,6 @@ export const useHeaderStore = create<HeaderStore>()((set) => ({
       },
     })),
 
-  // Set editing state for a field while ensuring all other fields are not editing
   setIsEditing: (headerId, value) =>
     set((state) => {
       const updatedHeaderData = { ...state.headerData };

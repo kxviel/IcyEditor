@@ -73,11 +73,11 @@ const Home = () => {
   };
 
   const handleDeletePaper = (id: number) => {
-deleteFn.mutate({ body: { id } })
+    deleteFn.mutate({ body: { id } });
   };
 
-return (
-<div className="flex h-full flex-col gap-6">
+  return (
+    <div className="flex h-full flex-col gap-6">
       {/* Header */}
       <div className="flex w-full items-center justify-between space-x-4 pt-20">
         <div>
@@ -106,7 +106,7 @@ return (
           <DatePickerWithRange date={date} setDate={setDate} />
 
           <Button variant="outline" onClick={handleSort}>
-            {order === "asc" ? <SortAscIcon /> : <SortDescIcon />} 
+            {order === "asc" ? <SortAscIcon /> : <SortDescIcon />}
             <span className="ml-2">Sort by Date</span>
           </Button>
         </div>
@@ -123,7 +123,10 @@ return (
       {!isPending && data?.examData && data.examData.length > 0 && (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {data.examData.map((card) => (
-            <Card key={card.ID} className="group p-5 transition-shadow hover:shadow-md">
+            <Card
+              key={card.ID}
+              className="group p-5 transition-shadow hover:shadow-md"
+            >
               <div className="mb-4 flex items-start justify-between">
                 <div className="flex-1">
                   <p className="text-xs text-slate-600">
@@ -133,7 +136,7 @@ return (
                     })}
                   </p>
 
-                  <h2 className="mb-4 text-xl font-semibold line-clamp-2">
+                  <h2 className="mb-4 line-clamp-2 text-xl font-semibold">
                     {card.EXAM_NAME}
                   </h2>
                 </div>
@@ -165,7 +168,7 @@ return (
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex flex-wrap gap-2">
                   <Badge
                     variant="secondary"
                     className="bg-purple-50 text-purple-500 hover:bg-purple-50"
@@ -201,12 +204,11 @@ return (
       {/* Empty State - Centered */}
       {!isPending && (!data?.examData || data.examData.length === 0) && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-lg text-gray-500 mb-2">No question papers found</p>
-          <p className="text-sm text-gray-400 mb-4">
-            {searchTerm || (date?.from && date?.to) ? 
-              "Try adjusting your search or date filters" : 
-              "Create your first question paper to get started"
-            }
+          <p className="mb-2 text-lg text-gray-500">No question papers found</p>
+          <p className="mb-4 text-sm text-gray-400">
+            {searchTerm || (date?.from && date?.to)
+              ? "Try adjusting your search or date filters"
+              : "Create your first question paper to get started"}
           </p>
           {!searchTerm && (!date?.from || !date?.to) && (
             <Button onClick={() => navigate({ to: "/exam-type" })}>
@@ -218,10 +220,10 @@ return (
 
       {/* Pagination */}
       {data?.examData && data.examData.length > 0 && (
-      <Pagination
-        totalPages={Math.ceil(rowCount / 10)}
-        onPageChange={handlePageChange}
-      />
+        <Pagination
+          totalPages={Math.ceil(rowCount / 10)}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   );

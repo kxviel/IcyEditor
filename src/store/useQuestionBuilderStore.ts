@@ -2,6 +2,7 @@ import { addIndexesToFields } from "@/lib/utils";
 import { queryClient } from "@/main";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useHeaderStore } from "./useHeaderStore";
 
 export type Fieldtype = Map<string, CategoryItem>;
 
@@ -175,6 +176,14 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
             });
           }
 
+          let totalMarks = 0;
+          newFields.forEach((category) => {
+            const categoryMarks = parseInt(category.categoryMarks) || 0;
+            const questionCount = category.questions.length;
+            totalMarks += categoryMarks * questionCount;
+          });
+
+          useHeaderStore.getState().setValue("totalMarks", `${totalMarks}`);
           return { fields: newFields };
         }),
       editQuestion: (

@@ -2,7 +2,8 @@
   "name": "test-generator",
   "version": "1.0.1",
   "author": {
-    "name": "Kevin D Goveas"
+    "name": "Kevin D Goveas",
+    "email": "kxviel@proton.me"
   },
   "private": true,
   "type": "module",
