@@ -413,7 +413,6 @@ const QuestionBuilder = ({ examId }: Props) => {
         </div>
       )}
 
-      {/* Prerequisites Modal */}
       {isModalOpen && (
         <PaperPrerequisitesModal
           isModalOpen={isModalOpen}
