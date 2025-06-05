@@ -37,11 +37,11 @@ const QuestionList = ({ chapterIds }: Props) => {
     categoryName: string,
     question: any,
   ) => {
-    addQuestion(categoryId, categoryName, {
+    addQuestion(categoryId?.toString(), categoryName, {
       questionId: question.id,
       questionText: question.QUESTION_DATA,
       ANSWER_DATA: question.ANSWER_DATA,
-      CATEGORY_ID: question.CATEGORY_ID,
+      CATEGORY_ID: question.CATEGORY_ID?.toString(),
       CHAPTER_ID: question.CHAPTER_ID,
       FILE_ID: question.FILE_ID,
       REASON: question.REASON,
