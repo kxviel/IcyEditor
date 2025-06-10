@@ -10,16 +10,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { Check } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useState } from "react";
 
-const STEPS = 3;
+const STEPS = ["Exam Type", "Builder", "Preview"];
 const builderPaths = ["/builder/manual-selection", "/builder/auto-selection"];
 const stepperDict: Record<string, number> = {
   "/exam-type": 0,
@@ -96,39 +90,50 @@ const Stepper = () => {
 
   return (
     <>
-      <TooltipProvider delayDuration={300}>
-        <div className="flex items-center">
-          {Array.from({ length: STEPS }).map((_, index) => (
-            <div key={index} className="flex items-center">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div
-                    className={`${index <= stepperDict[pathname] ? "bg-violet-500" : "bg-gray-200"} flex h-6 w-6 items-center justify-center rounded-full hover:cursor-pointer hover:shadow-md`}
-                    onClick={() => handleClick(index)}
-                  >
-                    {index < stepperDict[pathname] ? (
-                      <Check className="h-4 w-4 text-white" />
-                    ) : (
-                      <div className="h-2 w-2 rounded-full bg-white" />
-                    )}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent className="border border-violet-200 bg-white/80 text-black">
-                  <p>
-                    {index === 0
-                      ? "Exam Type"
-                      : index === 1
-                        ? "Builder"
-                        : "Preview"}
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-
-              {index < STEPS - 1 && <div className="h-1 w-20 bg-gray-200" />}
+      <div className="flex items-center justify-between">
+        {STEPS.map((step, index) => (
+          <div className="gap flex items-start" key={step}>
+            {/* Circle w Label */}
+            <div className="flex flex-col items-center">
+              <div
+                className={`${
+                  index <= stepperDict[pathname]
+                    ? "bg-violet-500 text-white"
+                    : "bg-gray-200 text-gray-400"
+                } mb-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-all duration-200 hover:shadow-md`}
+                onClick={() => handleClick(index)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    handleClick(index);
+                  }
+                }}
+              >
+                {index < stepperDict[pathname] ? (
+                  <Check className="h-4 w-4 text-white" />
+                ) : (
+                  <div className="h-2 w-2 rounded-full bg-white" />
+                )}
+              </div>
+              <span className="text-center text-sm font-medium text-gray-700">
+                {step}
+              </span>
             </div>
-          ))}
-        </div>
-      </TooltipProvider>
+
+            {/* Line */}
+            {index < STEPS.length - 1 && (
+              <div
+                className={`mt-3 h-1 w-20 ${
+                  index < stepperDict[pathname]
+                    ? "bg-violet-500"
+                    : "bg-gray-200"
+                }`}
+              />
+            )}
+          </div>
+        ))}
+      </div>
 
       {isBlockerOpen && (
         <AlertDialog open={isBlockerOpen} onOpenChange={setIsBlockerOpen}>
