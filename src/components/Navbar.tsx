@@ -43,10 +43,30 @@ const Navbar = () => {
 
   const user = getUser();
 
-  const isExamTypePage = pathname === "/exam-type";
+  const needBackArrow = [
+    "/exam-type",
+    "/builder/manual-selection",
+    "/builder/auto-selection",
+    "/preview",
+  ].includes(pathname);
+  console.log("Current Pathname:", pathname);
 
-  const handleBackToDashboard = () => {
-    navigate({ to: "/", search: { page: 1 } });
+  const handleBack = () => {
+    if (pathname === "/exam-type") {
+      navigate({ to: "/", search: { page: 1 } });
+    } else if (
+      ["/builder/manual-selection", "/builder/auto-selection"].includes(
+        pathname,
+      )
+    ) {
+      navigate({ to: "/exam-type" });
+    } else if (pathname === "/preview") {
+      navigate({
+        to: "/builder/$examId",
+        params: { examId: "manual-selection" },
+        search: { needPreselection: false },
+      });
+    }
   };
 
   const handleLogoClick = () => {
@@ -62,19 +82,31 @@ const Navbar = () => {
     navigate({ to: "/users", search: { page: 1 } });
   };
 
+  let backLabel = "Back to Dashboard";
+
+  if (pathname === "/exam-type") {
+    backLabel = "Back to Dashboard";
+  } else if (
+    ["/builder/manual-selection", "/builder/auto-selection"].includes(pathname)
+  ) {
+    backLabel = "Back to Exam Type";
+  } else if (pathname === "/preview") {
+    backLabel = "Back to Builder";
+  }
+
   return (
     <header className="h-[72px] w-full border-b border-gray-200 bg-white">
       <nav className="mx-auto flex h-full max-w-screen-xl items-center justify-between gap-2 px-8">
         {/* Logo or Back Button */}
         <div className="flex items-center">
-          {isExamTypePage ? (
+          {needBackArrow ? (
             <Button
               variant="ghost"
-              onClick={handleBackToDashboard}
+              onClick={handleBack}
               className="flex items-center gap-2 text-gray-600 text-primary hover:text-gray-900"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
+              {backLabel}
             </Button>
           ) : (
             <div className="cursor-pointer" onClick={handleLogoClick}>
