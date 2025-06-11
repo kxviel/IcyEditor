@@ -13,17 +13,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import Logo from "@/assets/Logo.svg";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import SavePaper from "@/features/Builder/SavePaper";
 import Stepper from "@/components/ui/stepper";
-import AvatarPlaceholder from "@/assets/avatarImg.svg";
+import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { useModalStore } from "@/store/useModalStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "./ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronDown } from "lucide-react";
+import { Avatar, AvatarImage } from "./ui/avatar";
+import AvatarPlaceholder from "@/assets/avatarImg.svg";
 
 const allowedStepperRoutes = [
   "/builder/manual-selection",
@@ -125,13 +126,20 @@ const Navbar = () => {
         {/* Save Paper - only show on preview */}
         {pathname === "/preview" && <SavePaper />}
 
+        <Separator className="mx-2 h-6" orientation="vertical" />
+
         {/* User Avatar Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Button
+              variant="link"
+              className="relative flex items-center gap-4 outline-none"
+            >
               <Avatar className="h-8 w-8">
                 <AvatarImage src={AvatarPlaceholder} alt="User avatar" />
               </Avatar>
+
+              <ChevronDown size={24} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
