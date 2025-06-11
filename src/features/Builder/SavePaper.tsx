@@ -69,24 +69,25 @@ const SavePaper = () => {
     }
   };
 
+  const s3Path = "https://guiderimages.s3.ap-south-1.amazonaws.com/docs";
   const layoutDict: Record<
     string,
     { path: string; patchContent: Record<string, IPatch> }
   > = {
     "1": {
-      path: "./src/assets/headers/layout_one.docx",
+      path: `${s3Path}/layout_one.docx`,
       patchContent: docxHeaderOne(headerData, fontSize),
     },
     "2": {
-      path: "./src/assets/headers/layout_two.docx",
+      path: `${s3Path}/layout_two.docx`,
       patchContent: docxHeaderTwo(headerData, fontSize),
     },
     "3": {
-      path: "./src/assets/headers/layout_three.docx",
+      path: `${s3Path}/layout_three.docx`,
       patchContent: docxHeaderTwo(headerData, fontSize),
     },
     "4": {
-      path: "./src/assets/headers/layout_four.docx",
+      path: `${s3Path}/layout_four.docx`,
       patchContent: docxHeaderFour(headerData, fontSize),
     },
   };
