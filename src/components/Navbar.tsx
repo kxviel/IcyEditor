@@ -155,6 +155,20 @@ const Navbar = () => {
                 Complete Profile
               </DropdownMenuItem>
             )}
+
+            {user && user.isProfileCompleted && (
+              <DropdownMenuItem
+                onClick={() => {
+                  setModal("COMPLETE_PROFILE", {
+                    isOpen: true,
+                    data: getUser(),
+                  });
+                }}
+              >
+                Edit Profile
+              </DropdownMenuItem>
+            )}
+
             {user && user.IS_SUPER_ADMIN > 0 && (
               <DropdownMenuItem onClick={handleViewUsers}>
                 View Users
