@@ -32,7 +32,6 @@ import { useGetSeries } from "../Builder/api/getSeries";
 import { UpdateUserProps, useUpdateUser } from "./api/updateUser";
 import { useAuthStore, User } from "@/store/useAuthStore";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
 
 const registerSchema = z
   .object({
@@ -110,20 +109,6 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
     useGetPublication();
   const { data: series, isPending: isSeriesPending } =
     useGetSeries(watchedPublicationId);
-
-  // Reset city when state changes
-  useEffect(() => {
-    if (watchedState && form.getValues("city")) {
-      form.setValue("city", "");
-    }
-  }, [watchedState, form]);
-
-  // Reset series when publication changes
-  useEffect(() => {
-    if (watchedPublicationId && form.getValues("seriesId")) {
-      form.setValue("seriesId", "");
-    }
-  }, [watchedPublicationId, form]);
 
   const onSubmit = (data: RegisterSchemaTypes) => {
     const user = getUser();
@@ -212,7 +197,10 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                       <FormItem>
                         <FormLabel>State</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
+                          onValueChange={(val) => {
+                            field.onChange(val);
+                            form.setValue("city", "");
+                          }}
                           defaultValue={field.value}
                           disabled={isFormDisabled}
                         >
@@ -262,7 +250,10 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                       <FormItem>
                         <FormLabel>Publication</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
+                          onValueChange={(val) => {
+                            field.onChange(val);
+                            form.setValue("seriesId", "");
+                          }}
                           defaultValue={field.value}
                           disabled={isFormDisabled}
                         >
