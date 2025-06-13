@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/useAuthStore";
+import { toast } from "sonner";
 
 const SavePaper = () => {
   const getUser = useAuthStore((state) => state.getUser);
@@ -93,23 +94,40 @@ const SavePaper = () => {
   };
 
   const handleDownloadDOCX = async () => {
-    const response = await fetch(layoutDict[headerLayout].path);
+    if (!layoutDict[headerLayout]) {
+      console.error("Invalid header layout selected.");
+      toast.error("Invalid header layout selected.");
+      return;
+    }
+
+    if (!fields || fields.size === 0) {
+      console.error("No fields available to generate the document.");
+      toast.error("No fields available to generate the document.");
+      return;
+    }
+
+    const headerObject = layoutDict[headerLayout];
+
+    const response = await fetch(headerObject.path);
     const responseBlob = await response.blob();
 
     const docxBlob = generateDocFromFields(fields, Number(fontSize));
+    const headerPatch = headerObject.patchContent;
+
+    const allPatches = {
+      ...headerPatch,
+      content: {
+        type: PatchType.DOCUMENT,
+        children: docxBlob,
+      },
+    };
 
     if (docxBlob && responseBlob) {
       patchDocument({
         keepOriginalStyles: true,
         outputType: "blob",
         data: responseBlob,
-        patches: {
-          content: {
-            type: PatchType.DOCUMENT,
-            children: docxBlob,
-          },
-          ...layoutDict[headerLayout].patchContent,
-        },
+        patches: allPatches,
       }).then((formattedDoc) => {
         saveAs(
           formattedDoc,
