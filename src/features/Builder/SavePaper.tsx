@@ -108,7 +108,12 @@ const SavePaper = () => {
 
     const headerObject = layoutDict[headerLayout];
 
-    const response = await fetch(headerObject.path);
+    const response = await fetch(headerObject.path).catch((error) => {
+      console.error("Error fetching the header template:", error);
+      toast.error("Error fetching the header template.");
+      throw error;
+    });
+
     const responseBlob = await response.blob();
 
     const docxBlob = generateDocFromFields(fields, Number(fontSize));
@@ -128,16 +133,21 @@ const SavePaper = () => {
         outputType: "blob",
         data: responseBlob,
         patches: allPatches,
-      }).then((formattedDoc) => {
-        saveAs(
-          formattedDoc,
-          `${headerData.examName.value} - ${format(new Date(), "dd-MM-yyyy HH:mm")}.docx`,
-        );
-      });
+      })
+        .then((formattedDoc) => {
+          saveAs(
+            formattedDoc,
+            `${headerData.examName.value} - ${format(new Date(), "dd-MM-yyyy HH:mm")}.docx`,
+          );
+        })
+        .then(() => {
+          handleSaveManualPaper();
+        });
     }
   };
 
   const handleDownloadPDF = async () => {
+    handleSaveManualPaper();
     window.open("/print", "_blank", "height=1122.85,width=794.44");
   };
 
