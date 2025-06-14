@@ -1,3 +1,4 @@
+import { useHeaderStore } from "@/store/useHeaderStore";
 import EditableField from "../shared/EditableField";
 
 const PaperHeaderFour = ({
@@ -7,6 +8,7 @@ const PaperHeaderFour = ({
   isPreview?: boolean;
   headerRef?: React.RefObject<HTMLDivElement>;
 }) => {
+  const classNumber = useHeaderStore((state) => state.classNumber);
   return (
     <div
       className="mb-1 flex w-full gap-2 border-b border-black"
@@ -14,7 +16,7 @@ const PaperHeaderFour = ({
     >
       <div className="flex h-full w-1/4 flex-col justify-evenly gap-1 p-4 leading-5">
         <p>Name:</p>
-        <p>Grade:</p>
+        <p>Grade: {classNumber}</p>
         <EditableField
           headerId="subjectName"
           fontSize={14}

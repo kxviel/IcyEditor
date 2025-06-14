@@ -43,6 +43,8 @@ export interface HeaderItem {
 
 interface HeaderStore {
   headerData: Record<string, HeaderItem>;
+  classNumber: string;
+  setClassNumber: (classNumber: string) => void;
   setValue: (headerId: string, value: string) => void;
   setIsEditing: (headerId: string, isEditing: boolean) => void;
   presetHeaderData: (headerData: HeaderData) => void;
@@ -51,6 +53,8 @@ interface HeaderStore {
 
 export const useHeaderStore = create<HeaderStore>()((set) => ({
   headerData: initialFieldState,
+  classNumber: "",
+  setClassNumber: (classNumber) => set({ classNumber }),
   presetHeaderData: (headerData) => set(() => ({ headerData })),
   setValue: (headerId, value) =>
     set((state) => ({

@@ -68,14 +68,6 @@ export const generateDocFromFields = (
 
   // Create and return the document
   return paragraphs;
-  // return new Document({
-  //   sections: [
-  //     {
-  //       properties: {},
-  //       children: paragraphs,
-  //     },
-  //   ],
-  // });
 };
 
 // Helper function to process question text and handle HTML content

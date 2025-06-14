@@ -57,6 +57,16 @@ export const docxHeaderOne = (
       }),
     ],
   },
+  class_number: {
+    type: PatchType.PARAGRAPH,
+    children: [
+      new TextRun({
+        text: `Marks: ${headerData.classNumber}`,
+        bold: true,
+        size: (14 + Number(fontSize)) * 2,
+      }),
+    ],
+  },
 });
 
 export const docxHeaderTwo = (

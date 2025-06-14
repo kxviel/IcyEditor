@@ -85,12 +85,10 @@ export const ControlledSelect = ({
 }: Props) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const setIds = useQuestionBuilderStore((state) => state.setIds);
+  const setClassNumber = useHeaderStore((state) => state.setClassNumber);
   const resetHeader = useHeaderStore((state) => state.reset);
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
-  // const invalidateRelatedQueries = useQuestionBuilderStore(
-  //   (state) => state.invalidateRelatedQueries,
-  // );
   const setChapterNames = useQuestionBuilderStore(
     (state) => state.setChapterNames,
   );
@@ -99,7 +97,10 @@ export const ControlledSelect = ({
   const [pendingValue, setPendingValue] = useState<string | null>(null);
 
   const handleValueChange = (value: string) => {
-    console.log(value);
+    if (label === "classId") {
+      const curr = options.filter((option) => option.value === value);
+      setClassNumber(curr?.[0]?.label || "");
+    }
 
     if (isModal || fields.size === 0) {
       //if modal OR no fields, no need to confirm changes
