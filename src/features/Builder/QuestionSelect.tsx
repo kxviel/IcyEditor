@@ -111,67 +111,94 @@ const QuestionSelect = ({ chapterIds }: Props) => {
   if (isPending) {
     return (
       <div className="relative flex h-full w-1/2 items-center justify-center">
-        <span>Loading questions...</span>
+        Loading..., Please wait...
       </div>
     );
   }
 
   return (
     <div className="relative h-full w-1/2">
-      <form>
-        <div className="custom_scrollbar h-[calc(100%-56px)] w-full overflow-y-auto bg-white p-3 shadow-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Section Name</TableHead>
-                <TableHead>Question Count</TableHead>
-                <TableHead>Required Questions</TableHead>
+      <form className="h-full w-full overflow-y-auto bg-white p-3 shadow-md">
+        <Table>
+          <TableHeader className="sticky top-0 z-10 bg-white">
+            <TableRow className="bg-gray-50">
+              <TableHead className="font-semibold">Section Name</TableHead>
+              <TableHead className="text-center font-semibold">
+                Question Count
+              </TableHead>
+              <TableHead className="text-center font-semibold">
+                Required Questions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {questionList?.categories.map((category, index) => (
+              <TableRow
+                key={category.categoryId}
+                className={index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}
+              >
+                <TableCell className="font-medium">
+                  {category.categoryName}
+                </TableCell>
+                <TableCell className="text-center">
+                  <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
+                    {category.questionCount}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <Input
+                    type="text"
+                    placeholder="0"
+                    className={`text-center ${
+                      errors[category.categoryId]
+                        ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+                        : ""
+                    }`}
+                    value={
+                      formData[category.categoryId] === 0
+                        ? ""
+                        : formData[category.categoryId]?.toString() || ""
+                    }
+                    onChange={(e) =>
+                      handleInputChange(category.categoryId, e.target.value)
+                    }
+                  />
+                  {errors[category.categoryId] && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors[category.categoryId]}
+                    </p>
+                  )}
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {questionList?.categories.map((category) => (
-                <TableRow key={category.categoryId}>
-                  <TableCell className="font-medium">
-                    {category.categoryName}
-                  </TableCell>
-                  <TableCell>{category.questionCount}</TableCell>
-                  <TableCell>
-                    <Input
-                      type="text"
-                      placeholder="0"
-                      value={
-                        formData[category.categoryId] === 0
-                          ? ""
-                          : formData[category.categoryId]?.toString() || ""
-                      }
-                      onChange={(e) =>
-                        handleInputChange(category.categoryId, e.target.value)
-                      }
-                    />
-                    {errors[category.categoryId] && (
-                      <p className="text-sm text-red-500">
-                        {errors[category.categoryId]}
-                      </p>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
 
-        <div className="absolute bottom-0 flex h-14 w-full items-center gap-4 bg-white px-4">
+        <div className="absolute bottom-0 flex h-14 w-full items-center gap-4 border-t border-gray-200 bg-white px-4 shadow-lg">
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full font-medium"
             onClick={handleBack}
+            disabled={autoGenerate.isPending}
           >
             Back
           </Button>
 
-          <Button type="submit" className="w-full" onClick={handleSubmit}>
-            {autoGenerate.isPending ? "Generating..." : "Generate Questions"}
+          <Button
+            type="submit"
+            className="w-full"
+            onClick={handleSubmit}
+            disabled={autoGenerate.isPending}
+          >
+            {autoGenerate.isPending ? (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
+                Generating...
+              </div>
+            ) : (
+              "Generate Questions"
+            )}
           </Button>
         </div>
       </form>

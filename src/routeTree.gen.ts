@@ -10,76 +10,64 @@
 
 import { createFileRoute } from '@tanstack/react-router'
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as PrintRouteImport } from './routes/print'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthRouteImport } from './routes/_auth'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as PrintImport } from './routes/print'
-import { Route as LoginImport } from './routes/login'
-import { Route as AuthImport } from './routes/_auth'
+const ForgotPasswordLazyRouteImport = createFileRoute('/forgot-password')()
+const AuthIndexLazyRouteImport = createFileRoute('/_auth/')()
+const AuthUsersLazyRouteImport = createFileRoute('/_auth/users')()
+const AuthPreviewLazyRouteImport = createFileRoute('/_auth/preview')()
+const AuthExamTypeLazyRouteImport = createFileRoute('/_auth/exam-type')()
+const AuthBuilderExamIdLazyRouteImport = createFileRoute(
+  '/_auth/builder/$examId',
+)()
 
-// Create Virtual Routes
-
-const ForgotPasswordLazyImport = createFileRoute('/forgot-password')()
-const AuthIndexLazyImport = createFileRoute('/_auth/')()
-const AuthUsersLazyImport = createFileRoute('/_auth/users')()
-const AuthPreviewLazyImport = createFileRoute('/_auth/preview')()
-const AuthExamTypeLazyImport = createFileRoute('/_auth/exam-type')()
-const AuthBuilderExamIdLazyImport = createFileRoute('/_auth/builder/$examId')()
-
-// Create/Update Routes
-
-const ForgotPasswordLazyRoute = ForgotPasswordLazyImport.update({
+const ForgotPasswordLazyRoute = ForgotPasswordLazyRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any).lazy(() =>
   import('./routes/forgot-password.lazy').then((d) => d.Route),
 )
-
-const PrintRoute = PrintImport.update({
+const PrintRoute = PrintRouteImport.update({
   id: '/print',
   path: '/print',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const LoginRoute = LoginImport.update({
+const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AuthRoute = AuthImport.update({
+const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AuthIndexLazyRoute = AuthIndexLazyImport.update({
+const AuthIndexLazyRoute = AuthIndexLazyRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthRoute,
 } as any).lazy(() => import('./routes/_auth/index.lazy').then((d) => d.Route))
-
-const AuthUsersLazyRoute = AuthUsersLazyImport.update({
+const AuthUsersLazyRoute = AuthUsersLazyRouteImport.update({
   id: '/users',
   path: '/users',
   getParentRoute: () => AuthRoute,
 } as any).lazy(() => import('./routes/_auth/users.lazy').then((d) => d.Route))
-
-const AuthPreviewLazyRoute = AuthPreviewLazyImport.update({
+const AuthPreviewLazyRoute = AuthPreviewLazyRouteImport.update({
   id: '/preview',
   path: '/preview',
   getParentRoute: () => AuthRoute,
 } as any).lazy(() => import('./routes/_auth/preview.lazy').then((d) => d.Route))
-
-const AuthExamTypeLazyRoute = AuthExamTypeLazyImport.update({
+const AuthExamTypeLazyRoute = AuthExamTypeLazyRouteImport.update({
   id: '/exam-type',
   path: '/exam-type',
   getParentRoute: () => AuthRoute,
 } as any).lazy(() =>
   import('./routes/_auth/exam-type.lazy').then((d) => d.Route),
 )
-
-const AuthBuilderExamIdLazyRoute = AuthBuilderExamIdLazyImport.update({
+const AuthBuilderExamIdLazyRoute = AuthBuilderExamIdLazyRouteImport.update({
   id: '/builder/$examId',
   path: '/builder/$examId',
   getParentRoute: () => AuthRoute,
@@ -87,98 +75,7 @@ const AuthBuilderExamIdLazyRoute = AuthBuilderExamIdLazyImport.update({
   import('./routes/_auth/builder.$examId.lazy').then((d) => d.Route),
 )
 
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/_auth': {
-      id: '/_auth'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthImport
-      parentRoute: typeof rootRoute
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/print': {
-      id: '/print'
-      path: '/print'
-      fullPath: '/print'
-      preLoaderRoute: typeof PrintImport
-      parentRoute: typeof rootRoute
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/_auth/exam-type': {
-      id: '/_auth/exam-type'
-      path: '/exam-type'
-      fullPath: '/exam-type'
-      preLoaderRoute: typeof AuthExamTypeLazyImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/preview': {
-      id: '/_auth/preview'
-      path: '/preview'
-      fullPath: '/preview'
-      preLoaderRoute: typeof AuthPreviewLazyImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/users': {
-      id: '/_auth/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof AuthUsersLazyImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/': {
-      id: '/_auth/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AuthIndexLazyImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/builder/$examId': {
-      id: '/_auth/builder/$examId'
-      path: '/builder/$examId'
-      fullPath: '/builder/$examId'
-      preLoaderRoute: typeof AuthBuilderExamIdLazyImport
-      parentRoute: typeof AuthImport
-    }
-  }
-}
-
-// Create and export the route tree
-
-interface AuthRouteChildren {
-  AuthExamTypeLazyRoute: typeof AuthExamTypeLazyRoute
-  AuthPreviewLazyRoute: typeof AuthPreviewLazyRoute
-  AuthUsersLazyRoute: typeof AuthUsersLazyRoute
-  AuthIndexLazyRoute: typeof AuthIndexLazyRoute
-  AuthBuilderExamIdLazyRoute: typeof AuthBuilderExamIdLazyRoute
-}
-
-const AuthRouteChildren: AuthRouteChildren = {
-  AuthExamTypeLazyRoute: AuthExamTypeLazyRoute,
-  AuthPreviewLazyRoute: AuthPreviewLazyRoute,
-  AuthUsersLazyRoute: AuthUsersLazyRoute,
-  AuthIndexLazyRoute: AuthIndexLazyRoute,
-  AuthBuilderExamIdLazyRoute: AuthBuilderExamIdLazyRoute,
-}
-
-const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
-
 export interface FileRoutesByFullPath {
-  '': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/print': typeof PrintRoute
   '/forgot-password': typeof ForgotPasswordLazyRoute
@@ -188,7 +85,6 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthIndexLazyRoute
   '/builder/$examId': typeof AuthBuilderExamIdLazyRoute
 }
-
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/print': typeof PrintRoute
@@ -199,9 +95,8 @@ export interface FileRoutesByTo {
   '/': typeof AuthIndexLazyRoute
   '/builder/$examId': typeof AuthBuilderExamIdLazyRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
   '/print': typeof PrintRoute
@@ -212,11 +107,9 @@ export interface FileRoutesById {
   '/_auth/': typeof AuthIndexLazyRoute
   '/_auth/builder/$examId': typeof AuthBuilderExamIdLazyRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | ''
     | '/login'
     | '/print'
     | '/forgot-password'
@@ -248,7 +141,6 @@ export interface FileRouteTypes {
     | '/_auth/builder/$examId'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   LoginRoute: typeof LoginRoute
@@ -256,68 +148,98 @@ export interface RootRouteChildren {
   ForgotPasswordLazyRoute: typeof ForgotPasswordLazyRoute
 }
 
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/print': {
+      id: '/print'
+      path: '/print'
+      fullPath: '/print'
+      preLoaderRoute: typeof PrintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth/': {
+      id: '/_auth/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthIndexLazyRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/users': {
+      id: '/_auth/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthUsersLazyRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/preview': {
+      id: '/_auth/preview'
+      path: '/preview'
+      fullPath: '/preview'
+      preLoaderRoute: typeof AuthPreviewLazyRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/exam-type': {
+      id: '/_auth/exam-type'
+      path: '/exam-type'
+      fullPath: '/exam-type'
+      preLoaderRoute: typeof AuthExamTypeLazyRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/builder/$examId': {
+      id: '/_auth/builder/$examId'
+      path: '/builder/$examId'
+      fullPath: '/builder/$examId'
+      preLoaderRoute: typeof AuthBuilderExamIdLazyRouteImport
+      parentRoute: typeof AuthRoute
+    }
+  }
+}
+
+interface AuthRouteChildren {
+  AuthExamTypeLazyRoute: typeof AuthExamTypeLazyRoute
+  AuthPreviewLazyRoute: typeof AuthPreviewLazyRoute
+  AuthUsersLazyRoute: typeof AuthUsersLazyRoute
+  AuthIndexLazyRoute: typeof AuthIndexLazyRoute
+  AuthBuilderExamIdLazyRoute: typeof AuthBuilderExamIdLazyRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthExamTypeLazyRoute: AuthExamTypeLazyRoute,
+  AuthPreviewLazyRoute: AuthPreviewLazyRoute,
+  AuthUsersLazyRoute: AuthUsersLazyRoute,
+  AuthIndexLazyRoute: AuthIndexLazyRoute,
+  AuthBuilderExamIdLazyRoute: AuthBuilderExamIdLazyRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
   PrintRoute: PrintRoute,
   ForgotPasswordLazyRoute: ForgotPasswordLazyRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/_auth",
-        "/login",
-        "/print",
-        "/forgot-password"
-      ]
-    },
-    "/_auth": {
-      "filePath": "_auth.tsx",
-      "children": [
-        "/_auth/exam-type",
-        "/_auth/preview",
-        "/_auth/users",
-        "/_auth/",
-        "/_auth/builder/$examId"
-      ]
-    },
-    "/login": {
-      "filePath": "login.tsx"
-    },
-    "/print": {
-      "filePath": "print.tsx"
-    },
-    "/forgot-password": {
-      "filePath": "forgot-password.lazy.tsx"
-    },
-    "/_auth/exam-type": {
-      "filePath": "_auth/exam-type.lazy.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/preview": {
-      "filePath": "_auth/preview.lazy.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/users": {
-      "filePath": "_auth/users.lazy.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/": {
-      "filePath": "_auth/index.lazy.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/builder/$examId": {
-      "filePath": "_auth/builder.$examId.lazy.tsx",
-      "parent": "/_auth"
-    }
-  }
-}
-ROUTE_MANIFEST_END */
