@@ -29,6 +29,11 @@ export function EditCategoryMarksModal({
 
   const [marks, setMarks] = useState(currentMarks);
 
+  const handeSaveChanges = () => {
+    addCategoryMarks(categoryId, marks);
+    hideModal();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={hideModal}>
       <DialogContent className="max-w-[278px]">
@@ -42,14 +47,7 @@ export function EditCategoryMarksModal({
           <Button variant="outline" onClick={hideModal}>
             Cancel
           </Button>
-          <Button
-            onClick={() => {
-              addCategoryMarks(categoryId, marks);
-              hideModal();
-            }}
-          >
-            Save changes
-          </Button>
+          <Button onClick={handeSaveChanges}>Save changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

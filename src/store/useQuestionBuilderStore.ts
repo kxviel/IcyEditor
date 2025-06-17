@@ -133,6 +133,15 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
               ...currentCategory,
               categoryMarks,
             });
+
+            let totalMarks = 0;
+            newFields.forEach((category) => {
+              const categoryMarks = parseInt(category.categoryMarks) || 0;
+              const questionCount = category.questions.length;
+              totalMarks += categoryMarks * questionCount;
+            });
+
+            useHeaderStore.getState().setValue("totalMarks", `${totalMarks}`);
           }
 
           return { fields: newFields };
