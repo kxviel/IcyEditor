@@ -87,6 +87,8 @@ const QuestionList = ({ chapterIds }: Props) => {
     );
   }
 
+  console.log(fields);
+
   return (
     <div className="custom_scrollbar mt-2 h-full overflow-y-auto">
       <Accordion
@@ -117,11 +119,10 @@ const QuestionList = ({ chapterIds }: Props) => {
                   questions.map((question) => {
                     const isChecked =
                       fields
-                        .get(categoryId)
+                        .get(categoryId.toString())
                         ?.questions?.some(
                           (q) => q.questionId === question.id,
                         ) || false;
-
                     return (
                       <div
                         key={question.id}
