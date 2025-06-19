@@ -16,7 +16,7 @@ import {
 import Logo from "@/assets/Logo.svg";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import SavePaper from "@/features/Builder/SavePaper";
-import Stepper from "@/components/ui/stepper";
+import Stepper from "@/components/stepper";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { useModalStore } from "@/store/useModalStore";

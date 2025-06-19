@@ -1,7 +1,7 @@
 import { Contact } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "@tanstack/react-router";
-import Stepper from "@/components/ui/stepper";
+import Stepper from "@/components/stepper";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";

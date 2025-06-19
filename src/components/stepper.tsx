@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { Check } from "lucide-react";
-import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useState } from "react";
 
 const STEPS = ["Exam Type", "Builder", "Preview"];
@@ -34,7 +33,6 @@ const routeDict: Record<number, Record<string, any>> = {
 const Stepper = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const fields = useQuestionBuilderStore((state) => state.fields);
 
   const [isBlockerOpen, setIsBlockerOpen] = useState(false);
   const [pendingValue, setPendingValue] = useState<Record<string, any> | null>(
@@ -43,34 +41,40 @@ const Stepper = () => {
 
   const handleClick = (clickedIndex: number) => {
     if (clickedIndex === 0) {
+      // Going to Exam Type
       if (pathname === "/exam-type") {
-        return;
+        return; // Already on exam type, do nothing
       } else if (builderPaths.includes(pathname)) {
+        // From builder to exam type - show alert
         setPendingValue(routeDict[clickedIndex]);
         setIsBlockerOpen(true);
       } else if (pathname === "/preview") {
+        // From preview to exam type - show alert
         setPendingValue(routeDict[clickedIndex]);
         setIsBlockerOpen(true);
       }
     } else if (clickedIndex === 1) {
+      // Going to Builder
       if (pathname === "/exam-type") {
-        setPendingValue(routeDict[clickedIndex]);
-        setIsBlockerOpen(true);
-      } else if (builderPaths.includes(pathname)) {
+        // From exam type to builder - do nothing
         return;
+      } else if (builderPaths.includes(pathname)) {
+        return; // Already on builder, do nothing
       } else if (pathname === "/preview") {
+        // From preview to builder - allow direct navigation
         navigate(routeDict[clickedIndex]);
       }
     } else if (clickedIndex === 2) {
+      // Going to Preview
       if (pathname === "/exam-type") {
+        // From exam type to preview - do nothing
+        return;
+      } else if (builderPaths.includes(pathname)) {
+        // From builder to preview - show alert
         setPendingValue(routeDict[clickedIndex]);
         setIsBlockerOpen(true);
-      } else if (builderPaths.includes(pathname) && fields.size > 0) {
-        navigate(routeDict[clickedIndex]);
-      } else if (builderPaths.includes(pathname) && fields.size === 0) {
-        return;
       } else if (pathname === "/preview") {
-        return;
+        return; // Already on preview, do nothing
       }
     }
   };
