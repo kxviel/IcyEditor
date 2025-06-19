@@ -18,7 +18,6 @@ import SortDescIcon from "@/assets/Icons/SortDescIcon";
 import { DatePickerWithRange } from "@/components/DatePickerWithRange";
 import { DateRange } from "react-day-picker";
 import { formatDistance } from "date-fns";
-import { useDeletePaper } from "./api/deletePaper";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
@@ -30,7 +29,6 @@ const Home = () => {
     from: "/_auth",
   }) as { page: number };
 
-  const deleteFn = useDeletePaper();
   const resetHeader = useHeaderStore((state) => state.reset);
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
@@ -70,10 +68,6 @@ const Home = () => {
 
   const handlePageChange = (page: number) => {
     navigate({ to: "/", search: { page } });
-  };
-
-  const handleDeletePaper = (id: number) => {
-    deleteFn.mutate({ body: { id } });
   };
 
   return (
@@ -156,12 +150,6 @@ const Home = () => {
                       }
                     >
                       Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="text-red-600 focus:text-red-600"
-                      onClick={() => handleDeletePaper(card.ID)}
-                    >
-                      Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
