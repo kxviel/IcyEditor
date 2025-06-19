@@ -141,7 +141,9 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
               totalMarks += categoryMarks * questionCount;
             });
 
-            useHeaderStore.getState().setValue("totalMarks", `${totalMarks}`);
+            useHeaderStore
+              .getState()
+              .setHeaderValue("totalMarks", `${totalMarks}`);
           }
 
           return { fields: newFields };
@@ -192,7 +194,9 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
             totalMarks += categoryMarks * questionCount;
           });
 
-          useHeaderStore.getState().setValue("totalMarks", `${totalMarks}`);
+          useHeaderStore
+            .getState()
+            .setHeaderValue("totalMarks", `${totalMarks}`);
           return { fields: newFields };
         }),
       editQuestion: (

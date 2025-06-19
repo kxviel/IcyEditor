@@ -1,6 +1,7 @@
 import { create } from "zustand";
+import { immer } from "zustand/middleware/immer";
 
-const initialFieldState = {
+const headerData = {
   schoolName: {
     placeholder: "SCHOOL NAME",
     value: "SCHOOL NAME",
@@ -33,7 +34,7 @@ const initialFieldState = {
   },
 };
 
-export type HeaderData = typeof initialFieldState;
+export type HeaderData = typeof headerData;
 
 export interface HeaderItem {
   value: string;
@@ -45,42 +46,46 @@ interface HeaderStore {
   headerData: Record<string, HeaderItem>;
   classNumber: string;
   setClassNumber: (classNumber: string) => void;
-  setValue: (headerId: string, value: string) => void;
+  setHeaderValue: (headerId: keyof HeaderData, value: string) => void;
   setIsEditing: (headerId: string, isEditing: boolean) => void;
   presetHeaderData: (headerData: HeaderData) => void;
   reset: () => void;
 }
 
-export const useHeaderStore = create<HeaderStore>()((set) => ({
-  headerData: initialFieldState,
-  classNumber: "",
-  setClassNumber: (classNumber) => set({ classNumber }),
-  presetHeaderData: (headerData) => set(() => ({ headerData })),
-  setValue: (headerId, value) =>
-    set((state) => ({
-      headerData: {
-        ...state.headerData,
-        [headerId]: {
-          ...state.headerData[headerId],
-          value,
-        },
-      },
-    })),
+export const useHeaderStore = create<HeaderStore>()(
+  immer((set) => ({
+    headerData,
+    classNumber: "",
 
-  setIsEditing: (headerId, value) =>
-    set((state) => {
-      const updatedHeaderData = { ...state.headerData };
+    setClassNumber: (classNumber) =>
+      set((state) => {
+        state.classNumber = classNumber;
+      }),
 
-      Object.keys(updatedHeaderData).forEach((key) => {
-        updatedHeaderData[key].isEditing = key === headerId ? value : false;
-      });
+    presetHeaderData: (headerData) =>
+      set((state) => {
+        state.headerData = headerData;
+      }),
 
-      return { headerData: updatedHeaderData };
-    }),
+    setHeaderValue: (headerId, value) =>
+      set((state) => {
+        state.headerData[headerId].value = value;
+      }),
 
-  reset: () => {
-    set({
-      headerData: initialFieldState,
-    });
-  },
-}));
+    setIsEditing: (headerId, isEditing) =>
+      set((state) => {
+        // Set all fields to not editing first
+        Object.keys(state.headerData).forEach((key) => {
+          state.headerData[key].isEditing = false;
+        });
+        // Then set the target field to the desired editing state
+        state.headerData[headerId].isEditing = isEditing;
+      }),
+
+    reset: () =>
+      set((state) => {
+        state.headerData = headerData;
+        state.classNumber = "";
+      }),
+  })),
+);

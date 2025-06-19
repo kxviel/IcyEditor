@@ -1,10 +1,10 @@
-import { useHeaderStore } from "@/store/useHeaderStore";
+import { HeaderData, useHeaderStore } from "@/store/useHeaderStore";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 
 type Props = {
-  headerId: string;
+  headerId: keyof HeaderData;
   fontSize: number;
   fontWeight: number;
   isPreview: boolean;
@@ -24,25 +24,26 @@ const EditableField = ({
   inputClassName = "w-full",
   isTextarea = false,
 }: Props) => {
-  const item = useHeaderStore((state) => state.headerData);
+  const headerData = useHeaderStore((state) => state.headerData);
+  const item = headerData[headerId];
+
   const currentFontSize = usePageSettingsStore(
     (state) => state.currentFontSize,
   );
-
-  const setValue = useHeaderStore((state) => state.setValue);
+  const setHeaderValue = useHeaderStore((state) => state.setHeaderValue);
   const setIsEditing = useHeaderStore((state) => state.setIsEditing);
 
-  if (item[headerId].isEditing) {
+  if (item.isEditing) {
     if (isTextarea) {
       return (
         <Textarea
           className={`w-full rounded border bg-white p-2 text-xs text-black`}
           rows={4}
           autoFocus={true}
-          placeholder={item[headerId].placeholder}
-          value={item[headerId].value}
+          placeholder={item.placeholder}
+          value={item.value}
           onBlur={() => setIsEditing(headerId, false)}
-          onChange={(e) => setValue(headerId, e.target.value)}
+          onChange={(e) => setHeaderValue(headerId, e.target.value)}
           style={{
             fontWeight,
             fontSize: fontSize + Number(currentFontSize),
@@ -50,7 +51,6 @@ const EditableField = ({
         />
       );
     }
-
     return (
       <div className="flex items-center gap-2">
         {prefix && (
@@ -63,14 +63,13 @@ const EditableField = ({
             {prefix}
           </p>
         )}
-
         <Input
           className={inputClassName}
           autoFocus={true}
-          placeholder={item[headerId].placeholder}
-          value={item[headerId].value}
+          placeholder={item.placeholder}
+          value={item.value}
           onBlur={() => setIsEditing(headerId, false)}
-          onChange={(e) => setValue(headerId, e.target.value)}
+          onChange={(e) => setHeaderValue(headerId, e.target.value)}
           style={{
             fontWeight,
             fontSize: fontSize + Number(currentFontSize),
@@ -82,14 +81,16 @@ const EditableField = ({
 
   return (
     <p
-      className={`${textClassName || ""} py-1 ${isPreview ? "" : "hover:cursor-pointer hover:bg-gray-50 hover:p-1"}`}
+      className={`${textClassName || ""} py-1 ${
+        isPreview ? "" : "hover:cursor-pointer hover:bg-gray-50 hover:p-1"
+      }`}
       onClick={() => !isPreview && setIsEditing(headerId, true)}
       style={{
         fontWeight,
         fontSize: fontSize + Number(currentFontSize),
       }}
     >
-      {prefix} {item[headerId].value}
+      {prefix} {item.value}
     </p>
   );
 };

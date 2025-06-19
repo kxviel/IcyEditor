@@ -86,7 +86,7 @@ export const ControlledSelect = ({
   const fields = useQuestionBuilderStore((state) => state.fields);
   const setIds = useQuestionBuilderStore((state) => state.setIds);
   const setClassNumber = useHeaderStore((state) => state.setClassNumber);
-  const resetHeader = useHeaderStore((state) => state.reset);
+  const setHeaderValue = useHeaderStore((state) => state.setHeaderValue);
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
   const setChapterNames = useQuestionBuilderStore(
@@ -100,6 +100,11 @@ export const ControlledSelect = ({
     if (label === "classId") {
       const curr = options.filter((option) => option.value === value);
       setClassNumber(curr?.[0]?.label || "");
+    }
+
+    if (label === "subjectId") {
+      const curr = options.filter((option) => option.value === value);
+      setHeaderValue("subjectName", curr?.[0]?.label || "");
     }
 
     if (isModal || fields.size === 0) {
@@ -127,8 +132,8 @@ export const ControlledSelect = ({
       }
     });
 
-    resetHeader();
     resetBuilder();
+    // resetHeader();
     resetPageSettings();
     // invalidateRelatedQueries();
     localStorage.removeItem("optimized");
