@@ -87,8 +87,6 @@ const QuestionList = ({ chapterIds }: Props) => {
     );
   }
 
-  console.log(fields);
-
   return (
     <div className="custom_scrollbar mt-2 h-full overflow-y-auto">
       <Accordion

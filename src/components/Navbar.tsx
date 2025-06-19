@@ -50,7 +50,6 @@ const Navbar = () => {
     "/builder/auto-selection",
     "/preview",
   ].includes(pathname);
-  console.log("Current Pathname:", pathname);
 
   const handleBack = () => {
     if (pathname === "/exam-type") {

@@ -57,7 +57,7 @@ const PaperPrerequisitesModal = ({
   const chapterNames = useQuestionBuilderStore((state) => state.chapterNames);
 
   const user = getUser();
-  const selectedChapterIds = form.watch("chapterIds");
+  const selectedChapterIds = form.watch("chapterIds") || [];
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleModalState}>
