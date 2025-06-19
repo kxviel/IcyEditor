@@ -27,7 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 
@@ -95,7 +95,14 @@ export const ControlledSelect = ({
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [pendingValue, setPendingValue] = useState<string | null>(null);
 
+  // Track if this is the initial render/population
+  const hasUserInteracted = useRef(false);
+  const currentValue = form.watch(label);
+
   const handleValueChange = (value: string) => {
+    // Mark that user has interacted with the component
+    hasUserInteracted.current = true;
+
     if (label === "classId") {
       const curr = options.filter((option) => option.value === value);
       setHeaderValue("className", curr?.[0]?.label || "");
@@ -106,22 +113,32 @@ export const ControlledSelect = ({
       setHeaderValue("subjectName", curr?.[0]?.label || "");
     }
 
-    if (isModal || fields.size === 0) {
-      //if modal OR no fields, no need to confirm changes
-      applyValueChange(value);
-    } else {
-      // since not modal, confirm changes
+    // Check if we need confirmation:
+    // - Skip confirmation if it's a modal
+    // - Skip confirmation if no fields exist yet
+    // - Skip confirmation if this is the first user interaction and field was empty
+    const shouldConfirm =
+      !isModal &&
+      fields.size > 0 &&
+      hasUserInteracted.current &&
+      currentValue &&
+      currentValue !== value;
+
+    if (shouldConfirm) {
       setPendingValue(value);
       setIsConfirmOpen(true);
+    } else {
+      // No confirmation needed, so apply with reset
+      applyValueChange(value, true);
     }
   };
 
-  const applyValueChange = (value: string) => {
+  const applyValueChange = (value: string, shouldReset: boolean = true) => {
     // Set selected value
     setIds(label, value);
     form.setValue(label, value);
 
-    // Reset related fields
+    // Reset dependent fields
     FIELD_DEPENDENCIES[label].forEach(({ idKey, resetValue }) => {
       form.resetField(idKey);
       setIds(idKey, resetValue);
@@ -131,22 +148,27 @@ export const ControlledSelect = ({
       }
     });
 
-    resetBuilder();
-    // resetHeader();
-    resetPageSettings();
-    // invalidateRelatedQueries();
-    localStorage.removeItem("optimized");
+    // Only reset builder state, page settings, and form when confirmed or no confirmation needed
+    if (shouldReset) {
+      resetBuilder();
+      resetPageSettings();
+
+      // Clear any cached/optimized data
+      localStorage.removeItem("optimized");
+    }
   };
 
   const handleConfirm = () => {
     if (pendingValue !== null) {
-      applyValueChange(pendingValue);
+      // User confirmed, apply with reset
+      applyValueChange(pendingValue, true);
       setPendingValue(null);
     }
     setIsConfirmOpen(false);
   };
 
   const handleCancel = () => {
+    // User cancelled, don't change anything
     setPendingValue(null);
     setIsConfirmOpen(false);
   };
@@ -191,8 +213,8 @@ export const ControlledSelect = ({
             <AlertDialogHeader>
               <AlertDialogTitle>Confirm Change</AlertDialogTitle>
               <AlertDialogDescription>
-                Changing this {labels[label]} will reset all dependent fields.
-                Are you sure you want to continue?
+                Changing this {labels[label]} will reset all dependent fields
+                and clear selected questions. Are you sure you want to continue?
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

@@ -2,7 +2,12 @@ import { addIndexesToFields } from "@/lib/utils";
 import { queryClient } from "@/main";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { immer } from "zustand/middleware/immer";
+import { enableMapSet } from "immer";
 import { useHeaderStore } from "./useHeaderStore";
+
+// Enable Map and Set support in Immer
+enableMapSet();
 
 export type Fieldtype = Map<string, CategoryItem>;
 
@@ -21,7 +26,6 @@ export interface QuestionItem {
   ANSWER_DATA: string;
   CATEGORY_ID: string;
   CHAPTER_ID: number;
-
   FILE_ID: string;
   REASON: string | null;
   REMARKS: string | null;
@@ -88,7 +92,6 @@ interface HeaderStore {
       ANSWER_DATA: string;
       CATEGORY_ID: string;
       CHAPTER_ID: number;
-
       FILE_ID: string;
       REASON: string | null;
       REMARKS: string | null;
@@ -107,9 +110,20 @@ interface HeaderStore {
   reset: () => void;
 }
 
+// Helper function to calculate total marks
+const calculateTotalMarks = (fields: Fieldtype): number => {
+  let totalMarks = 0;
+  fields.forEach((category) => {
+    const categoryMarks = parseInt(category.categoryMarks) || 0;
+    const questionCount = category.questions.length;
+    totalMarks += categoryMarks * questionCount;
+  });
+  return totalMarks;
+};
+
 export const useQuestionBuilderStore = create<HeaderStore>()(
   persist(
-    (set) => ({
+    immer((set) => ({
       fields: new Map(),
       publicationId: "",
       seriesId: "",
@@ -118,68 +132,63 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
       bookId: "",
       chapterIds: [],
       chapterNames: [],
-      setIds: (idKey, value) => set(() => ({ [idKey]: value })),
-      setChapterNames: (names) => set(() => ({ chapterNames: names })),
-      presetFields: (fields) => set(() => ({ fields })),
+
+      setIds: (idKey, value) =>
+        set((state) => {
+          state[idKey] = value as any; // Type assertion needed for union type
+        }),
+
+      setChapterNames: (names) =>
+        set((state) => {
+          state.chapterNames = names;
+        }),
+
+      presetFields: (fields) =>
+        set((state) => {
+          state.fields = fields;
+        }),
+
       addCategoryMarks: (categoryId, categoryMarks) =>
         set((state) => {
-          const newFields = new Map(state.fields);
+          const category = state.fields.get(categoryId);
+          if (category) {
+            category.categoryMarks = categoryMarks;
 
-          if (newFields.has(categoryId)) {
-            const currentCategory = newFields.get(categoryId)!;
-
-            // Add Question to Existing Category
-            newFields.set(categoryId, {
-              ...currentCategory,
-              categoryMarks,
-            });
-
-            let totalMarks = 0;
-            newFields.forEach((category) => {
-              const categoryMarks = parseInt(category.categoryMarks) || 0;
-              const questionCount = category.questions.length;
-              totalMarks += categoryMarks * questionCount;
-            });
-
+            // Calculate and update total marks
+            const totalMarks = calculateTotalMarks(state.fields);
             useHeaderStore
               .getState()
               .setHeaderValue("totalMarks", `${totalMarks}`);
           }
-
-          return { fields: newFields };
         }),
+
       addQuestion: (categoryId, categoryName, addedQuestion) =>
         set((state) => {
-          const newFields = new Map(state.fields);
-          const currentCategory = newFields.get(categoryId);
+          const currentCategory = state.fields.get(categoryId);
 
           if (currentCategory) {
-            const currentQuestions = currentCategory.questions;
-            const questionExists = currentQuestions.some(
+            const questionExists = currentCategory.questions.some(
               (q) => q.questionId === addedQuestion.questionId,
             );
 
             if (questionExists) {
-              const updatedQuestions = currentQuestions.filter(
-                (q) => q.questionId !== addedQuestion.questionId,
+              // Remove existing question
+              const questionIndex = currentCategory.questions.findIndex(
+                (q) => q.questionId === addedQuestion.questionId,
               );
+              currentCategory.questions.splice(questionIndex, 1);
 
-              if (updatedQuestions.length === 0) {
-                newFields.delete(categoryId);
-              } else {
-                newFields.set(categoryId, {
-                  ...currentCategory,
-                  questions: updatedQuestions,
-                });
+              // If no questions left, remove the category
+              if (currentCategory.questions.length === 0) {
+                state.fields.delete(categoryId);
               }
             } else {
-              newFields.set(categoryId, {
-                ...currentCategory,
-                questions: [...currentQuestions, addedQuestion],
-              });
+              // Add new question
+              currentCategory.questions.push(addedQuestion);
             }
           } else {
-            newFields.set(categoryId, {
+            // Create new category with the question
+            state.fields.set(categoryId, {
               categoryId,
               categoryName,
               categoryMarks: "1",
@@ -187,69 +196,53 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
             });
           }
 
-          let totalMarks = 0;
-          newFields.forEach((category) => {
-            const categoryMarks = parseInt(category.categoryMarks) || 0;
-            const questionCount = category.questions.length;
-            totalMarks += categoryMarks * questionCount;
-          });
-
+          // Calculate and update total marks
+          const totalMarks = calculateTotalMarks(state.fields);
           useHeaderStore
             .getState()
             .setHeaderValue("totalMarks", `${totalMarks}`);
-          return { fields: newFields };
         }),
+
       editQuestion: (
-        categoryId: string,
-        oldQuestionId: number,
-        newQuestionId: number,
-        newQuestionText: string,
+        categoryId,
+        oldQuestionId,
+        newQuestionId,
+        newQuestionText,
       ) =>
         set((state) => {
-          const newFields = new Map(state.fields);
-
-          if (newFields.has(categoryId)) {
-            const currentCategory = newFields.get(categoryId)!;
-            const currentQuestions = currentCategory.questions;
-
-            // Find the question to edit
-            const questionIndex = currentQuestions.findIndex(
+          const category = state.fields.get(categoryId);
+          if (category) {
+            const questionIndex = category.questions.findIndex(
               (question) => question.questionId === oldQuestionId,
             );
 
             if (questionIndex !== -1) {
-              // Create a new array with the updated question
-              const updatedQuestions = [...currentQuestions];
-              updatedQuestions[questionIndex] = {
-                ...updatedQuestions[questionIndex],
-                questionId: newQuestionId,
-                questionText: newQuestionText,
-              };
-
-              // Update the category with the modified questions array
-              newFields.set(categoryId, {
-                ...currentCategory,
-                questions: updatedQuestions,
-              });
+              const question = category.questions[questionIndex];
+              question.questionId = newQuestionId;
+              question.questionText = newQuestionText;
             }
           }
-
-          return { fields: newFields };
         }),
+
       sanitizeFields: () =>
-        set((state) => ({ fields: addIndexesToFields(state.fields) })),
+        set((state) => {
+          state.fields = addIndexesToFields(state.fields);
+        }),
+
       reset: () => {
-        set({
-          fields: new Map(),
-          publicationId: "",
-          seriesId: "",
-          classId: "",
-          subjectId: "",
-          bookId: "",
-          chapterIds: [],
+        set((state) => {
+          state.fields = new Map();
+          state.publicationId = "";
+          state.seriesId = "";
+          state.classId = "";
+          state.subjectId = "";
+          state.bookId = "";
+          state.chapterIds = [];
+          state.chapterNames = [];
         });
         useQuestionBuilderStore.persist.clearStorage();
       },
+
       invalidateRelatedQueries: () => {
         queryClient.invalidateQueries({ queryKey: ["GetPublication"] });
         queryClient.invalidateQueries({ queryKey: ["GetSeries"] });
@@ -258,7 +251,7 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
         queryClient.invalidateQueries({ queryKey: ["GetBook"] });
         queryClient.invalidateQueries({ queryKey: ["GetChapter"] });
       },
-    }),
+    })),
     {
       name: "question-builder-store",
       storage: mapStorage,
