@@ -35,6 +35,7 @@ const headerData = {
 };
 
 export type HeaderData = typeof headerData;
+export type HeaderDataKeys = keyof HeaderData;
 
 export interface HeaderItem {
   value: string;
@@ -43,11 +44,9 @@ export interface HeaderItem {
 }
 
 interface HeaderStore {
-  headerData: Record<string, HeaderItem>;
-  classNumber: string;
-  setClassNumber: (classNumber: string) => void;
-  setHeaderValue: (headerId: keyof HeaderData, value: string) => void;
-  setIsEditing: (headerId: string, isEditing: boolean) => void;
+  headerData: Record<HeaderDataKeys, HeaderItem>;
+  setHeaderValue: (headerId: HeaderDataKeys, value: string) => void;
+  setIsEditing: (headerId: HeaderDataKeys, isEditing: boolean) => void;
   presetHeaderData: (headerData: HeaderData) => void;
   reset: () => void;
 }
@@ -55,12 +54,6 @@ interface HeaderStore {
 export const useHeaderStore = create<HeaderStore>()(
   immer((set) => ({
     headerData,
-    classNumber: "",
-
-    setClassNumber: (classNumber) =>
-      set((state) => {
-        state.classNumber = classNumber;
-      }),
 
     presetHeaderData: (headerData) =>
       set((state) => {
@@ -76,7 +69,7 @@ export const useHeaderStore = create<HeaderStore>()(
       set((state) => {
         // Set all fields to not editing first
         Object.keys(state.headerData).forEach((key) => {
-          state.headerData[key].isEditing = false;
+          state.headerData[key as HeaderDataKeys].isEditing = false;
         });
         // Then set the target field to the desired editing state
         state.headerData[headerId].isEditing = isEditing;
@@ -85,7 +78,6 @@ export const useHeaderStore = create<HeaderStore>()(
     reset: () =>
       set((state) => {
         state.headerData = headerData;
-        state.classNumber = "";
       }),
   })),
 );

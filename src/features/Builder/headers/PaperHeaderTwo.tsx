@@ -8,7 +8,7 @@ const PaperHeaderTwo = ({
   isPreview?: boolean;
   headerRef?: React.RefObject<HTMLDivElement>;
 }) => {
-  const classNumber = useHeaderStore((state) => state.classNumber);
+  const className = useHeaderStore((state) => state.headerData["className"]);
   return (
     <div
       className="mb-1 flex w-full flex-col items-center gap-4 border-[3px] border-black p-4"
@@ -54,7 +54,7 @@ const PaperHeaderTwo = ({
 
       <div className="flex w-full items-center justify-between border-t-[3px] border-black px-2 pb-0 pt-3">
         <p>Name: ____________________</p>
-        <p>Class: {classNumber}</p>
+        <p>Class: {className.value || className.placeholder}</p>
         <p>Roll No.: ____________________</p>
       </div>
     </div>

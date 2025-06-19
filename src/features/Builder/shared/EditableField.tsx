@@ -1,10 +1,10 @@
-import { HeaderData, useHeaderStore } from "@/store/useHeaderStore";
+import { HeaderDataKeys, useHeaderStore } from "@/store/useHeaderStore";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 
 type Props = {
-  headerId: keyof HeaderData;
+  headerId: HeaderDataKeys;
   fontSize: number;
   fontWeight: number;
   isPreview: boolean;

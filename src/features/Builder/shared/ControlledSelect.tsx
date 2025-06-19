@@ -85,7 +85,6 @@ export const ControlledSelect = ({
 }: Props) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const setIds = useQuestionBuilderStore((state) => state.setIds);
-  const setClassNumber = useHeaderStore((state) => state.setClassNumber);
   const setHeaderValue = useHeaderStore((state) => state.setHeaderValue);
   const resetBuilder = useQuestionBuilderStore((state) => state.reset);
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
@@ -99,7 +98,7 @@ export const ControlledSelect = ({
   const handleValueChange = (value: string) => {
     if (label === "classId") {
       const curr = options.filter((option) => option.value === value);
-      setClassNumber(curr?.[0]?.label || "");
+      setHeaderValue("className", curr?.[0]?.label || "");
     }
 
     if (label === "subjectId") {
