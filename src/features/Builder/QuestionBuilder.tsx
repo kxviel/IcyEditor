@@ -66,14 +66,20 @@ const QuestionBuilder = ({ examId }: Props) => {
   }) as { needPreselection: boolean };
 
   const [isModalOpen, setIsModalOpen] = useState(needPreselection);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
-  const { data: examData } = useGetExamById(examId);
+  const { data: examData, isLoading: examDataLoading } = useGetExamById(examId);
   const publication = useGetPublication();
   const series = useGetSeries(publicationId);
   const classes = useGetClass(seriesId);
   const subjects = useGetSubject(classId);
   const books = useGetBook(subjectId);
   const chapters = useGetChapter(bookId);
+
+  // Check if we should show loading state
+  const shouldShowLoader =
+    !["manual-selection", "auto-selection"].includes(examId) &&
+    (examDataLoading || (!isDataLoaded && examData));
 
   useEffect(() => {
     const user = getUser();
@@ -119,6 +125,12 @@ const QuestionBuilder = ({ examId }: Props) => {
 
         setChapterNames(chapterNameArray);
       }
+
+      // Mark data as loaded after processing
+      setIsDataLoaded(true);
+    } else if (["manual-selection", "auto-selection"].includes(examId)) {
+      // For manual/auto selection, mark as loaded immediately
+      setIsDataLoaded(true);
     }
   }, [
     examId,
@@ -188,6 +200,18 @@ const QuestionBuilder = ({ examId }: Props) => {
       localStorage.removeItem("optimized");
     }
   };
+
+  // Show minimal loader
+  if (shouldShowLoader) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+          <p className="text-sm text-gray-600">Loading exam data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full">
