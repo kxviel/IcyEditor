@@ -107,6 +107,7 @@ interface HeaderStore {
   ) => void;
   sanitizeFields: () => void;
   invalidateRelatedQueries: () => void;
+  resetFields: () => void;
   reset: () => void;
 }
 
@@ -241,6 +242,11 @@ export const useQuestionBuilderStore = create<HeaderStore>()(
           state.chapterNames = [];
         });
         useQuestionBuilderStore.persist.clearStorage();
+      },
+      resetFields: () => {
+        set((state) => {
+          state.fields = new Map();
+        });
       },
 
       invalidateRelatedQueries: () => {

@@ -1,35 +1,18 @@
 import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PrerequisitesForm } from "@/features/Builder/QuestionBuilder";
 import {
   IdKey,
   useQuestionBuilderStore,
 } from "@/store/useQuestionBuilderStore";
-import { UseFormReturn } from "react-hook-form";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useRef, useState } from "react";
 import { useHeaderStore } from "@/store/useHeaderStore";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
+import { Label } from "@/components/ui/label";
+import { SelectFormState } from "../QuestionBuilder";
 
 const FIELD_DEPENDENCIES: Record<
   string,
@@ -60,7 +43,10 @@ const FIELD_DEPENDENCIES: Record<
   bookId: [{ idKey: "chapterIds", resetValue: [] }],
 };
 
-const labels = {
+type SelectFormStateWithoutChapters = Omit<SelectFormState, "chapterIds">;
+type SelectFormStateKeysWithoutChapters = keyof SelectFormStateWithoutChapters;
+
+const labels: Record<SelectFormStateKeysWithoutChapters, string> = {
   publicationId: "Publication",
   seriesId: "Series",
   classId: "Class",
@@ -69,165 +55,144 @@ const labels = {
 };
 
 type Props = {
-  form: UseFormReturn<PrerequisitesForm, any>;
-  label: "publicationId" | "seriesId" | "classId" | "subjectId" | "bookId";
+  label: SelectFormStateKeysWithoutChapters;
   options: { value: string; label: string }[];
   isDisabled: boolean;
   isModal?: boolean;
 };
 
-export const ControlledSelect = ({
-  form,
-  label,
-  options,
-  isDisabled,
-  isModal = false,
-}: Props) => {
-  const fields = useQuestionBuilderStore((state) => state.fields);
-  const setIds = useQuestionBuilderStore((state) => state.setIds);
+export const ControlledSelect = ({ label, options, isDisabled }: Props) => {
   const setHeaderValue = useHeaderStore((state) => state.setHeaderValue);
-  const resetBuilder = useQuestionBuilderStore((state) => state.reset);
+  const {
+    setChapterNames,
+    publicationId,
+    seriesId,
+    classId,
+    subjectId,
+    bookId,
+    setIds,
+    resetFields,
+  } = useQuestionBuilderStore();
   const resetPageSettings = usePageSettingsStore((state) => state.reset);
-  const setChapterNames = useQuestionBuilderStore(
-    (state) => state.setChapterNames,
-  );
 
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [pendingValue, setPendingValue] = useState<string | null>(null);
+  // Get current value from store based on label
+  const getCurrentValue = () => {
+    switch (label) {
+      case "publicationId":
+        return publicationId;
+      case "seriesId":
+        return seriesId;
+      case "classId":
+        return classId;
+      case "subjectId":
+        return subjectId;
+      case "bookId":
+        return bookId;
+      default:
+        return "";
+    }
+  };
 
-  // Track if this is the initial render/population
-  const hasUserInteracted = useRef(false);
-  const currentValue = form.watch(label);
+  const currentValue = getCurrentValue();
 
   const handleValueChange = (value: string) => {
-    // Mark that user has interacted with the component
-    hasUserInteracted.current = true;
+    // Check if the value is actually different from current value
+    const isValueDifferent = currentValue !== value;
 
+    if (!isValueDifferent) {
+      return; // No change needed
+    }
+
+    // Set the current field value first
+    setIds(label as IdKey, value);
+
+    // Update header values for specific fields
     if (label === "classId") {
-      const curr = options.filter((option) => option.value === value);
-      setHeaderValue("className", curr?.[0]?.label || "");
+      const selectedOption = options.find((option) => option.value === value);
+      setHeaderValue("className", selectedOption?.label || "");
     }
-
     if (label === "subjectId") {
-      const curr = options.filter((option) => option.value === value);
-      setHeaderValue("subjectName", curr?.[0]?.label || "");
+      const selectedOption = options.find((option) => option.value === value);
+      setHeaderValue("subjectName", selectedOption?.label || "");
     }
 
-    // Check if we need confirmation:
-    // - Skip confirmation if it's a modal
-    // - Skip confirmation if no fields exist yet
-    // - Skip confirmation if this is the first user interaction and field was empty
-    const shouldConfirm =
-      !isModal &&
-      fields.size > 0 &&
-      hasUserInteracted.current &&
-      currentValue &&
-      currentValue !== value;
+    // Reset dependent fields only if they have values
+    const dependentFields = FIELD_DEPENDENCIES[label];
+    if (dependentFields) {
+      let shouldResetPageSettings = false;
 
-    if (shouldConfirm) {
-      setPendingValue(value);
-      setIsConfirmOpen(true);
-    } else {
-      // No confirmation needed, so apply with reset
-      applyValueChange(value, true);
-    }
-  };
+      dependentFields.forEach(({ idKey, resetValue }) => {
+        // Get current value of the dependent field to check if it has a value
+        const currentDependentValue = getCurrentDependentValue(idKey);
 
-  const applyValueChange = (value: string, shouldReset: boolean = true) => {
-    // Set selected value
-    setIds(label, value);
-    form.setValue(label, value);
+        // Only reset if the dependent field currently has a value
+        if (hasValue(currentDependentValue)) {
+          setIds(idKey, resetValue);
+          shouldResetPageSettings = true;
+        }
+      });
 
-    // Reset dependent fields
-    FIELD_DEPENDENCIES[label].forEach(({ idKey, resetValue }) => {
-      form.resetField(idKey);
-      setIds(idKey, resetValue);
-
-      if (idKey === "chapterIds") {
+      // Reset chapter names if chapterIds is being reset
+      if (dependentFields.some((field) => field.idKey === "chapterIds")) {
         setChapterNames([]);
       }
-    });
 
-    // Only reset builder state, page settings, and form when confirmed or no confirmation needed
-    if (shouldReset) {
-      resetBuilder();
-      resetPageSettings();
-
-      // Clear any cached/optimized data
-      localStorage.removeItem("optimized");
+      // Reset fields and page settings if we actually reset some dependent fields
+      if (shouldResetPageSettings) {
+        resetFields();
+        resetPageSettings();
+      }
     }
   };
 
-  const handleConfirm = () => {
-    if (pendingValue !== null) {
-      // User confirmed, apply with reset
-      applyValueChange(pendingValue, true);
-      setPendingValue(null);
+  // Helper function to get current value of dependent fields
+  const getCurrentDependentValue = (idKey: IdKey) => {
+    const state = useQuestionBuilderStore.getState();
+    switch (idKey) {
+      case "publicationId":
+        return state.publicationId;
+      case "seriesId":
+        return state.seriesId;
+      case "classId":
+        return state.classId;
+      case "subjectId":
+        return state.subjectId;
+      case "bookId":
+        return state.bookId;
+      case "chapterIds":
+        return state.chapterIds;
+      default:
+        return "";
     }
-    setIsConfirmOpen(false);
   };
 
-  const handleCancel = () => {
-    // User cancelled, don't change anything
-    setPendingValue(null);
-    setIsConfirmOpen(false);
+  // Helper function to check if a value is not empty
+  const hasValue = (value: string | string[]) => {
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+    return value !== "";
   };
 
   return (
-    <>
-      <FormField
-        control={form.control}
-        name={label}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>{labels[label]}</FormLabel>
-            <Select
-              onValueChange={handleValueChange}
-              defaultValue={field.value}
-              value={field.value}
-              disabled={isDisabled}
-            >
-              <FormControl>
-                <SelectTrigger
-                  className={
-                    form.formState.errors[field.name] ? "border-red-100" : ""
-                  }
-                >
-                  <SelectValue placeholder={`Select ${labels[label]}`} />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {options.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormItem>
-        )}
-      />
-      {!isModal && isConfirmOpen && (
-        <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Confirm Change</AlertDialogTitle>
-              <AlertDialogDescription>
-                Changing this {labels[label]} will reset all dependent fields
-                and clear selected questions. Are you sure you want to continue?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={handleCancel}>
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction onClick={handleConfirm}>
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
-    </>
+    <div>
+      <Label>{labels[label]}</Label>
+      <Select
+        onValueChange={handleValueChange}
+        value={currentValue}
+        disabled={isDisabled}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder={`Select ${labels[label]}`} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 };

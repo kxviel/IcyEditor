@@ -1,18 +1,14 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "@tanstack/react-router";
-import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Subject } from "../api/getSubject";
 import { Class } from "../api/getClass";
 import { Series } from "../api/getSeries";
 import { Publication } from "../api/getPublication";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { UseQueryResult } from "@tanstack/react-query";
-import { PrerequisitesForm } from "../QuestionBuilder";
 import { Book } from "../api/getBook";
 import { Chapter } from "../api/getChapter";
 import { ControlledSelect } from "@/features/Builder/shared/ControlledSelect";
-import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -22,42 +18,64 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import { Label } from "@/components/ui/label";
+import { UseQueryResult } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 type Props = {
-  isModalOpen: boolean;
-  handleModalState: (open: boolean) => void;
   publication: UseQueryResult<Publication[], Error>;
   series: UseQueryResult<Series[], Error>;
   classes: UseQueryResult<Class[], Error>;
   subjects: UseQueryResult<Subject[], Error>;
   books: UseQueryResult<Book[], Error>;
   chapters: UseQueryResult<Chapter[], Error>;
-  form: UseFormReturn<PrerequisitesForm, any>;
-  onPrequisitesSubmit: (data: PrerequisitesForm) => void;
+  isModalOpen: boolean;
+  handleModalState: (open: boolean) => void;
+  onPrequisitesSubmit: () => void;
   handleChapters: (chapterId: string, chapterName: string) => void;
   handleSelectAll: () => void;
 };
 
 const PaperPrerequisitesModal = ({
-  isModalOpen,
-  handleModalState,
   publication,
   series,
   classes,
   subjects,
   books,
   chapters,
-  form,
-  onPrequisitesSubmit,
-  handleChapters,
+  isModalOpen,
+  handleModalState,
   handleSelectAll,
+  handleChapters,
+  onPrequisitesSubmit,
 }: Props) => {
   const navigate = useNavigate();
   const getUser = useAuthStore((state) => state.getUser);
-  const chapterNames = useQuestionBuilderStore((state) => state.chapterNames);
-
   const user = getUser();
-  const selectedChapterIds = form.watch("chapterIds") || [];
+
+  const {
+    chapterNames,
+    publicationId,
+    seriesId,
+    classId,
+    subjectId,
+    bookId,
+    chapterIds,
+    reset,
+  } = useQuestionBuilderStore();
+
+  useEffect(() => {
+    reset();
+  }, [reset]);
+
+  // Check if form is valid (all required fields filled)
+  const isFormValid =
+    publicationId &&
+    seriesId &&
+    classId &&
+    subjectId &&
+    bookId &&
+    chapterIds.length > 0;
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleModalState}>
@@ -78,13 +96,9 @@ const PaperPrerequisitesModal = ({
           <div className="flex flex-col space-y-4">
             <DialogTitle>Select Subject and Proceed</DialogTitle>
 
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onPrequisitesSubmit)}
-                className="grid w-full grid-cols-2 gap-4"
-              >
+            <form className="flex flex-col gap-6">
+              <div className="grid w-full grid-cols-2 gap-4">
                 <ControlledSelect
-                  form={form}
                   label="publicationId"
                   options={
                     publication.data
@@ -100,8 +114,8 @@ const PaperPrerequisitesModal = ({
                   }
                   isModal={true}
                 />
+
                 <ControlledSelect
-                  form={form}
                   label="seriesId"
                   options={
                     series.data
@@ -114,12 +128,12 @@ const PaperPrerequisitesModal = ({
                   isDisabled={
                     (user && user.RESTRICTED_ACCESS > 0) ||
                     series.isPending ||
-                    !form.watch("publicationId")
+                    !publicationId
                   }
                   isModal={true}
                 />
+
                 <ControlledSelect
-                  form={form}
                   label="classId"
                   options={
                     classes.data
@@ -129,11 +143,11 @@ const PaperPrerequisitesModal = ({
                         }))
                       : []
                   }
-                  isDisabled={classes.isPending || !form.watch("seriesId")}
+                  isDisabled={classes.isPending || !seriesId}
                   isModal={true}
                 />
+
                 <ControlledSelect
-                  form={form}
                   label="subjectId"
                   options={
                     subjects.data
@@ -143,11 +157,11 @@ const PaperPrerequisitesModal = ({
                         }))
                       : []
                   }
-                  isDisabled={subjects.isPending || !form.watch("classId")}
+                  isDisabled={subjects.isPending || !classId}
                   isModal={true}
                 />
+
                 <ControlledSelect
-                  form={form}
                   label="bookId"
                   options={
                     books.data
@@ -157,71 +171,61 @@ const PaperPrerequisitesModal = ({
                         }))
                       : []
                   }
-                  isDisabled={books.isPending || !form.watch("classId")}
+                  isDisabled={books.isPending || !subjectId}
                   isModal={true}
                 />
 
-                <FormField
-                  control={form.control}
-                  name={"chapterIds"}
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Select Chapter</FormLabel>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="flex w-full items-center justify-start hover:bg-slate-50"
-                          >
-                            {chapterNames.length > 0 ? (
-                              <p className="truncate font-normal text-black">
-                                {chapterNames.map((name) => `'${name},'`)}
-                              </p>
-                            ) : (
-                              <p className="truncate font-light text-slate-600">
-                                Select Chapter
-                              </p>
-                            )}
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="custom_scrollbar max-h-56 w-56">
+                <div>
+                  <Label>Select Chapter</Label>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        disabled={chapters.isPending || !bookId}
+                        className="flex w-full items-center justify-start hover:bg-slate-50"
+                      >
+                        {chapterNames.length > 0 ? (
+                          <p className="truncate font-normal text-black">
+                            {chapterNames.map((name) => `'${name},'`)}
+                          </p>
+                        ) : (
+                          <p className="truncate font-light text-slate-600">
+                            Select Chapter
+                          </p>
+                        )}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="custom_scrollbar max-h-56 w-56">
+                      <DropdownMenuCheckboxItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          handleSelectAll();
+                        }}
+                      >
+                        Select All
+                      </DropdownMenuCheckboxItem>
+                      <DropdownMenuSeparator />
+                      {chapters.data &&
+                        chapters.data.map(({ id, NAME }) => (
                           <DropdownMenuCheckboxItem
-                            checked={
-                              selectedChapterIds.length ===
-                              chapters.data?.length
-                            }
+                            key={id}
+                            checked={chapterIds?.includes(id.toString())}
                             onSelect={(e) => {
                               e.preventDefault();
-                              handleSelectAll();
+                              handleChapters(id.toString(), NAME);
                             }}
                           >
-                            {selectedChapterIds.length === chapters.data?.length
-                              ? "Deselect All"
-                              : "Select All"}
+                            {NAME}
                           </DropdownMenuCheckboxItem>
-                          <DropdownMenuSeparator />
-                          {chapters.data &&
-                            chapters.data.map(({ id, NAME }) => (
-                              <DropdownMenuCheckboxItem
-                                key={id}
-                                checked={selectedChapterIds?.includes(
-                                  id.toString(),
-                                )}
-                                onSelect={(e) => {
-                                  e.preventDefault();
-                                  handleChapters(id.toString(), NAME);
-                                }}
-                              >
-                                {NAME}
-                              </DropdownMenuCheckboxItem>
-                            ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </FormItem>
-                  )}
-                />
+                        ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
 
+              <div className="grid w-full grid-cols-2 gap-4">
                 <Button
+                  type="button"
                   variant={"outline"}
                   className="w-full"
                   onClick={() => {
@@ -235,12 +239,13 @@ const PaperPrerequisitesModal = ({
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={!form.formState.isValid}
+                  disabled={!isFormValid}
+                  onClick={onPrequisitesSubmit}
                 >
                   Submit
                 </Button>
-              </form>
-            </Form>
+              </div>
+            </form>
           </div>
         )}
       </DialogContent>

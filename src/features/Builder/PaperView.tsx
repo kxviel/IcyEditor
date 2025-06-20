@@ -12,8 +12,6 @@ import {
   CategoryWrapper,
   QuestionWrapper,
 } from "@/features/Builder/shared/DisplayComp";
-import { PrerequisitesForm } from "./QuestionBuilder";
-import { UseFormReturn } from "react-hook-form";
 
 const layoutDict: Record<string, React.ReactNode> = {
   "1": <PaperHeaderOne isPreview={false} />,
@@ -23,11 +21,10 @@ const layoutDict: Record<string, React.ReactNode> = {
 };
 
 type Props = {
-  form: UseFormReturn<PrerequisitesForm, any>;
-  onPaperViewNext: (data: PrerequisitesForm) => void;
+  onPaperViewNext: () => void;
 };
 
-const PaperView = ({ form, onPaperViewNext }: Props) => {
+const PaperView = ({ onPaperViewNext }: Props) => {
   const navigate = useNavigate();
   const addQuestion = useQuestionBuilderStore((state) => state.addQuestion);
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
@@ -130,7 +127,7 @@ const PaperView = ({ form, onPaperViewNext }: Props) => {
           Back
         </Button>
 
-        <Button className="w-full" onClick={form.handleSubmit(onPaperViewNext)}>
+        <Button className="w-full" onClick={onPaperViewNext}>
           Next
         </Button>
       </div>
