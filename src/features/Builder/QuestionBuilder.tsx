@@ -10,7 +10,6 @@ import QuestionSelect from "./QuestionSelect";
 import ChapterList from "./ChapterList";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { useAuthStore } from "@/store/useAuthStore";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import HeaderForm from "./shared/HeaderForm";
 import { useGetPublication } from "./api/getPublication";
@@ -50,7 +49,7 @@ const QuestionBuilder = ({ examId }: Props) => {
     sanitizeFields,
     setChapterNames,
   } = useQuestionBuilderStore();
-  const getUser = useAuthStore((state) => state.getUser);
+  // const getUser = useAuthStore((state) => state.getUser);
   const navigate = useNavigate();
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
 
@@ -81,17 +80,17 @@ const QuestionBuilder = ({ examId }: Props) => {
     !["manual-selection", "auto-selection"].includes(examId) &&
     (examDataLoading || (!isDataLoaded && examData));
 
-  useEffect(() => {
-    const user = getUser();
-    const isUserRestricted = user && user.RESTRICTED_ACCESS === 0;
-    const valuesAlreadySet = publicationId && seriesId;
+  // useEffect(() => {
+  //   const user = getUser();
+  //   const isUserRestricted = user && user.RESTRICTED_ACCESS === 0;
+  //   const valuesAlreadySet = publicationId && seriesId;
 
-    // For restricted users, always set publication and series IDs
-    if (isUserRestricted && !valuesAlreadySet) {
-      setIds("publicationId", user.PUBLICATION_ID?.toString());
-      setIds("seriesId", user.SERIES_ID?.toString());
-    }
-  }, [getUser, publicationId, seriesId, setIds]);
+  //   // For restricted users, always set publication and series IDs
+  //   if (isUserRestricted && !valuesAlreadySet) {
+  //     setIds("publicationId", user.PUBLICATION_ID?.toString());
+  //     setIds("seriesId", user.SERIES_ID?.toString());
+  //   }
+  // }, [getUser, publicationId, seriesId, setIds]);
 
   useEffect(() => {
     // Process exam data for both restricted and non-restricted users
