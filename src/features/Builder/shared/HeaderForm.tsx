@@ -1,4 +1,3 @@
-import { ControlledSelect } from "./shared/ControlledSelect";
 import { useAuthStore } from "@/store/useAuthStore";
 import {
   DropdownMenu,
@@ -11,12 +10,13 @@ import { Button } from "@/components/ui/button";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { Label } from "@/components/ui/label";
 import { UseQueryResult } from "@tanstack/react-query";
-import { Book } from "./api/getBook";
-import { Chapter } from "./api/getChapter";
-import { Class } from "./api/getClass";
-import { Publication } from "./api/getPublication";
-import { Series } from "./api/getSeries";
-import { Subject } from "./api/getSubject";
+import { Book } from "../api/getBook";
+import { Chapter } from "../api/getChapter";
+import { Class } from "../api/getClass";
+import { Publication } from "../api/getPublication";
+import { Series } from "../api/getSeries";
+import { Subject } from "../api/getSubject";
+import { ControlledSelect } from "./ControlledSelect";
 
 type Props = {
   publication: UseQueryResult<Publication[], Error>;

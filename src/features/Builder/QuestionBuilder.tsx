@@ -12,7 +12,7 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store/useAuthStore";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
-import HeaderForm from "./HeaderForm";
+import HeaderForm from "./shared/HeaderForm";
 import { useGetPublication } from "./api/getPublication";
 import { useGetSeries } from "./api/getSeries";
 import { useGetClass } from "./api/getClass";
@@ -185,6 +185,7 @@ const QuestionBuilder = ({ examId }: Props) => {
       toast.error("Please add at least one question");
     } else {
       sanitizeFields();
+      console.log("BUILDER:  ", fields);
       navigate({ to: "/preview" });
     }
   };

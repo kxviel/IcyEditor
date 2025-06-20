@@ -7,7 +7,7 @@ import {
   useQuestionBuilderStore,
 } from "@/store/useQuestionBuilderStore";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -32,7 +32,7 @@ const pageDimensions: Record<string, string> = {
 const layoutDict = (
   headerRef: React.RefObject<HTMLDivElement>,
   headerLayout: string,
-) => {
+): React.ReactNode => {
   const dict: Record<string, React.ReactNode> = {
     "1": <PaperHeaderOne isPreview={true} headerRef={headerRef} />,
     "2": <PaperHeaderTwo isPreview={true} headerRef={headerRef} />,
@@ -40,7 +40,7 @@ const layoutDict = (
     "4": <PaperHeaderFour isPreview={true} headerRef={headerRef} />,
   };
 
-  return dict[headerLayout];
+  return dict[headerLayout] || null;
 };
 
 export const Route = createLazyFileRoute("/_auth/preview")({
@@ -72,7 +72,6 @@ function Preview() {
 
   const fields = useQuestionBuilderStore((state) => state.fields);
   const setFontSize = usePageSettingsStore((state) => state.setFontSize);
-
   const currentFontSize = usePageSettingsStore(
     (state) => state.currentFontSize,
   );
@@ -80,120 +79,117 @@ function Preview() {
   const [pageSize, setPageSize] = useState("A4");
   const [showOptimizer, setShowOptimizer] = useState(false);
   const [showDuplicate, setShowDuplicate] = useState(false);
-
-  const calcFontSize = (value: string) => {
-    setFontSize(value);
-  };
-
   const [pageArray, setPageArray] = useState<CategoryItem[][]>([[]]);
 
+  const calcFontSize = useCallback(
+    (value: string) => {
+      setFontSize(value);
+    },
+    [setFontSize],
+  );
+
+  const handlePopState = useCallback(
+    (event: PopStateEvent) => {
+      event.preventDefault();
+      navigate({
+        to: "/builder/$examId",
+        params: { examId: "manual-selection" },
+        search: { needPreselection: false },
+        replace: true,
+      });
+    },
+    [navigate],
+  );
+
   useEffect(() => {
-    window.addEventListener(
-      "popstate",
-      function (event) {
-        event.preventDefault();
-        navigate({
-          to: "/builder/$examId",
-          params: { examId: "manual-selection" },
-          search: { needPreselection: false },
-          replace: true,
-        });
-      },
-      false,
-    );
+    window.addEventListener("popstate", handlePopState, false);
 
     return () => {
-      window.removeEventListener("popstate", () => {});
+      window.removeEventListener("popstate", handlePopState, false);
     };
-  }, [navigate]);
+  }, [handlePopState]);
 
-  useEffect(() => {
+  const calculatePageLayout = useCallback(() => {
+    if (!pageRef.current || !childRef.current) return;
+
     setShowOptimizer(false);
     setShowDuplicate(false);
-    localStorage.removeItem("optimized");
 
-    let currentChildHeight: number = 0;
-    let currentPageIndex: number = 0;
+    // Remove localStorage usage as it's not supported in artifacts
+    console.log("PREVIEW:  ", fields);
+
+    let currentChildHeight = 0;
+    let currentPageIndex = 0;
 
     const tempPageArray: CategoryItem[][] = [[]];
-    const headerGap = 4; //mb-1
+    const headerGap = 4; // mb-1
 
-    if (pageRef.current) {
-      let totalPageHeight = pageRef.current.getBoundingClientRect().height;
+    let totalPageHeight = pageRef.current.getBoundingClientRect().height;
 
-      // Calculate header height if exists
-      if (currentPageIndex === 0 && headerRef.current) {
-        totalPageHeight =
-          totalPageHeight -
-          headerRef.current.getBoundingClientRect().height -
-          headerGap;
-      }
-
-      if (childRef.current) {
-        // Calculate Height of Each Field
-        [...childRef.current.children].forEach((child, index) => {
-          currentChildHeight += child.getBoundingClientRect().height;
-
-          const currentField = Array.from(fields.values())[index];
-
-          if (currentChildHeight < totalPageHeight) {
-            if (tempPageArray[currentPageIndex]) {
-              tempPageArray[currentPageIndex].push(currentField);
-            } else {
-              tempPageArray[currentPageIndex] = [currentField];
-            }
-          } else {
-            currentPageIndex += 1;
-            currentChildHeight = 0;
-
-            tempPageArray[currentPageIndex] = [currentField];
-          }
-        });
-      }
+    // Calculate header height if exists
+    if (currentPageIndex === 0 && headerRef.current) {
+      totalPageHeight =
+        totalPageHeight -
+        headerRef.current.getBoundingClientRect().height -
+        headerGap;
     }
+
+    // Calculate Height of Each Field
+    const fieldsArray = Array.from(fields.values());
+    const children = Array.from(childRef.current.children);
+
+    children.forEach((child, index) => {
+      currentChildHeight += child.getBoundingClientRect().height;
+
+      const currentField = fieldsArray[index];
+      if (!currentField) return;
+
+      if (currentChildHeight < totalPageHeight) {
+        if (tempPageArray[currentPageIndex]) {
+          tempPageArray[currentPageIndex].push(currentField);
+        } else {
+          tempPageArray[currentPageIndex] = [currentField];
+        }
+      } else {
+        currentPageIndex += 1;
+        currentChildHeight = child.getBoundingClientRect().height;
+        tempPageArray[currentPageIndex] = [currentField];
+      }
+    });
 
     setPageArray(tempPageArray);
 
     // Check if there's only one page and content fills less than 50% of page
     setTimeout(() => {
-      if (tempPageArray.length === 1 && pageRef.current && childRef.current) {
-        let contentHeight = 0;
-        const totalPageHeight =
-          pageRef.current.getBoundingClientRect().height - headerGap;
+      if (
+        tempPageArray.length === 1 &&
+        pageRef.current &&
+        childRef.current &&
+        headerRef.current
+      ) {
+        const contentHeight =
+          childRef.current.getBoundingClientRect().height +
+          headerRef.current.getBoundingClientRect().height +
+          headerGap;
 
-        // Calculate header & content area height
-        if (childRef.current && headerRef.current) {
-          contentHeight =
-            childRef.current.getBoundingClientRect().height +
-            headerRef.current.getBoundingClientRect().height +
-            headerGap;
-        }
-        const fillPercentage = (contentHeight / totalPageHeight) * 100;
+        const totalHeight = pageRef.current.getBoundingClientRect().height;
+        const fillPercentage = (contentHeight / totalHeight) * 100;
 
         // Show optimizer if content fills less than 50%
         setShowOptimizer(fillPercentage < 50);
-
-        console.log("Logging for Proof: ");
-        console.log("Total Page Height: ", totalPageHeight);
-        console.log("Content Height: ", contentHeight);
-        console.log("Filled Percentage: ", fillPercentage);
       } else {
         setShowOptimizer(false);
       }
     }, 300); // Small delay to ensure DOM measurements are accurate
-  }, [fields, currentFontSize, pageSize]);
+  }, [fields]);
 
-  const handleOptimize = () => {
-    setShowDuplicate((prev) => {
-      if (prev) {
-        localStorage.removeItem("optimized");
-      } else {
-        localStorage.setItem("optimized", "true");
-      }
+  useEffect(() => {
+    calculatePageLayout();
+  }, [calculatePageLayout]);
 
-      return !prev;
-    });
-  };
+  const handleOptimize = useCallback(() => {
+    setShowDuplicate((prev) => !prev);
+  }, []);
 
   return (
     <div className="flex h-full flex-col items-center gap-6 pt-6">
@@ -350,13 +346,16 @@ const OptimizedPage = ({
       ref={pageRef}
       className={`${pageDimensions[pageSize]} mx-auto mb-3 border border-gray-200 bg-white shadow-md`}
     >
-      {[1, 2].map((isThisAButterfly) => (
-        <div key={isThisAButterfly} className="w-full">
+      {[1, 2].map((duplicateIndex) => (
+        <div key={duplicateIndex} className="w-full">
           {pageIndex === 0 && layoutDict(headerRef, headerLayout)}
 
           <div className="flex w-full flex-col gap-3 px-6 py-2">
             {pageValue.map((field) => (
-              <div className="w-full" key={field.categoryId}>
+              <div
+                className="w-full"
+                key={`${field.categoryId}-${duplicateIndex}`}
+              >
                 <CategoryWrapper
                   categoryIndex={field.categoryIndex!}
                   categoryName={field.categoryName}
@@ -366,7 +365,7 @@ const OptimizedPage = ({
 
                 {field.questions.map((question) => (
                   <QuestionWrapper
-                    key={question.questionId}
+                    key={`${question.questionId}-${duplicateIndex}`}
                     questionIndex={question.questionIndex!}
                     questionContent={question.questionText}
                   />

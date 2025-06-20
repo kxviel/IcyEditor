@@ -102,24 +102,26 @@ export function parseAutoGenResponse(response: AutoGenData): {
       })),
     });
   });
-  console.log(fields);
 
   return { fields };
 }
 
 export function addIndexesToFields(fields: Fieldtype): Fieldtype {
-  const localFields = new Map(fields);
+  const localFields = new Map<string, any>(); // Replace 'any' with your actual field type
 
-  Array.from(localFields.entries()).forEach(([key, value], index) => {
+  let categoryIndex = 0;
+  for (const [key, value] of fields) {
     localFields.set(key, {
       ...value,
-      categoryIndex: index,
+      categoryIndex,
       questions: value.questions.map((question, questionIndex) => ({
         ...question,
         questionIndex,
       })),
     });
-  });
+    categoryIndex++;
+  }
+  console.log("Fields with indexes added:", localFields);
 
   return localFields;
 }
