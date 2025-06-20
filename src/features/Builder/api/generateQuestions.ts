@@ -1,5 +1,6 @@
 import http from "@/config/https";
 import { parseAutoGenResponse } from "@/lib/utils";
+import { useHeaderStore } from "@/store/useHeaderStore";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -52,19 +53,26 @@ const mutationFn = (body: Props): Promise<AxiosResponse<Root>> => {
 export const useGenerateQuestions = () => {
   const navigate = useNavigate();
   const presetFields = useQuestionBuilderStore((state) => state.presetFields);
+  const setHeaderValue = useHeaderStore((state) => state.setHeaderValue);
 
   const handlePreset = (examData: AutoGenData) => {
     if (examData && examData.categories) {
-      const parsedObject = parseAutoGenResponse(examData);
+      const { fields, totalMarks } = parseAutoGenResponse(examData);
 
-      if (parsedObject.fields) {
-        presetFields(parsedObject.fields);
-        navigate({
-          to: "/builder/$examId",
-          params: { examId: "manual-selection" },
-          search: { needPreselection: false },
-        });
+      if (fields) {
+        console.log(fields);
+
+        presetFields(fields);
       }
+      if (totalMarks) {
+        setHeaderValue("totalMarks", `${totalMarks}`);
+      }
+
+      navigate({
+        to: "/builder/$examId",
+        params: { examId: "manual-selection" },
+        search: { needPreselection: false },
+      });
     }
   };
 

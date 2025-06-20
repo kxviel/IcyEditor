@@ -85,8 +85,10 @@ export function parseExamDataResponse(response: ExamData): ReturnProps {
 
 export function parseAutoGenResponse(response: AutoGenData): {
   fields: Fieldtype;
+  totalMarks: number;
 } {
   const fields: Fieldtype = new Map();
+  let totalMarks = 0;
 
   response.categories.forEach((category, categoryIndex) => {
     fields.set(category.categoryId?.toString(), {
@@ -103,7 +105,13 @@ export function parseAutoGenResponse(response: AutoGenData): {
     });
   });
 
-  return { fields };
+  fields.forEach((category) => {
+    const categoryMarks = parseInt(category.categoryMarks) || 0;
+    const questionCount = category.questions.length;
+    totalMarks += categoryMarks * questionCount;
+  });
+
+  return { fields, totalMarks };
 }
 
 export function addIndexesToFields(fields: Fieldtype): Fieldtype {

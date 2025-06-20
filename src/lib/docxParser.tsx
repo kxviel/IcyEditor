@@ -75,47 +75,111 @@ const processQuestionText = (htmlText: string, currentFontSize: any) => {
   // Array to store text runs
   const textRuns = [];
 
+  // Simple function to parse nested tags and create text runs
+  const parseTextWithFormatting = (text: string) => {
+    const runs = [];
+    const currentText = text;
+
+    // First handle heading tags (h1, h2, h3) - they get priority
+    const headingRegex = /<\/?h([1-3])>/gi;
+    const headingParts = currentText.split(headingRegex);
+
+    for (let i = 0; i < headingParts.length; i += 2) {
+      const textPart = headingParts[i];
+      const headingLevel = headingParts[i + 1];
+
+      if (textPart && textPart.trim()) {
+        // Determine if this is a heading and what level
+        const isHeading =
+          headingLevel && ["1", "2", "3"].includes(headingLevel);
+        let fontSize = (14 + Number(currentFontSize)) * 2;
+        let isBold = false;
+
+        if (isHeading) {
+          // Adjust font size based on heading level
+          const sizeMultiplier =
+            headingLevel === "1" ? 1.5 : headingLevel === "2" ? 1.3 : 1.1;
+          fontSize = Math.round(fontSize * sizeMultiplier);
+          isBold = true;
+        }
+
+        // Handle bold tags within this part
+        const boldRegex = /<\/?(?:b|strong)>/gi;
+        const boldParts = textPart.split(boldRegex);
+
+        for (let j = 0; j < boldParts.length; j++) {
+          if (boldParts[j].trim()) {
+            // Check if this part should be bold (odd indices after split, or if it's a heading)
+            const shouldBeBold = isBold || j % 2 === 1;
+
+            // Handle italic within this part
+            const italicRegex = /<\/?(?:i|em)>/gi;
+            const italicParts = boldParts[j].split(italicRegex);
+
+            for (let k = 0; k < italicParts.length; k++) {
+              if (italicParts[k].trim()) {
+                const isItalic = k % 2 === 1;
+
+                runs.push(
+                  new TextRun({
+                    text: italicParts[k],
+                    size: fontSize,
+                    bold: shouldBeBold,
+                    italics: isItalic,
+                  }),
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return runs;
+  };
+
   // Remove HTML tags and handle specific formatting
   const cleanText = htmlText
     .replace(/<\/?p>/g, "") // Remove p tags
-    .replace(/&nbsp;/g, " "); // Replace non-breaking spaces
+    .replace(/<br\s*\/?>/gi, "\n") // Convert br tags to newlines
+    .replace(/&nbsp;/g, " ") // Replace non-breaking spaces
+    .replace(/&amp;/g, "&") // Replace HTML entities
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"');
 
   // Check if there are options (a. and b.)
   if (cleanText.includes("a.") && cleanText.includes("b.")) {
     // Split at the first occurrence of "a."
     const [questionPart, optionsPart] = cleanText.split(/a\./);
 
-    // Add the question part
-    textRuns.push(
-      new TextRun({
-        text: questionPart.trim(),
-        size: (14 + Number(currentFontSize)) * 2,
-      }),
-    );
+    // Add the question part with formatting
+    const questionRuns = parseTextWithFormatting(questionPart.trim());
+    textRuns.push(...questionRuns);
 
     // Split options part by "b." to get both options
     const [optionA, optionB] = ("a." + optionsPart).split(/b\./);
 
-    // Add option A
-    textRuns.push(
-      new TextRun({
-        text: "\n" + optionA.trim(),
-        size: (14 + Number(currentFontSize)) * 2,
-      }),
-    );
+    // Add option A with formatting
+    const optionARuns = parseTextWithFormatting("\n" + optionA.trim());
+    textRuns.push(...optionARuns);
 
-    // Add option B
-    textRuns.push(
-      new TextRun({
-        text: "\nb." + optionB.trim(),
-        size: (14 + Number(currentFontSize)) * 2,
-      }),
-    );
+    // Add option B with formatting
+    if (optionB) {
+      const optionBRuns = parseTextWithFormatting("\nb." + optionB.trim());
+      textRuns.push(...optionBRuns);
+    }
   } else {
-    // No options, just add the clean text
+    // No options, just add the clean text with formatting
+    const formattedRuns = parseTextWithFormatting(cleanText.trim());
+    textRuns.push(...formattedRuns);
+  }
+
+  // Fallback: if no runs were created, add plain text
+  if (textRuns.length === 0) {
     textRuns.push(
       new TextRun({
-        text: cleanText.trim(),
+        text: cleanText.trim() || htmlText.trim(),
         size: (14 + Number(currentFontSize)) * 2,
       }),
     );

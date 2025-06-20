@@ -64,22 +64,22 @@ export const QuestionWrapper = ({
   );
 
   return (
-    <div className="flex items-start gap-2 py-1">
+    <div className="flex w-full min-w-0 items-start gap-2 py-1">
       <p
-        className="font-semibold text-gray-800"
+        className="flex-shrink-0 font-semibold text-gray-800"
         style={{ fontSize: 14 + Number(currentFontSize) }}
       >
         {questionIndex + 1}.
       </p>
-      <p
-        className="flex-1 whitespace-pre text-gray-700"
+      <div
+        className="min-w-0 flex-1 overflow-hidden whitespace-pre-wrap break-words text-gray-700"
         style={{ fontSize: 14 + Number(currentFontSize) }}
         dangerouslySetInnerHTML={{
           __html: questionContent,
         }}
       />
       {isEditable && (editQuestionContent || removeQuestion) && (
-        <div className="flex items-center gap-1">
+        <div className="flex flex-shrink-0 items-center gap-1">
           {editQuestionContent && (
             <Button
               variant="ghost"
