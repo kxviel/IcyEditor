@@ -1,12 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, MoreVertical, Plus, Search } from "lucide-react";
+import { ArrowUpRight, Plus, Search } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { IconInput } from "@/components/ui/IconInput";
 import { useNavigate, useSearch } from "@tanstack/react-router";
@@ -70,6 +64,13 @@ const Home = () => {
     navigate({ to: "/", search: { page } });
   };
 
+  const handleCardClick = (examId: string) => {
+    navigate({
+      to: "/builder/$examId",
+      params: { examId },
+    });
+  };
+
   return (
     <div className="flex h-full flex-col gap-6">
       {/* Header */}
@@ -119,7 +120,8 @@ const Home = () => {
           {data.examData.map((card) => (
             <Card
               key={card.ID}
-              className="group p-5 transition-shadow hover:shadow-md"
+              className="group cursor-pointer p-5 transition-shadow hover:shadow-md"
+              onClick={() => handleCardClick(card.ID.toString())}
             >
               <div className="mb-4 flex items-start justify-between">
                 <div className="flex-1">
@@ -134,25 +136,30 @@ const Home = () => {
                     {card.EXAM_NAME}
                   </h2>
                 </div>
-                <DropdownMenu>
+                {/* <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
+                    <Button
+                      variant="ghost"
+                      className="h-8 w-8 p-0"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <MoreVertical className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation();
                         navigate({
                           to: "/builder/$examId",
                           params: { examId: card.ID.toString() },
-                        })
-                      }
+                        });
+                      }}
                     >
                       Edit
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu> */}
               </div>
 
               <div className="flex items-center justify-between">
@@ -171,18 +178,9 @@ const Home = () => {
                   </Badge>
                 </div>
 
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() =>
-                    navigate({
-                      to: "/builder/$examId",
-                      params: { examId: card.ID.toString() },
-                    })
-                  }
-                >
+                <div className="opacity-50 transition-opacity group-hover:opacity-100">
                   <ArrowUpRight className="h-4 w-4" />
-                </Button>
+                </div>
               </div>
             </Card>
           ))}
