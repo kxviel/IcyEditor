@@ -1,5 +1,6 @@
 import { useHeaderStore } from "@/store/useHeaderStore";
 import EditableField from "../shared/EditableField";
+import { useModalStore } from "@/store/useModalStore";
 
 const PaperHeaderFour = ({
   isPreview = false,
@@ -8,6 +9,7 @@ const PaperHeaderFour = ({
   isPreview?: boolean;
   headerRef?: React.RefObject<HTMLDivElement>;
 }) => {
+  const setModal = useModalStore((state) => state.setModal);
   const className = useHeaderStore((state) => state.headerData["className"]);
   return (
     <div
@@ -16,7 +18,16 @@ const PaperHeaderFour = ({
     >
       <div className="flex h-full w-1/4 flex-col justify-evenly gap-1 p-4 leading-5">
         <p>Name:</p>
-        <p>Grade: {className.value || className.placeholder}</p>
+        <p
+          onClick={() =>
+            setModal("EDIT_CLASS_NAME", {
+              isOpen: true,
+              currentClassName: className.value,
+            })
+          }
+        >
+          Grade: {className.value || className.placeholder}
+        </p>
         <EditableField
           headerId="subjectName"
           fontSize={14}

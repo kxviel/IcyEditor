@@ -4,6 +4,7 @@ export type ModalType =
   | "COMPLETE_PROFILE"
   | "EDIT_QUESTION"
   | "EDIT_CATEGORY_MARKS"
+  | "EDIT_CLASS_NAME"
   | "";
 
 interface ModalState {
