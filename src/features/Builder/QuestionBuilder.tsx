@@ -18,6 +18,7 @@ import { useGetClass } from "./api/getClass";
 import { useGetSubject } from "./api/getSubject";
 import { useGetBook } from "./api/getBook";
 import { useGetChapter } from "./api/getChapter";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export type SelectFormState = {
   publicationId: string;
@@ -49,8 +50,9 @@ const QuestionBuilder = ({ examId }: Props) => {
     sanitizeFields,
     setChapterNames,
   } = useQuestionBuilderStore();
-  // const getUser = useAuthStore((state) => state.getUser);
+  const getUser = useAuthStore((state) => state.getUser);
   const navigate = useNavigate();
+  const setHeaderValue = useHeaderStore((state) => state.setHeaderValue);
   const presetHeaderData = useHeaderStore((state) => state.presetHeaderData);
 
   const resetHeader = useHeaderStore((state) => state.reset);
@@ -129,6 +131,8 @@ const QuestionBuilder = ({ examId }: Props) => {
       setIsDataLoaded(true);
     } else if (["manual-selection", "auto-selection"].includes(examId)) {
       // For manual/auto selection, mark as loaded immediately
+      const user = getUser();
+      setHeaderValue("schoolName", user?.school || "SCHOOL NAME");
       setIsDataLoaded(true);
     }
   }, [
@@ -136,6 +140,7 @@ const QuestionBuilder = ({ examId }: Props) => {
     examData,
     chapters.data,
     presetFields,
+    setHeaderValue,
     presetHeaderData,
     setChapterNames,
     setIds,
