@@ -24,7 +24,7 @@ const headerData = {
   },
   duration: {
     placeholder: "Duration",
-    value: "1hr 30min",
+    value: "Enter Duration",
     isEditing: false,
   },
   totalMarks: {
