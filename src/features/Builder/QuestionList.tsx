@@ -9,12 +9,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Chapter } from "./api/getChapter";
 
 type Props = {
-  chapterIds: string[];
+  chapters: Chapter[];
+  selectedChapterIds: string[];
 };
 
-const QuestionList = ({ chapterIds }: Props) => {
+const QuestionList = ({ chapters, selectedChapterIds }: Props) => {
   const fields = useQuestionBuilderStore((state) => state.fields);
   const addQuestion = useQuestionBuilderStore((state) => state.addQuestion);
 
@@ -30,7 +32,11 @@ const QuestionList = ({ chapterIds }: Props) => {
   //   }
   // }, [questionResponse, setQuestionList]);
 
-  const { data: questionList, isPending } = useGetQuestions(chapterIds);
+  const { data: questionList, isPending } = useGetQuestions(selectedChapterIds);
+
+  const getChapterName = (chapterId: number) => {
+    return chapters.find((c) => c.id === chapterId)?.NAME || "";
+  };
 
   const handleQuestionToggle = (
     categoryId: string,
@@ -124,7 +130,7 @@ const QuestionList = ({ chapterIds }: Props) => {
                     return (
                       <div
                         key={question.id}
-                        className="flex cursor-pointer items-start gap-4 border-b border-gray-100 bg-white p-4 transition-colors hover:bg-gray-50"
+                        className="flex cursor-pointer items-center gap-4 border-b border-gray-100 bg-white p-4 transition-colors hover:bg-gray-50"
                         onClick={() => {
                           handleQuestionToggle(
                             categoryId,
@@ -138,19 +144,22 @@ const QuestionList = ({ chapterIds }: Props) => {
                           checked={isChecked}
                         />
                         <div className="min-w-0 flex-1">
-                          <div
-                            className="select-none text-sm leading-relaxed"
-                            dangerouslySetInnerHTML={{
-                              __html:
-                                question.QUESTION_DATA ||
-                                "Question text not available",
-                            }}
-                          />
-                          {question.type && (
-                            <Badge variant="secondary" className="mt-2 text-xs">
-                              {question.type}
+                          <div className="flex items-start justify-between gap-3">
+                            <div
+                              className="flex-1 select-none text-sm leading-relaxed"
+                              dangerouslySetInnerHTML={{
+                                __html:
+                                  question.QUESTION_DATA ||
+                                  "Question text not available",
+                              }}
+                            />
+                            <Badge
+                              variant="secondary"
+                              className="whitespace-nowrap text-xs"
+                            >
+                              {getChapterName(question.CHAPTER_ID)}
                             </Badge>
-                          )}
+                          </div>
                         </div>
                       </div>
                     );

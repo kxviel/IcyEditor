@@ -242,7 +242,10 @@ const QuestionBuilder = ({ examId }: Props) => {
                 handleChapters={handleChapters}
               />
             ) : (
-              <QuestionList chapterIds={chapterIds} />
+              <QuestionList
+                chapters={chapters.data || []}
+                selectedChapterIds={chapterIds}
+              />
             )}
           </div>
           {examId === "auto-selection" ? (
