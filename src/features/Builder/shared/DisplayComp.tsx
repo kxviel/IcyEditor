@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { Edit, Trash2 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const CategoryWrapper = ({
   categoryIndex,
@@ -79,30 +85,46 @@ export const QuestionWrapper = ({
         }}
       />
       {isEditable && (editQuestionContent || removeQuestion) && (
-        <div className="flex flex-shrink-0 items-center gap-1">
-          {editQuestionContent && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-blue-500 hover:bg-blue-50 hover:text-blue-700"
-              onClick={editQuestionContent}
-            >
-              <Edit className="h-4 w-4" />
-              <span className="sr-only">Edit question</span>
-            </Button>
-          )}
-          {removeQuestion && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-700"
-              onClick={removeQuestion}
-            >
-              <Trash2 className="h-4 w-4" />
-              <span className="sr-only">Delete question</span>
-            </Button>
-          )}
-        </div>
+        <TooltipProvider>
+          <div className="flex flex-shrink-0 items-center gap-1">
+            {editQuestionContent && (
+              <Tooltip delayDuration={300}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-blue-500 hover:bg-blue-50 hover:text-blue-700"
+                    onClick={editQuestionContent}
+                  >
+                    <Edit className="h-4 w-4" />
+                    <span className="sr-only">Edit question</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Edit question</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            {removeQuestion && (
+              <Tooltip delayDuration={300}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-red-500 hover:bg-red-50 hover:text-red-700"
+                    onClick={removeQuestion}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="sr-only">Remove question</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Remove question</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        </TooltipProvider>
       )}
     </div>
   );
