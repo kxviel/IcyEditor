@@ -8,7 +8,11 @@ import PaperHeaderThree from "@/features/Builder/headers/PaperHeaderThree";
 import PaperHeaderTwo from "@/features/Builder/headers/PaperHeaderTwo";
 import { usePageSettingsStore } from "@/store/usePageSettingsStore";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useLocation,
+  useNavigate,
+} from "@tanstack/react-router";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/print")({
@@ -22,29 +26,44 @@ const layoutDict: Record<string, React.ReactNode> = {
   "4": <PaperHeaderFour isPreview={true} />,
 };
 
+type URL_Params = {
+  layout: number;
+  font: number;
+};
+
 const RenderedPage = () => {
   const navigate = useNavigate();
+  const urlParams = useLocation().search as URL_Params;
+
   const optimized = localStorage.getItem("optimized") === "true";
-  const fields = useQuestionBuilderStore((state) => state.fields);
-  console.log(fields);
 
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
+  const setFontSize = usePageSettingsStore((state) => state.setFontSize);
+  const fields = useQuestionBuilderStore((state) => state.fields);
+  const setHeaderLayout = usePageSettingsStore(
+    (state) => state.setHeaderLayout,
+  );
+
+  const handleAfterPrint = () => {
+    navigate({ to: "/preview" });
+  };
+
+  useEffect(() => {
+    if (urlParams) {
+      setFontSize(urlParams.font.toString());
+      setHeaderLayout(urlParams.layout.toString());
+    }
+  }, [urlParams, setFontSize, setHeaderLayout]);
 
   useEffect(() => {
     window.print();
 
-    const handleAfterPrint = () => {
-      navigate({ to: "/preview" });
-    };
-
-    window.addEventListener("beforeprint", handleAfterPrint);
     window.addEventListener("afterprint", handleAfterPrint);
 
     return () => {
-      window.addEventListener("beforeprint", handleAfterPrint);
-      window.addEventListener("afterprint", handleAfterPrint);
+      window.removeEventListener("afterprint", handleAfterPrint);
     };
-  }, [navigate]);
+  }, []);
 
   return (
     <div className="h-full w-full">

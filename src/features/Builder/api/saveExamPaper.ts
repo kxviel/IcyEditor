@@ -1,9 +1,5 @@
 import http from "@/config/https";
-import { useHeaderStore } from "@/store/useHeaderStore";
-import { usePageSettingsStore } from "@/store/usePageSettingsStore";
-import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 
 type Props = {
@@ -39,25 +35,10 @@ const mutationFn = ({ body }: Props) => {
 };
 
 export const useSaveExamPaper = () => {
-  const navigate = useNavigate();
-  const resetHeader = useHeaderStore((state) => state.reset);
-  const resetBuilder = useQuestionBuilderStore((state) => state.reset);
-  const resetPageSettings = usePageSettingsStore((state) => state.reset);
-  const invalidateRelatedQueries = useQuestionBuilderStore(
-    (state) => state.invalidateRelatedQueries,
-  );
-
   return useMutation({
     mutationFn,
     onSuccess: ({ data }) => {
       toast.success(data.message);
-      resetHeader();
-      resetBuilder();
-      resetPageSettings();
-      invalidateRelatedQueries();
-      localStorage.removeItem("optimized");
-
-      navigate({ to: "/", search: { page: 1 } });
     },
     onError: (err: string) => {
       toast.error(err);

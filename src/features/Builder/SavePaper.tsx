@@ -21,8 +21,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
 
 const SavePaper = () => {
+  const navigate = useNavigate();
   const getUser = useAuthStore((state) => state.getUser);
   const saveManualPaper = useSaveExamPaper();
 
@@ -34,16 +36,21 @@ const SavePaper = () => {
     subjectId,
     bookId,
     chapterIds,
+    invalidateRelatedQueries,
   } = useQuestionBuilderStore();
   const headerLayout = usePageSettingsStore((state) => state.headerLayout);
   const fontSize = usePageSettingsStore((state) => state.currentFontSize);
   const headerData = useHeaderStore((state) => state.headerData);
 
+  const resetHeader = useHeaderStore((state) => state.reset);
+  const resetBuilder = useQuestionBuilderStore((state) => state.reset);
+  const resetPageSettings = usePageSettingsStore((state) => state.reset);
+
   const handleSaveManualPaper = () => {
     const user = getUser();
 
     if (user) {
-      saveManualPaper.mutate({
+      saveManualPaper.mutateAsync({
         body: {
           PUBLICATIONS: publicationId,
           SERIES: seriesId,
@@ -142,13 +149,26 @@ const SavePaper = () => {
         })
         .then(() => {
           handleSaveManualPaper();
+        })
+        .then(() => {
+          resetHeader();
+          resetBuilder();
+          resetPageSettings();
+          invalidateRelatedQueries();
+          localStorage.removeItem("optimized");
+
+          navigate({ to: "/", search: { page: 1 } });
         });
     }
   };
 
   const handleDownloadPDF = async () => {
     handleSaveManualPaper();
-    window.open("/print", "_blank", "height=1122.85,width=794.44");
+    window.open(
+      `/print?layout=${headerLayout}&font=${fontSize}`,
+      "_blank",
+      "height=1122.85,width=794.44",
+    );
   };
 
   return (

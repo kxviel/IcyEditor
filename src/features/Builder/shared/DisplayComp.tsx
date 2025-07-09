@@ -24,6 +24,7 @@ export const CategoryWrapper = ({
   const currentFontSize = usePageSettingsStore(
     (state) => state.currentFontSize,
   );
+  console.log(currentFontSize);
 
   return (
     <div className="my-1 flex gap-2">
