@@ -15,6 +15,7 @@ type Props = {
   schoolName?: string;
   publicationId?: string;
   seriesId?: string;
+  distributorName?: string;
 };
 
 interface RegisterResponse {

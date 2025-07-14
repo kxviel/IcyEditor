@@ -46,23 +46,54 @@ const registerSchema = z
       .trim()
       .min(1, { message: "Confirm password is required" })
       .min(8, { message: "Confirm password must be at least 8 characters" }),
+    countryCode: z.string().min(1, { message: "Country code is required" }),
     phone: z
       .string()
       .trim()
       .min(1, { message: "Phone is required" })
-      .regex(/^(\+91[-\s]?)?[6789]\d{9}$/, {
+      .regex(/^[6789]\d{9}$/, {
         message: "Please enter a valid phone number",
       }),
     city: z.string().trim().min(1, { message: "City is required" }),
+    customCity: z.string().trim().optional(),
     state: z.string().trim().min(1, { message: "State is required" }),
     schoolName: z.string().trim().min(1, { message: "School is required" }),
+    customSchoolName: z.string().trim().optional(),
+    distributorName: z
+      .string()
+      .trim()
+      .min(1, { message: "Distributor name is required" }),
     publicationId: z.string().min(1, { message: "Publication is required" }),
     seriesId: z.string().min(1, { message: "Series is required" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-  });
+  })
+  .refine(
+    (data) => {
+      if (data.city === "other") {
+        return data.customCity && data.customCity.trim().length > 0;
+      }
+      return true;
+    },
+    {
+      message: "Please enter city name",
+      path: ["customCity"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.schoolName === "other") {
+        return data.customSchoolName && data.customSchoolName.trim().length > 0;
+      }
+      return true;
+    },
+    {
+      message: "Please enter school name",
+      path: ["customSchoolName"],
+    },
+  );
 
 type RegisterSchemaTypes = z.infer<typeof registerSchema>;
 
@@ -70,6 +101,9 @@ const Register = () => {
   const registerFn = useRegisterFn();
   const form = useForm<RegisterSchemaTypes>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      countryCode: "+91",
+    },
   });
 
   const { data: stateList } = useGetStates();
@@ -77,9 +111,40 @@ const Register = () => {
   const publication = useGetPublication();
   const series = useGetSeries(form.watch("publicationId"));
 
+  const countryCodes = [
+    { code: "+91", country: "India" },
+    { code: "+1", country: "USA/Canada" },
+    { code: "+44", country: "UK" },
+    { code: "+86", country: "China" },
+    { code: "+81", country: "Japan" },
+    { code: "+49", country: "Germany" },
+    { code: "+33", country: "France" },
+    { code: "+39", country: "Italy" },
+    { code: "+34", country: "Spain" },
+    { code: "+61", country: "Australia" },
+  ];
+
+  const watchedCity = form.watch("city");
+  const watchedSchoolName = form.watch("schoolName");
+
   const onSubmit = (data: RegisterSchemaTypes) => {
     const modifiedData: any = { ...data };
     delete modifiedData.confirmPassword;
+
+    // Handle custom city
+    if (data.city === "other" && data.customCity) {
+      modifiedData.city = data.customCity;
+    }
+    delete modifiedData.customCity;
+
+    // Handle custom school name
+    if (data.schoolName === "other" && data.customSchoolName) {
+      modifiedData.schoolName = data.customSchoolName;
+    }
+    delete modifiedData.customSchoolName;
+
+    // Combine country code with phone number
+    modifiedData.phone = `${data.countryCode}${data.phone}`;
 
     registerFn.mutate({ ...modifiedData });
   };
@@ -111,24 +176,55 @@ const Register = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone No.</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
+
+              <div className="flex gap-2">
+                <FormField
+                  control={form.control}
+                  name="countryCode"
+                  render={({ field }) => (
+                    <FormItem className="w-28">
+                      <FormLabel>Code</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
                         disabled={registerFn.isPending}
-                        placeholder="Enter your phone number"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Code" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {countryCodes.map((item) => (
+                            <SelectItem key={item.code} value={item.code}>
+                              {item.code}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Phone No.</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          disabled={registerFn.isPending}
+                          placeholder="Enter your phone number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
@@ -161,6 +257,7 @@ const Register = () => {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="password"
@@ -179,6 +276,7 @@ const Register = () => {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="publicationId"
@@ -207,7 +305,27 @@ const Register = () => {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="distributorName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Distributor Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        disabled={registerFn.isPending}
+                        placeholder="Enter distributor name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
+
             <div className="w-96 space-y-4">
               <FormField
                 control={form.control}
@@ -227,24 +345,59 @@ const Register = () => {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="schoolName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>School Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        disabled={registerFn.isPending}
-                        placeholder="Enter school name"
-                        {...field}
-                      />
-                    </FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={registerFn.isPending}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a School" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="cbse">CBSE</SelectItem>
+                        <SelectItem value="icse">ICSE</SelectItem>
+                        <SelectItem value="state_board">State Board</SelectItem>
+                        <SelectItem value="ib">
+                          International Baccalaureate
+                        </SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {watchedSchoolName === "other" && (
+                <FormField
+                  control={form.control}
+                  name="customSchoolName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Enter School Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          disabled={registerFn.isPending}
+                          placeholder="Enter school name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
               <FormField
                 control={form.control}
                 name="city"
@@ -267,12 +420,34 @@ const Register = () => {
                             {city.NAME}
                           </SelectItem>
                         ))}
+                        <SelectItem value="other">Other</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {watchedCity === "other" && (
+                <FormField
+                  control={form.control}
+                  name="customCity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Enter City Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          disabled={registerFn.isPending}
+                          placeholder="Enter city name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}
@@ -292,6 +467,7 @@ const Register = () => {
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="seriesId"
@@ -301,7 +477,9 @@ const Register = () => {
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
-                      disabled={registerFn.isPending}
+                      disabled={
+                        registerFn.isPending || !form.watch("publicationId")
+                      }
                     >
                       <FormControl>
                         <SelectTrigger>
