@@ -59,7 +59,7 @@ const registerSchema = z
     state: z.string().trim().min(1, { message: "State is required" }),
     schoolName: z.string().trim().min(1, { message: "School is required" }),
     customSchoolName: z.string().trim().optional(),
-    distributorName: z
+    distributor_name: z
       .string()
       .trim()
       .min(1, { message: "Distributor name is required" }),
@@ -308,7 +308,7 @@ const Register = () => {
 
               <FormField
                 control={form.control}
-                name="distributorName"
+                name="distributor_name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Distributor Name</FormLabel>
