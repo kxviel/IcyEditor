@@ -1,5 +1,4 @@
 import http from "@/config/https";
-import { queryClient } from "@/main";
 import { useModalStore } from "@/store/useModalStore";
 import { useQuestionBuilderStore } from "@/store/useQuestionBuilderStore";
 import { useMutation } from "@tanstack/react-query";
@@ -66,7 +65,7 @@ export const useSaveNewQuestion = () => {
         data.data.id,
         data.data.QUESTION_DATA,
       );
-      queryClient.invalidateQueries({ queryKey: ["GetQuestionList"] });
+      // queryClient.invalidateQueries({ queryKey: ["GetQuestionList"] });
       hideModal();
     },
     onError: (err: string) => {
