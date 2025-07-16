@@ -58,7 +58,8 @@ const registerSchema = z
     customCity: z.string().trim().optional(),
     state: z.string().trim().min(1, { message: "State is required" }),
     schoolName: z.string().trim().min(1, { message: "School is required" }),
-    customSchoolName: z.string().trim().optional(),
+    school_board: z.string().trim().min(1, { message: "Board is required" }),
+    customSchoolBoard: z.string().trim().optional(),
     distributor_name: z
       .string()
       .trim()
@@ -84,14 +85,16 @@ const registerSchema = z
   )
   .refine(
     (data) => {
-      if (data.schoolName === "other") {
-        return data.customSchoolName && data.customSchoolName.trim().length > 0;
+      if (data.school_board === "other") {
+        return (
+          data.customSchoolBoard && data.customSchoolBoard.trim().length > 0
+        );
       }
       return true;
     },
     {
-      message: "Please enter school name",
-      path: ["customSchoolName"],
+      message: "Please enter school board",
+      path: ["customSchoolBoard"],
     },
   );
 
@@ -125,7 +128,7 @@ const Register = () => {
   ];
 
   const watchedCity = form.watch("city");
-  const watchedSchoolName = form.watch("schoolName");
+  const watchedSchoolBoard = form.watch("school_board");
 
   const onSubmit = (data: RegisterSchemaTypes) => {
     const modifiedData: any = { ...data };
@@ -138,10 +141,10 @@ const Register = () => {
     delete modifiedData.customCity;
 
     // Handle custom school name
-    if (data.schoolName === "other" && data.customSchoolName) {
-      modifiedData.schoolName = data.customSchoolName;
+    if (data.school_board === "other" && data.customSchoolBoard) {
+      modifiedData.school_board = data.customSchoolBoard;
     }
-    delete modifiedData.customSchoolName;
+    delete modifiedData.customSchoolBoard;
 
     // Combine country code with phone number
     modifiedData.phone = `${data.countryCode}${data.phone}`;
@@ -150,7 +153,7 @@ const Register = () => {
   };
 
   return (
-    <div className="w-[642px] py-3">
+    <div className="w-[642px] overflow-y-auto py-3">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -225,6 +228,58 @@ const Register = () => {
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="school_board"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>School Board</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={registerFn.isPending}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a Board" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="CBSE">CBSE</SelectItem>
+                        <SelectItem value="ICSE">ICSE</SelectItem>
+                        <SelectItem value="State Board">State Board</SelectItem>
+                        <SelectItem value="International Baccalaureate">
+                          International Baccalaureate
+                        </SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {watchedSchoolBoard === "other" && (
+                <FormField
+                  control={form.control}
+                  name="customSchoolBoard"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Enter School Board</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          disabled={registerFn.isPending}
+                          placeholder="Enter school name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={form.control}
@@ -305,25 +360,6 @@ const Register = () => {
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="distributor_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Distributor Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        disabled={registerFn.isPending}
-                        placeholder="Enter distributor name"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
             <div className="w-96 space-y-4">
@@ -352,51 +388,18 @@ const Register = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>School Name</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={registerFn.isPending}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a School" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="cbse">CBSE</SelectItem>
-                        <SelectItem value="icse">ICSE</SelectItem>
-                        <SelectItem value="state_board">State Board</SelectItem>
-                        <SelectItem value="ib">
-                          International Baccalaureate
-                        </SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        disabled={registerFn.isPending}
+                        placeholder="Enter your School Name"
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              {watchedSchoolName === "other" && (
-                <FormField
-                  control={form.control}
-                  name="customSchoolName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Enter School Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          disabled={registerFn.isPending}
-                          placeholder="Enter school name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
 
               <FormField
                 control={form.control}
@@ -494,6 +497,25 @@ const Register = () => {
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="distributor_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Distributor Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        disabled={registerFn.isPending}
+                        placeholder="Enter distributor name"
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

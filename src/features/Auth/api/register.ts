@@ -13,6 +13,7 @@ type Props = {
   city?: string;
   state?: string;
   schoolName?: string;
+  school_board?: string;
   publicationId?: string;
   seriesId?: string;
   distributor_name?: string;
