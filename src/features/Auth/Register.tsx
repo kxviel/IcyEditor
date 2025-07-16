@@ -157,242 +157,165 @@ const Register = () => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col items-center gap-4"
+          className="flex flex-col gap-4 px-1"
         >
-          <div className="flex w-full gap-4">
-            <div className="w-96 space-y-4">
+          {/* Row 1: Full Name, Email */}
+          <div className="flex gap-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      disabled={registerFn.isPending}
+                      placeholder="Enter your fullname"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      disabled={registerFn.isPending}
+                      placeholder="Enter your email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Row 2: Country Code + Phone, School Name */}
+          <div className="flex gap-4">
+            <div className="flex flex-1 gap-2">
               <FormField
                 control={form.control}
-                name="name"
+                name="countryCode"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>FullName</FormLabel>
+                  <FormItem className="w-24">
+                    <FormLabel>Code</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      disabled={registerFn.isPending}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Code" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {countryCodes.map((item) => (
+                          <SelectItem key={item.code} value={item.code}>
+                            {item.code}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Phone No.</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         disabled={registerFn.isPending}
-                        placeholder="Enter your fullname"
+                        placeholder="Enter your phone number"
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex gap-2">
-                <FormField
-                  control={form.control}
-                  name="countryCode"
-                  render={({ field }) => (
-                    <FormItem className="w-28">
-                      <FormLabel>Code</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        disabled={registerFn.isPending}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Code" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {countryCodes.map((item) => (
-                            <SelectItem key={item.code} value={item.code}>
-                              {item.code}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Phone No.</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          disabled={registerFn.isPending}
-                          placeholder="Enter your phone number"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="school_board"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>School Board</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={registerFn.isPending}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a Board" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="CBSE">CBSE</SelectItem>
-                        <SelectItem value="ICSE">ICSE</SelectItem>
-                        <SelectItem value="State Board">State Board</SelectItem>
-                        <SelectItem value="International Baccalaureate">
-                          International Baccalaureate
-                        </SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {watchedSchoolBoard === "other" && (
-                <FormField
-                  control={form.control}
-                  name="customSchoolBoard"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Enter School Board</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          disabled={registerFn.isPending}
-                          placeholder="Enter school name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              <FormField
-                control={form.control}
-                name="state"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>State</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={registerFn.isPending}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a State" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {stateList?.map((state) => (
-                          <SelectItem
-                            key={state.id}
-                            value={state.id?.toString()}
-                          >
-                            {state.NAME}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        disabled={registerFn.isPending}
-                        placeholder="Create your password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="publicationId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Publication</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={registerFn.isPending}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a Publication" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {publication.data?.map((p) => (
-                          <SelectItem key={p.id} value={p.id?.toString()}>
-                            {p.NAME}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
-            <div className="w-96 space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        disabled={registerFn.isPending}
-                        placeholder="Enter your email"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              control={form.control}
+              name="schoolName"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>School Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      disabled={registerFn.isPending}
+                      placeholder="Enter your School Name"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
+          {/* Row 3: School Board, Custom School Board (if other) OR Distributor Name */}
+          <div className="flex gap-4">
+            <FormField
+              control={form.control}
+              name="school_board"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>School Board</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={registerFn.isPending}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a Board" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="CBSE">CBSE</SelectItem>
+                      <SelectItem value="ICSE">ICSE</SelectItem>
+                      <SelectItem value="State Board">State Board</SelectItem>
+                      <SelectItem value="International Baccalaureate">
+                        International Baccalaureate
+                      </SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {watchedSchoolBoard === "other" ? (
               <FormField
                 control={form.control}
-                name="schoolName"
+                name="customSchoolBoard"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>School Name</FormLabel>
+                  <FormItem className="flex-1">
+                    <FormLabel>Enter School Board</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
                         disabled={registerFn.isPending}
-                        placeholder="Enter your School Name"
+                        placeholder="Enter school board name"
                         {...field}
                       />
                     </FormControl>
@@ -400,113 +323,12 @@ const Register = () => {
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="city"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>City</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={registerFn.isPending}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a City" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {cityList?.map((city) => (
-                          <SelectItem key={city.id} value={city.id?.toString()}>
-                            {city.NAME}
-                          </SelectItem>
-                        ))}
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {watchedCity === "other" && (
-                <FormField
-                  control={form.control}
-                  name="customCity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Enter City Name</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          disabled={registerFn.isPending}
-                          placeholder="Enter city name"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        disabled={registerFn.isPending}
-                        placeholder="Confirm your password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="seriesId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Series</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={
-                        registerFn.isPending || !form.watch("publicationId")
-                      }
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a Series" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {series.data?.map((s) => (
-                          <SelectItem key={s.id} value={s.id?.toString()}>
-                            {s.NAME}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
+            ) : (
               <FormField
                 control={form.control}
                 name="distributor_name"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex-1">
                     <FormLabel>Distributor Name</FormLabel>
                     <FormControl>
                       <Input
@@ -520,16 +342,211 @@ const Register = () => {
                   </FormItem>
                 )}
               />
-            </div>
+            )}
           </div>
 
-          <Button
-            className="w-96"
-            type="submit"
-            disabled={registerFn.isPending}
-          >
-            {registerFn.isPending ? "Registering..." : "Get Started"}
-          </Button>
+          {/* Row 4: State, City with Custom City handling */}
+          <div className="flex gap-4">
+            <FormField
+              control={form.control}
+              name="state"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>State</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={registerFn.isPending}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a State" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {stateList?.map((state) => (
+                        <SelectItem key={state.id} value={state.id?.toString()}>
+                          {state.NAME}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>City</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={registerFn.isPending}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a City" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="other">Other</SelectItem>
+                      {cityList?.map((city) => (
+                        <SelectItem key={city.id} value={city.id?.toString()}>
+                          {city.NAME}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Custom City Input (appears below city row when "other" is selected) */}
+          {watchedCity === "other" && (
+            <div className="flex gap-4">
+              <div className="flex-1"></div>{" "}
+              {/* Empty space to align with city column */}
+              <FormField
+                control={form.control}
+                name="customCity"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Enter City Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        disabled={registerFn.isPending}
+                        placeholder="Enter city name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
+          {/* Row 5: Password, Confirm Password */}
+          <div className="flex gap-4">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      disabled={registerFn.isPending}
+                      placeholder="Create your password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      disabled={registerFn.isPending}
+                      placeholder="Confirm your password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Row 6: Publication, Series */}
+          <div className="flex gap-4">
+            <FormField
+              control={form.control}
+              name="publicationId"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Publication</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={registerFn.isPending}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a Publication" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {publication.data?.map((p) => (
+                        <SelectItem key={p.id} value={p.id?.toString()}>
+                          {p.NAME}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="seriesId"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Series</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={
+                      registerFn.isPending || !form.watch("publicationId")
+                    }
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a Series" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {series.data?.map((s) => (
+                        <SelectItem key={s.id} value={s.id?.toString()}>
+                          {s.NAME}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div className="mt-4 flex justify-center">
+            <Button
+              className="w-96"
+              type="submit"
+              disabled={registerFn.isPending}
+            >
+              {registerFn.isPending ? "Registering..." : "Get Started"}
+            </Button>
+          </div>
         </form>
       </Form>
     </div>
