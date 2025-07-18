@@ -21,6 +21,7 @@ type ReturnProps = {
     chapterIds: string[];
   };
 };
+
 export function parseExamDataResponse(response: ExamData): ReturnProps {
   const fields: Fieldtype = new Map();
   const headerData: HeaderData = {
@@ -133,3 +134,35 @@ export function addIndexesToFields(fields: Fieldtype): Fieldtype {
 
   return localFields;
 }
+
+export const countryCodes = [
+  { code: "+91", country: "India" },
+  { code: "+1", country: "USA/Canada" },
+  { code: "+44", country: "UK" },
+  { code: "+86", country: "China" },
+  { code: "+81", country: "Japan" },
+  { code: "+49", country: "Germany" },
+  { code: "+33", country: "France" },
+  { code: "+39", country: "Italy" },
+  { code: "+34", country: "Spain" },
+  { code: "+61", country: "Australia" },
+];
+
+export const separatePhoneNumber = (fullPhoneNumber: string) => {
+  if (!fullPhoneNumber) return { countryCode: "+91", phone: "" };
+
+  const codes = countryCodes.map((item) => item.code);
+
+  // Find matching country code
+  const matchedCode = codes.find((code) => fullPhoneNumber.startsWith(code));
+
+  if (matchedCode) {
+    return {
+      countryCode: matchedCode,
+      phone: fullPhoneNumber.substring(matchedCode.length),
+    };
+  }
+
+  // Default fallback
+  return { countryCode: "+91", phone: fullPhoneNumber };
+};

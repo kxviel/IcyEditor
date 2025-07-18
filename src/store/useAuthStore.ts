@@ -22,6 +22,8 @@ export type User = {
   token: string;
   status: string;
   isProfileCompleted: boolean;
+  distributor_name: string;
+  school_board: string;
 };
 
 type AuthState = {

@@ -32,6 +32,7 @@ import { useGetSeries } from "../Builder/api/getSeries";
 import { UpdateUserProps, useUpdateUser } from "./api/updateUser";
 import { useAuthStore, User } from "@/store/useAuthStore";
 import { Loader2 } from "lucide-react";
+import { countryCodes, separatePhoneNumber } from "@/lib/utils";
 
 const registerSchema = z
   .object({
@@ -55,21 +56,57 @@ const registerSchema = z
       .trim()
       .min(1, { message: "Confirm password is required" })
       .min(8, { message: "Confirm password must be at least 8 characters" }),
+    countryCode: z.string().min(1, { message: "Country code is required" }),
     phone: z
       .string()
       .trim()
       .min(1, { message: "Phone is required" })
-      .regex(/^\d{10}$/, { message: "Phone must be a valid 10-digit number" }),
+      .regex(/^[6789]\d{9}$/, {
+        message: "Please enter a valid phone number",
+      }),
     city: z.string().trim().min(1, { message: "City is required" }),
+    customCity: z.string().trim().optional(),
     state: z.string().trim().min(1, { message: "State is required" }),
     schoolName: z.string().trim().min(1, { message: "School is required" }),
+    school_board: z.string().trim().min(1, { message: "Board is required" }),
+    customSchoolBoard: z.string().trim().optional(),
+    distributor_name: z
+      .string()
+      .trim()
+      .min(1, { message: "Distributor name is required" }),
     publicationId: z.string().min(1, { message: "Publication is required" }),
     seriesId: z.string().min(1, { message: "Series is required" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-  });
+  })
+  .refine(
+    (data) => {
+      if (data.city === "other") {
+        return data.customCity && data.customCity.trim().length > 0;
+      }
+      return true;
+    },
+    {
+      message: "Please enter city name",
+      path: ["customCity"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.school_board === "other") {
+        return (
+          data.customSchoolBoard && data.customSchoolBoard.trim().length > 0
+        );
+      }
+      return true;
+    },
+    {
+      message: "Please enter school board",
+      path: ["customSchoolBoard"],
+    },
+  );
 
 type RegisterSchemaTypes = z.infer<typeof registerSchema>;
 
@@ -83,6 +120,8 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
   const getUser = useAuthStore((state) => state.getUser);
   const hideModal = useModalStore((state) => state.hideModal);
 
+  const { countryCode, phone } = separatePhoneNumber(data.MOBILE || "");
+
   const form = useForm<RegisterSchemaTypes>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -90,32 +129,51 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
       email: data.EMAIL || "",
       password: data.PASSWORD || "",
       confirmPassword: data.PASSWORD || "",
-      phone: data.MOBILE || "",
+      countryCode: countryCode,
+      phone: phone,
       city: data.city?.toString() || "",
       state: data.state?.toString() || "",
       schoolName: data.school || "",
+      school_board: "",
+      distributor_name: "",
       publicationId: data.PUBLICATION_ID?.toString() || "",
       seriesId: data.SERIES_ID?.toString() || "",
     },
   });
 
-  const watchedState = form.watch("state");
-  const watchedPublicationId = form.watch("publicationId");
-
   const { data: stateList, isPending: isStatePending } = useGetStates();
-  const { data: cityList, isPending: isCityPending } =
-    useGetCities(watchedState);
+  const { data: cityList, isPending: isCityPending } = useGetCities(
+    form.watch("state"),
+  );
   const { data: publication, isPending: isPublicationPending } =
     useGetPublication();
-  const { data: series, isPending: isSeriesPending } =
-    useGetSeries(watchedPublicationId);
+  const { data: series, isPending: isSeriesPending } = useGetSeries(
+    form.watch("publicationId"),
+  );
+
+  const watchedCity = form.watch("city");
+  const watchedSchoolBoard = form.watch("school_board");
 
   const onSubmit = (data: RegisterSchemaTypes) => {
     const user = getUser();
-    const modifiedData: Omit<RegisterSchemaTypes, "confirmPassword"> = {
-      ...data,
-    };
-    delete (modifiedData as any).confirmPassword;
+    const modifiedData: any = { ...data };
+
+    delete modifiedData.confirmPassword;
+
+    // Handle custom city
+    if (data.city === "other" && data.customCity) {
+      modifiedData.city = data.customCity;
+    }
+    delete modifiedData.customCity;
+
+    // Handle custom school name
+    if (data.school_board === "other" && data.customSchoolBoard) {
+      modifiedData.school_board = data.customSchoolBoard;
+    }
+    delete modifiedData.customSchoolBoard;
+
+    // Combine country code with phone number
+    modifiedData.phone = `${data.countryCode}${data.phone}`;
 
     if (user) {
       updateUser.mutate({
@@ -146,41 +204,25 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
             <span className="ml-2">Loading form data...</span>
           </div>
         ) : (
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="flex flex-col items-center gap-4"
-            >
-              <div className="flex w-full gap-4">
-                <div className="w-96 space-y-4">
+          <div className="w-[642px] overflow-y-auto py-3">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col gap-4 px-1"
+              >
+                {/* Row 1: Full Name, Email */}
+                <div className="flex gap-4">
                   <FormField
                     control={form.control}
                     name="name"
-                    disabled={isFormDisabled}
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
                         <FormLabel>Full Name</FormLabel>
                         <FormControl>
                           <Input
                             type="text"
-                            placeholder="Enter your full name"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    disabled={isFormDisabled}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone No.</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Enter your phone number"
+                            disabled={isFormDisabled}
+                            placeholder="Enter your fullname"
                             {...field}
                           />
                         </FormControl>
@@ -191,16 +233,181 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
 
                   <FormField
                     control={form.control}
-                    name="state"
-                    disabled={isFormDisabled}
+                    name="email"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            disabled={true}
+                            placeholder="Enter your email"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Row 2: Country Code + Phone, School Name */}
+                <div className="flex gap-4">
+                  <div className="flex flex-1 gap-2">
+                    <FormField
+                      control={form.control}
+                      name="countryCode"
+                      render={({ field }) => (
+                        <FormItem className="w-24">
+                          <FormLabel>Code</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            disabled={isFormDisabled}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Code" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {countryCodes.map((item) => (
+                                <SelectItem key={item.code} value={item.code}>
+                                  {item.code}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Phone No.</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              disabled={isFormDisabled}
+                              placeholder="Enter your phone number"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="schoolName"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>School Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            disabled={isFormDisabled}
+                            placeholder="Enter your School Name"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Row 3: School Board, Custom School Board (if other) OR Distributor Name */}
+                <div className="flex gap-4">
+                  <FormField
+                    control={form.control}
+                    name="school_board"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>School Board</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={isFormDisabled}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a Board" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="CBSE">CBSE</SelectItem>
+                            <SelectItem value="ICSE">ICSE</SelectItem>
+                            <SelectItem value="State Board">
+                              State Board
+                            </SelectItem>
+                            <SelectItem value="International Baccalaureate">
+                              International Baccalaureate
+                            </SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {watchedSchoolBoard === "other" ? (
+                    <FormField
+                      control={form.control}
+                      name="customSchoolBoard"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Enter School Board</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              disabled={isFormDisabled}
+                              placeholder="Enter school board name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ) : (
+                    <FormField
+                      control={form.control}
+                      name="distributor_name"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Distributor Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              disabled={isFormDisabled}
+                              placeholder="Enter distributor name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
+
+                {/* Row 4: State, City with Custom City handling */}
+                <div className="flex gap-4">
+                  <FormField
+                    control={form.control}
+                    name="state"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
                         <FormLabel>State</FormLabel>
                         <Select
-                          onValueChange={(val) => {
-                            field.onChange(val);
-                            form.setValue("city", "");
-                          }}
+                          onValueChange={field.onChange}
                           defaultValue={field.value}
                           disabled={isFormDisabled}
                         >
@@ -224,16 +431,78 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>City</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={isFormDisabled || isCityPending}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a City" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="other">Other</SelectItem>
+                            {cityList?.map((city) => (
+                              <SelectItem
+                                key={city.id}
+                                value={city.id?.toString()}
+                              >
+                                {city.NAME}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Custom City Input (appears below city row when "other" is selected) */}
+                {watchedCity === "other" && (
+                  <div className="flex gap-4">
+                    <div className="flex-1"></div>
+                    <FormField
+                      control={form.control}
+                      name="customCity"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Enter City Name</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="text"
+                              disabled={isFormDisabled}
+                              placeholder="Enter city name"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
+
+                {/* Row 5: Password, Confirm Password */}
+                <div className="flex gap-4">
                   <FormField
                     control={form.control}
                     name="password"
-                    disabled={isFormDisabled}
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
                         <FormLabel>Password</FormLabel>
                         <FormControl>
                           <Input
                             type="password"
+                            disabled={isFormDisabled}
                             placeholder="Create your password"
                             {...field}
                           />
@@ -242,18 +511,37 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            disabled={isFormDisabled}
+                            placeholder="Confirm your password"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Row 6: Publication, Series */}
+                <div className="flex gap-4">
                   <FormField
                     control={form.control}
                     name="publicationId"
-                    disabled={isFormDisabled}
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
                         <FormLabel>Publication</FormLabel>
                         <Select
-                          onValueChange={(val) => {
-                            field.onChange(val);
-                            form.setValue("seriesId", "");
-                          }}
+                          onValueChange={field.onChange}
                           defaultValue={field.value}
                           disabled={isFormDisabled}
                         >
@@ -274,131 +562,25 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                       </FormItem>
                     )}
                   />
-                </div>
-                <div className="w-96 space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    disabled={true}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="email"
-                            placeholder="Enter your email"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="schoolName"
-                    disabled={isFormDisabled}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>School Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Enter school name"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    disabled={isFormDisabled || isCityPending}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          disabled={
-                            isFormDisabled || isCityPending || !watchedState
-                          }
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue
-                                placeholder={
-                                  !watchedState
-                                    ? "Select a state first"
-                                    : isCityPending
-                                      ? "Loading cities..."
-                                      : "Select a City"
-                                }
-                              />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {cityList?.map((city) => (
-                              <SelectItem
-                                key={city.id}
-                                value={city.id?.toString()}
-                              >
-                                {city.NAME}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="confirmPassword"
-                    disabled={isFormDisabled}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="password"
-                            placeholder="Confirm your password"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+
                   <FormField
                     control={form.control}
                     name="seriesId"
-                    disabled={isFormDisabled || isSeriesPending}
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
                         <FormLabel>Series</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                           disabled={
                             isFormDisabled ||
-                            isSeriesPending ||
-                            !watchedPublicationId
+                            !form.watch("publicationId") ||
+                            isSeriesPending
                           }
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue
-                                placeholder={
-                                  !watchedPublicationId
-                                    ? "Select a publication first"
-                                    : isSeriesPending
-                                      ? "Loading series..."
-                                      : "Select a Series"
-                                }
-                              />
+                              <SelectValue placeholder="Select a Series" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -414,35 +596,36 @@ const CompleteProfileModal = ({ isOpen, data }: Props) => {
                     )}
                   />
                 </div>
-              </div>
 
-              <div className="flex w-full items-center gap-4">
-                <Button
-                  className="w-full"
-                  variant={"outline"}
-                  type="button"
-                  disabled={isFormDisabled}
-                  onClick={() => hideModal()}
-                >
-                  Complete Later
-                </Button>
-                <Button
-                  className="w-full"
-                  type="submit"
-                  disabled={isFormDisabled}
-                >
-                  {updateUser.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    "Save Profile"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </Form>
+                {/* Submit Buttons */}
+                <div className="mt-4 flex gap-4">
+                  <Button
+                    className="flex-1"
+                    variant="outline"
+                    type="button"
+                    disabled={isFormDisabled}
+                    onClick={() => hideModal()}
+                  >
+                    Complete Later
+                  </Button>
+                  <Button
+                    className="flex-1"
+                    type="submit"
+                    disabled={isFormDisabled}
+                  >
+                    {updateUser.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Profile"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
         )}
       </DialogContent>
     </Dialog>

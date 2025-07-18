@@ -23,6 +23,7 @@ import { useGetStates } from "./api/getStates";
 import { useGetCities } from "./api/getCities";
 import { useGetPublication } from "@/features/Builder/api/getPublication";
 import { useGetSeries } from "@/features/Builder/api/getSeries";
+import { countryCodes } from "@/lib/utils";
 
 const registerSchema = z
   .object({
@@ -113,19 +114,6 @@ const Register = () => {
   const { data: cityList } = useGetCities(form.watch("state"));
   const publication = useGetPublication();
   const series = useGetSeries(form.watch("publicationId"));
-
-  const countryCodes = [
-    { code: "+91", country: "India" },
-    { code: "+1", country: "USA/Canada" },
-    { code: "+44", country: "UK" },
-    { code: "+86", country: "China" },
-    { code: "+81", country: "Japan" },
-    { code: "+49", country: "Germany" },
-    { code: "+33", country: "France" },
-    { code: "+39", country: "Italy" },
-    { code: "+34", country: "Spain" },
-    { code: "+61", country: "Australia" },
-  ];
 
   const watchedCity = form.watch("city");
   const watchedSchoolBoard = form.watch("school_board");

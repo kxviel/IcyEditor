@@ -12,13 +12,15 @@ type Props = {
 export type UpdateUserProps = {
   name: string;
   email: string;
-  phone: string;
-  password: string;
-  state: string;
-  city: string;
-  schoolName: string;
-  publicationId: string;
-  seriesId: string;
+  password?: string;
+  phone?: string;
+  city?: string;
+  state?: string;
+  schoolName?: string;
+  school_board?: string;
+  publicationId?: string;
+  seriesId?: string;
+  distributor_name?: string;
   restrictedAccess: boolean;
   isProfileCompleted: boolean;
 };
