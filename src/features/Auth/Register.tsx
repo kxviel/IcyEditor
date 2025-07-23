@@ -333,6 +333,29 @@ const Register = () => {
             )}
           </div>
 
+          {watchedSchoolBoard === "other" && (
+            <div className="flex items-center justify-center gap-4">
+              <FormField
+                control={form.control}
+                name="distributor_name"
+                render={({ field }) => (
+                  <FormItem className="w-60">
+                    <FormLabel>Distributor Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        disabled={registerFn.isPending}
+                        placeholder="Enter distributor name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
+
           {/* Row 4: State, City with Custom City handling */}
           <div className="flex gap-4">
             <FormField
