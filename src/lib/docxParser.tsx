@@ -1,7 +1,7 @@
-import { Paragraph, TextRun, HeadingLevel, FileChild } from "docx";
+import { Paragraph, TextRun, HeadingLevel, FileChild, ImageRun } from "docx";
 import { Fieldtype } from "@/store/useQuestionBuilderStore";
 
-export const generateDocFromFields = (
+export const generateDocFromFields = async (
   fields: Fieldtype,
   currentFontSize: number,
 ) => {
@@ -9,7 +9,7 @@ export const generateDocFromFields = (
   const paragraphs: FileChild[] = [];
 
   // Iterate through each field (category)
-  Array.from(fields.values()).forEach((field) => {
+  for (const field of Array.from(fields.values())) {
     // Add the category title paragraph
     paragraphs.push(
       new Paragraph({
@@ -41,7 +41,10 @@ export const generateDocFromFields = (
     );
 
     // Add each question
-    field.questions.forEach((question) => {
+    for (const question of field.questions) {
+      // Process the questionText to handle the HTML content with images
+      const questionContent = await processQuestionText(question.questionText, currentFontSize);
+      
       // Create a paragraph for each question
       paragraphs.push(
         new Paragraph({
@@ -55,24 +58,24 @@ export const generateDocFromFields = (
               bold: true,
               size: (14 + Number(currentFontSize)) * 2,
             }),
-            // Process the questionText to handle the HTML content
-            ...processQuestionText(question.questionText, currentFontSize),
+            // Add the processed question content (text and images)
+            ...questionContent,
           ],
         }),
       );
-    });
+    }
 
     // Add a blank paragraph after each category for spacing
     paragraphs.push(new Paragraph({}));
-  });
+  }
 
   // Create and return the document
   return paragraphs;
 };
 
 // Helper function to process question text and handle HTML content
-const processQuestionText = (htmlText: string, currentFontSize: any) => {
-  // Array to store text runs
+const processQuestionText = async (htmlText: string, currentFontSize: any) => {
+  // Array to store text runs and images
   const textRuns = [];
 
   // Simple function to parse nested tags and create text runs
@@ -138,8 +141,68 @@ const processQuestionText = (htmlText: string, currentFontSize: any) => {
     return runs;
   };
 
+  // Function to fetch image and create ImageRun
+  const createImageRun = async (imageUrl: string) => {
+    try {
+      const response = await fetch(imageUrl);
+      const imageBuffer = await response.arrayBuffer();
+      
+      return new ImageRun({
+        data: imageBuffer,
+        transformation: {
+          width: 300, // Adjust width as needed
+          height: 200, // Adjust height as needed
+        },
+      });
+    } catch (error) {
+      console.error('Failed to fetch image:', error);
+      // Return a text placeholder if image fails to load
+      return new TextRun({
+        text: '[Image failed to load]',
+        size: (14 + Number(currentFontSize)) * 2,
+        color: "999999",
+      });
+    }
+  };
+
+  // Function to parse text and replace image placeholders with actual images
+  const parseTextWithImages = async (text: string) => {
+    const runs = [];
+    const parts = text.split(/(\[IMAGE_\d+\])/);
+    
+    for (const part of parts) {
+      const imageMatch = part.match(/\[IMAGE_(\d+)\]/);
+      if (imageMatch) {
+        const imageIndex = parseInt(imageMatch[1]);
+        if (imageMatches[imageIndex]) {
+          const imageRun = await createImageRun(imageMatches[imageIndex]);
+          runs.push(imageRun);
+        }
+      } else if (part.trim()) {
+        const formattedRuns = parseTextWithFormatting(part);
+        runs.push(...formattedRuns);
+      }
+    }
+    
+    return runs;
+  };
+
+  // Extract images first and replace with placeholders
+  const imageRegex = /<img[^>]+src="([^"]+)"[^>]*>/gi;
+  const imageMatches = [];
+  let match;
+  let textWithImagePlaceholders = htmlText;
+
+  // Find all images and create placeholders
+  while ((match = imageRegex.exec(htmlText)) !== null) {
+    const imageUrl = match[1];
+    const placeholder = `[IMAGE_${imageMatches.length}]`;
+    imageMatches.push(imageUrl);
+    textWithImagePlaceholders = textWithImagePlaceholders.replace(match[0], placeholder);
+  }
+
   // Remove HTML tags and handle specific formatting
-  const cleanText = htmlText
+  const cleanText = textWithImagePlaceholders
     .replace(/<\/?p>/g, "") // Remove p tags
     .replace(/<br\s*\/?>/gi, "\n") // Convert br tags to newlines
     .replace(/&nbsp;/g, " ") // Replace non-breaking spaces
@@ -153,25 +216,25 @@ const processQuestionText = (htmlText: string, currentFontSize: any) => {
     // Split at the first occurrence of "a."
     const [questionPart, optionsPart] = cleanText.split(/a\./);
 
-    // Add the question part with formatting
-    const questionRuns = parseTextWithFormatting(questionPart.trim());
+    // Add the question part with formatting and images
+    const questionRuns = await parseTextWithImages(questionPart.trim());
     textRuns.push(...questionRuns);
 
     // Split options part by "b." to get both options
     const [optionA, optionB] = ("a." + optionsPart).split(/b\./);
 
-    // Add option A with formatting
-    const optionARuns = parseTextWithFormatting("\n" + optionA.trim());
+    // Add option A with formatting and images
+    const optionARuns = await parseTextWithImages("\n" + optionA.trim());
     textRuns.push(...optionARuns);
 
-    // Add option B with formatting
+    // Add option B with formatting and images
     if (optionB) {
-      const optionBRuns = parseTextWithFormatting("\nb." + optionB.trim());
+      const optionBRuns = await parseTextWithImages("\nb." + optionB.trim());
       textRuns.push(...optionBRuns);
     }
   } else {
-    // No options, just add the clean text with formatting
-    const formattedRuns = parseTextWithFormatting(cleanText.trim());
+    // No options, just add the clean text with formatting and images
+    const formattedRuns = await parseTextWithImages(cleanText.trim());
     textRuns.push(...formattedRuns);
   }
 

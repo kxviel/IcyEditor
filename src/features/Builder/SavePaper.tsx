@@ -123,7 +123,7 @@ const SavePaper = () => {
 
     const responseBlob = await response.blob();
 
-    const docxBlob = generateDocFromFields(fields, Number(fontSize));
+    const docxBlob = await generateDocFromFields(fields, Number(fontSize));
     const headerPatch = headerObject.patchContent;
 
     const allPatches = {
