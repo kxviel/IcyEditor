@@ -143,99 +143,81 @@ const processQuestionText = async (htmlText: string, currentFontSize: any) => {
 
   // Function to fetch image and create ImageRun
   const createImageRun = async (imageUrl: string) => {
-    try {
-      console.log('Attempting to fetch image:', imageUrl);
+    console.log('Attempting to load image:', imageUrl);
+    
+    return new Promise<any>((resolve) => {
+      // Use Image element to load the image (bypasses CORS for display)
+      const img = new Image();
       
-      // Try multiple approaches to fetch the image
-      let response;
-      let imageBuffer;
-      
-      // Approach 1: Direct fetch with CORS
-      try {
-        response = await fetch(imageUrl, {
-          mode: 'cors',
-          headers: {
-            'Accept': 'image/*',
-          },
-        });
-        
-        if (response.ok) {
-          imageBuffer = await response.arrayBuffer();
-        }
-      } catch (corsError) {
-        console.warn('CORS fetch failed:', corsError);
-      }
-      
-      // Approach 2: Try without CORS mode
-      if (!imageBuffer) {
+      img.onload = () => {
         try {
-          response = await fetch(imageUrl, {
-            headers: {
-              'Accept': 'image/*',
-            },
-          });
-          
-          if (response.ok) {
-            imageBuffer = await response.arrayBuffer();
-          }
-        } catch (noCorsError) {
-          console.warn('No-CORS fetch failed:', noCorsError);
-        }
-      }
-      
-      // Approach 3: Use a proxy approach (convert to data URL first)
-      if (!imageBuffer) {
-        try {
-          // Create an image element to load the image
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          
-          await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = imageUrl;
-          });
-          
-          // Convert to canvas and then to buffer
+          // Create canvas to convert image to data
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d')!;
-          canvas.width = img.width;
-          canvas.height = img.height;
+          
+          // Set canvas size to image size
+          canvas.width = img.naturalWidth;
+          canvas.height = img.naturalHeight;
+          
+          // Draw image on canvas
           ctx.drawImage(img, 0, 0);
           
-          // Convert canvas to blob
-          const blob = await new Promise<Blob>((resolve) => {
-            canvas.toBlob((blob) => resolve(blob!), 'image/png');
-          });
+          // Convert to blob
+          canvas.toBlob(async (blob) => {
+            if (blob) {
+              const imageBuffer = await blob.arrayBuffer();
+              console.log('Successfully converted image to buffer, size:', imageBuffer.byteLength);
+              
+              resolve(new ImageRun({
+                data: imageBuffer,
+                transformation: {
+                  width: Math.min(400, img.naturalWidth), // Limit width
+                  height: Math.min(300, img.naturalHeight), // Limit height
+                },
+              }));
+            } else {
+              console.warn('Failed to convert canvas to blob');
+              resolve(new TextRun({
+                text: `[Image conversion failed: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
+                size: (14 + Number(currentFontSize)) * 2,
+                color: "999999",
+              }));
+            }
+          }, 'image/png', 0.8); // PNG format with 0.8 quality
           
-          imageBuffer = await blob.arrayBuffer();
         } catch (canvasError) {
-          console.warn('Canvas approach failed:', canvasError);
+          console.error('Canvas processing failed:', canvasError);
+          resolve(new TextRun({
+            text: `[Image processing failed: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
+            size: (14 + Number(currentFontSize)) * 2,
+            color: "999999",
+          }));
         }
-      }
+      };
       
-      if (!imageBuffer) {
-        throw new Error('All image fetch approaches failed');
-      }
+      img.onerror = (error) => {
+        console.error('Image failed to load:', imageUrl, error);
+        resolve(new TextRun({
+          text: `[Image unavailable: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
+          size: (14 + Number(currentFontSize)) * 2,
+          color: "999999",
+        }));
+      };
       
-      console.log('Successfully fetched image, size:', imageBuffer.byteLength);
+      // Important: Set crossOrigin before src to handle CORS properly
+      img.crossOrigin = 'anonymous';
+      img.src = imageUrl;
       
-      return new ImageRun({
-        data: imageBuffer,
-        transformation: {
-          width: 300, // Adjust width as needed
-          height: 200, // Adjust height as needed
-        },
-      });
-    } catch (error) {
-      console.error('Failed to fetch image:', imageUrl, error);
-      // Return a text placeholder if image fails to load
-      return new TextRun({
-        text: `[Image unavailable: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
-        size: (14 + Number(currentFontSize)) * 2,
-        color: "999999",
-      });
-    }
+      // Timeout fallback
+      setTimeout(() => {
+        console.warn('Image loading timeout for:', imageUrl);
+        resolve(new TextRun({
+          text: `[Image timeout: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
+          size: (14 + Number(currentFontSize)) * 2,
+          color: "999999",
+        }));
+      }, 10000); // 10 second timeout
+    });
   };
 
   // Function to parse text and replace image placeholders with actual images
