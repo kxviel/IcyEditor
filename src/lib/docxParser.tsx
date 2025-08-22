@@ -144,8 +144,81 @@ const processQuestionText = async (htmlText: string, currentFontSize: any) => {
   // Function to fetch image and create ImageRun
   const createImageRun = async (imageUrl: string) => {
     try {
-      const response = await fetch(imageUrl);
-      const imageBuffer = await response.arrayBuffer();
+      console.log('Attempting to fetch image:', imageUrl);
+      
+      // Try multiple approaches to fetch the image
+      let response;
+      let imageBuffer;
+      
+      // Approach 1: Direct fetch with CORS
+      try {
+        response = await fetch(imageUrl, {
+          mode: 'cors',
+          headers: {
+            'Accept': 'image/*',
+          },
+        });
+        
+        if (response.ok) {
+          imageBuffer = await response.arrayBuffer();
+        }
+      } catch (corsError) {
+        console.warn('CORS fetch failed:', corsError);
+      }
+      
+      // Approach 2: Try without CORS mode
+      if (!imageBuffer) {
+        try {
+          response = await fetch(imageUrl, {
+            headers: {
+              'Accept': 'image/*',
+            },
+          });
+          
+          if (response.ok) {
+            imageBuffer = await response.arrayBuffer();
+          }
+        } catch (noCorsError) {
+          console.warn('No-CORS fetch failed:', noCorsError);
+        }
+      }
+      
+      // Approach 3: Use a proxy approach (convert to data URL first)
+      if (!imageBuffer) {
+        try {
+          // Create an image element to load the image
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          
+          await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = imageUrl;
+          });
+          
+          // Convert to canvas and then to buffer
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d')!;
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          
+          // Convert canvas to blob
+          const blob = await new Promise<Blob>((resolve) => {
+            canvas.toBlob((blob) => resolve(blob!), 'image/png');
+          });
+          
+          imageBuffer = await blob.arrayBuffer();
+        } catch (canvasError) {
+          console.warn('Canvas approach failed:', canvasError);
+        }
+      }
+      
+      if (!imageBuffer) {
+        throw new Error('All image fetch approaches failed');
+      }
+      
+      console.log('Successfully fetched image, size:', imageBuffer.byteLength);
       
       return new ImageRun({
         data: imageBuffer,
@@ -155,10 +228,10 @@ const processQuestionText = async (htmlText: string, currentFontSize: any) => {
         },
       });
     } catch (error) {
-      console.error('Failed to fetch image:', error);
+      console.error('Failed to fetch image:', imageUrl, error);
       // Return a text placeholder if image fails to load
       return new TextRun({
-        text: '[Image failed to load]',
+        text: `[Image unavailable: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
         size: (14 + Number(currentFontSize)) * 2,
         color: "999999",
       });
