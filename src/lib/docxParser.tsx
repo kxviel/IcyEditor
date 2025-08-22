@@ -1,5 +1,6 @@
 import { Paragraph, TextRun, HeadingLevel, FileChild, ImageRun } from "docx";
 import { Fieldtype } from "@/store/useQuestionBuilderStore";
+import { imageCache } from "./imageCache";
 
 export const generateDocFromFields = async (
   fields: Fieldtype,
@@ -141,83 +142,40 @@ const processQuestionText = async (htmlText: string, currentFontSize: any) => {
     return runs;
   };
 
-  // Function to fetch image and create ImageRun
+  // Function to fetch image and create ImageRun using cache
   const createImageRun = async (imageUrl: string) => {
-    console.log('Attempting to load image:', imageUrl);
-    
-    return new Promise<any>((resolve) => {
-      // Use Image element to load the image (bypasses CORS for display)
-      const img = new Image();
+    try {
+      console.log('Attempting to load image with cache:', imageUrl);
       
-      img.onload = () => {
-        try {
-          // Create canvas to convert image to data
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d')!;
-          
-          // Set canvas size to image size
-          canvas.width = img.naturalWidth;
-          canvas.height = img.naturalHeight;
-          
-          // Draw image on canvas
-          ctx.drawImage(img, 0, 0);
-          
-          // Convert to blob
-          canvas.toBlob(async (blob) => {
-            if (blob) {
-              const imageBuffer = await blob.arrayBuffer();
-              console.log('Successfully converted image to buffer, size:', imageBuffer.byteLength);
-              
-              resolve(new ImageRun({
-                data: imageBuffer,
-                transformation: {
-                  width: Math.min(400, img.naturalWidth), // Limit width
-                  height: Math.min(300, img.naturalHeight), // Limit height
-                },
-              }));
-            } else {
-              console.warn('Failed to convert canvas to blob');
-              resolve(new TextRun({
-                text: `[Image conversion failed: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
-                size: (14 + Number(currentFontSize)) * 2,
-                color: "999999",
-              }));
-            }
-          }, 'image/png', 0.8); // PNG format with 0.8 quality
-          
-        } catch (canvasError) {
-          console.error('Canvas processing failed:', canvasError);
-          resolve(new TextRun({
-            text: `[Image processing failed: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
-            size: (14 + Number(currentFontSize)) * 2,
-            color: "999999",
-          }));
-        }
-      };
+      // Use image cache to get the image buffer
+      const imageBuffer = await imageCache.cacheImage(imageUrl);
       
-      img.onerror = (error) => {
-        console.error('Image failed to load:', imageUrl, error);
-        resolve(new TextRun({
+      if (imageBuffer && imageBuffer.byteLength > 0) {
+        console.log('Successfully loaded image from cache, size:', imageBuffer.byteLength);
+        
+        return new ImageRun({
+          data: imageBuffer,
+          transformation: {
+            width: 350, // Standard width
+            height: 250, // Standard height
+          },
+        });
+      } else {
+        console.warn('Failed to load image:', imageUrl);
+        return new TextRun({
           text: `[Image unavailable: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
           size: (14 + Number(currentFontSize)) * 2,
           color: "999999",
-        }));
-      };
-      
-      // Important: Set crossOrigin before src to handle CORS properly
-      img.crossOrigin = 'anonymous';
-      img.src = imageUrl;
-      
-      // Timeout fallback
-      setTimeout(() => {
-        console.warn('Image loading timeout for:', imageUrl);
-        resolve(new TextRun({
-          text: `[Image timeout: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
-          size: (14 + Number(currentFontSize)) * 2,
-          color: "999999",
-        }));
-      }, 10000); // 10 second timeout
-    });
+        });
+      }
+    } catch (error) {
+      console.error('Image loading error:', imageUrl, error);
+      return new TextRun({
+        text: `[Image error: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
+        size: (14 + Number(currentFontSize)) * 2,
+        color: "999999",
+      });
+    }
   };
 
   // Function to parse text and replace image placeholders with actual images

@@ -22,6 +22,7 @@ import {
 import { useAuthStore } from "@/store/useAuthStore";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
+import { imageCache } from "@/lib/imageCache";
 
 const SavePaper = () => {
   const navigate = useNavigate();
@@ -156,6 +157,9 @@ const SavePaper = () => {
           resetPageSettings();
           invalidateRelatedQueries();
           localStorage.removeItem("optimized");
+
+          // Clear cached images after successful download
+          imageCache.clearOldImages();
 
           navigate({ to: "/", search: { page: 1 } });
         });
