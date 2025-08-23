@@ -145,23 +145,56 @@ const processQuestionText = async (htmlText: string, currentFontSize: any) => {
   // Function to fetch image and create ImageRun using cache
   const createImageRun = async (imageUrl: string) => {
     try {
-      console.log('Attempting to load image with cache:', imageUrl);
+      console.log('DOCX: Attempting to load image with cache:', imageUrl);
       
       // Use image cache to get the image buffer
       const imageBuffer = await imageCache.cacheImage(imageUrl);
       
       if (imageBuffer && imageBuffer.byteLength > 0) {
-        console.log('Successfully loaded image from cache, size:', imageBuffer.byteLength);
+        console.log('DOCX: Successfully loaded image from cache, size:', imageBuffer.byteLength);
         
-        return new ImageRun({
-          data: imageBuffer,
-          transformation: {
-            width: 350, // Standard width
-            height: 250, // Standard height
-          },
-        });
+        // Validate that we have a reasonable image buffer size
+        if (imageBuffer.byteLength < 100) {
+          console.warn('DOCX: Image buffer too small, likely corrupted:', imageUrl);
+          return new TextRun({
+            text: `[Image too small: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
+            size: (14 + Number(currentFontSize)) * 2,
+            color: "999999",
+          });
+        }
+
+        // Check for valid image file signatures (magic bytes)
+        const uint8Array = new Uint8Array(imageBuffer.slice(0, 8));
+        const isPNG = uint8Array[0] === 0x89 && uint8Array[1] === 0x50 && uint8Array[2] === 0x4E && uint8Array[3] === 0x47;
+        const isJPEG = uint8Array[0] === 0xFF && uint8Array[1] === 0xD8;
+        
+        if (!isPNG && !isJPEG) {
+          console.warn('DOCX: Image buffer has invalid signature, possibly corrupted:', imageUrl);
+          return new TextRun({
+            text: `[Invalid image format: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
+            size: (14 + Number(currentFontSize)) * 2,
+            color: "999999",
+          });
+        }
+
+        try {
+          return new ImageRun({
+            data: imageBuffer,
+            transformation: {
+              width: 300, // Reasonable width in pixels
+              height: 200, // Reasonable height in pixels
+            },
+          });
+        } catch (imageRunError) {
+          console.error('DOCX: Failed to create ImageRun:', imageRunError);
+          return new TextRun({
+            text: `[Image processing error: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
+            size: (14 + Number(currentFontSize)) * 2,
+            color: "999999",
+          });
+        }
       } else {
-        console.warn('Failed to load image:', imageUrl);
+        console.warn('DOCX: Failed to load image, using placeholder:', imageUrl);
         return new TextRun({
           text: `[Image unavailable: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
           size: (14 + Number(currentFontSize)) * 2,
@@ -169,7 +202,7 @@ const processQuestionText = async (htmlText: string, currentFontSize: any) => {
         });
       }
     } catch (error) {
-      console.error('Image loading error:', imageUrl, error);
+      console.error('DOCX: Image loading error:', imageUrl, error);
       return new TextRun({
         text: `[Image error: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
         size: (14 + Number(currentFontSize)) * 2,
