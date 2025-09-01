@@ -1,6 +1,6 @@
 import { Paragraph, TextRun, HeadingLevel, FileChild, ImageRun } from "docx";
-import { Fieldtype } from "@/store/useQuestionBuilderStore";
-import { imageCache } from "./imageCache";
+import { Fieldtype, QuestionItem } from "@/store/useQuestionBuilderStore";
+import http from "@/config/https";
 
 export const generateDocFromFields = async (
   fields: Fieldtype,
@@ -44,8 +44,11 @@ export const generateDocFromFields = async (
     // Add each question
     for (const question of field.questions) {
       // Process the questionText to handle the HTML content with images
-      const questionContent = await processQuestionText(question.questionText, currentFontSize);
-      
+      const questionContent = await processQuestionText(
+        question,
+        currentFontSize,
+      );
+
       // Create a paragraph for each question
       paragraphs.push(
         new Paragraph({
@@ -74,10 +77,66 @@ export const generateDocFromFields = async (
   return paragraphs;
 };
 
-// Helper function to process question text and handle HTML content
-const processQuestionText = async (htmlText: string, currentFontSize: any) => {
+const createImageRun = async (
+  imageUrl: string,
+  currentFontSize: any,
+  question: QuestionItem,
+) => {
+  try {
+    const s3Url = `https://guiderimages.s3.ap-south-1.amazonaws.com/${question.FILE_ID}/${imageUrl}`;
+    const response = await http.get(s3Url, {
+      responseType: "arraybuffer",
+    });
+
+    if (response.data) {
+      const extension = imageUrl.split(".").pop()?.toLowerCase();
+      let imageType: "png" | "jpeg" | "gif" | "bmp" | "svg";
+
+      if (extension === "jpg" || extension === "jpeg") {
+        imageType = "jpeg";
+      } else if (extension === "png") {
+        imageType = "png";
+      } else if (extension === "gif") {
+        imageType = "gif";
+      } else if (extension === "bmp") {
+        imageType = "bmp";
+      } else if (extension === "svg") {
+        imageType = "svg";
+      } else {
+        console.warn(
+          `Unsupported image extension: ${extension}, defaulting to png`,
+        );
+        imageType = "png";
+      }
+
+      return new ImageRun({
+        type: imageType as any,
+        data: response.data,
+        transformation: {
+          width: 300,
+          height: 200,
+        },
+      });
+    }
+    throw new Error("Image data is empty");
+  } catch (error) {
+    console.error("Error fetching or creating image run:", error);
+    return new TextRun({
+      text: `[Image could not be loaded]`,
+      size: (14 + Number(currentFontSize)) * 2,
+      color: "999999",
+    });
+  }
+};
+
+// Helper function to process question text and handle HTML content with images
+const processQuestionText = async (
+  question: QuestionItem,
+  currentFontSize: any,
+) => {
   // Array to store text runs and images
   const textRuns = [];
+  const htmlText = question.questionText;
 
   // Simple function to parse nested tags and create text runs
   const parseTextWithFormatting = (text: string) => {
@@ -142,86 +201,21 @@ const processQuestionText = async (htmlText: string, currentFontSize: any) => {
     return runs;
   };
 
-  // Function to fetch image and create ImageRun using cache
-  const createImageRun = async (imageUrl: string) => {
-    try {
-      console.log('DOCX: Attempting to load image with cache:', imageUrl);
-      
-      // Use image cache to get the image buffer
-      const imageBuffer = await imageCache.cacheImage(imageUrl);
-      
-      if (imageBuffer && imageBuffer.byteLength > 0) {
-        console.log('DOCX: Successfully loaded image from cache, size:', imageBuffer.byteLength);
-        
-        // Validate that we have a reasonable image buffer size
-        if (imageBuffer.byteLength < 100) {
-          console.warn('DOCX: Image buffer too small, likely corrupted:', imageUrl);
-          return new TextRun({
-            text: `[Image too small: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
-            size: (14 + Number(currentFontSize)) * 2,
-            color: "999999",
-          });
-        }
-
-        // Check for valid image file signatures (magic bytes)
-        const uint8Array = new Uint8Array(imageBuffer.slice(0, 8));
-        const isPNG = uint8Array[0] === 0x89 && uint8Array[1] === 0x50 && uint8Array[2] === 0x4E && uint8Array[3] === 0x47;
-        const isJPEG = uint8Array[0] === 0xFF && uint8Array[1] === 0xD8;
-        
-        if (!isPNG && !isJPEG) {
-          console.warn('DOCX: Image buffer has invalid signature, possibly corrupted:', imageUrl);
-          return new TextRun({
-            text: `[Invalid image format: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
-            size: (14 + Number(currentFontSize)) * 2,
-            color: "999999",
-          });
-        }
-
-        try {
-          return new ImageRun({
-            data: imageBuffer,
-            transformation: {
-              width: 300, // Reasonable width in pixels
-              height: 200, // Reasonable height in pixels
-            },
-          });
-        } catch (imageRunError) {
-          console.error('DOCX: Failed to create ImageRun:', imageRunError);
-          return new TextRun({
-            text: `[Image processing error: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
-            size: (14 + Number(currentFontSize)) * 2,
-            color: "999999",
-          });
-        }
-      } else {
-        console.warn('DOCX: Failed to load image, using placeholder:', imageUrl);
-        return new TextRun({
-          text: `[Image unavailable: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
-          size: (14 + Number(currentFontSize)) * 2,
-          color: "999999",
-        });
-      }
-    } catch (error) {
-      console.error('DOCX: Image loading error:', imageUrl, error);
-      return new TextRun({
-        text: `[Image error: ${imageUrl.split('/').pop()?.split('?')[0] || 'unknown'}]`,
-        size: (14 + Number(currentFontSize)) * 2,
-        color: "999999",
-      });
-    }
-  };
-
   // Function to parse text and replace image placeholders with actual images
   const parseTextWithImages = async (text: string) => {
     const runs = [];
     const parts = text.split(/(\[IMAGE_\d+\])/);
-    
+
     for (const part of parts) {
-      const imageMatch = part.match(/\[IMAGE_(\d+)\]/);
+      const imageMatch = part.match(/\ medziIMAGE_(\d+)\]/);
       if (imageMatch) {
         const imageIndex = parseInt(imageMatch[1]);
         if (imageMatches[imageIndex]) {
-          const imageRun = await createImageRun(imageMatches[imageIndex]);
+          const imageRun = await createImageRun(
+            imageMatches[imageIndex],
+            currentFontSize,
+            question,
+          );
           runs.push(imageRun);
         }
       } else if (part.trim()) {
@@ -229,13 +223,13 @@ const processQuestionText = async (htmlText: string, currentFontSize: any) => {
         runs.push(...formattedRuns);
       }
     }
-    
+
     return runs;
   };
 
   // Extract images first and replace with placeholders
   const imageRegex = /<img[^>]+src="([^"]+)"[^>]*>/gi;
-  const imageMatches = [];
+  const imageMatches: string[] = [];
   let match;
   let textWithImagePlaceholders = htmlText;
 
@@ -244,7 +238,10 @@ const processQuestionText = async (htmlText: string, currentFontSize: any) => {
     const imageUrl = match[1];
     const placeholder = `[IMAGE_${imageMatches.length}]`;
     imageMatches.push(imageUrl);
-    textWithImagePlaceholders = textWithImagePlaceholders.replace(match[0], placeholder);
+    textWithImagePlaceholders = textWithImagePlaceholders.replace(
+      match[0],
+      placeholder,
+    );
   }
 
   // Remove HTML tags and handle specific formatting
