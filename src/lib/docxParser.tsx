@@ -83,13 +83,22 @@ const createImageRun = async (
   question: QuestionItem,
 ) => {
   try {
-    const s3Url = `https://guiderimages.s3.ap-south-1.amazonaws.com/${question.FILE_ID}/${imageUrl}`;
-    const response = await http.get(s3Url, {
-      responseType: "arraybuffer",
+    const extractCleanS3Url = (s3Url: string) => {
+      return s3Url.split("?")[0];
+    };
+    const s3Url = extractCleanS3Url(imageUrl);
+    const response = await fetch(s3Url, {
+      method: "GET",
     });
 
-    if (response.data) {
-      const extension = imageUrl.split(".").pop()?.toLowerCase();
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+
+    if (arrayBuffer) {
+      const extension = imageUrl.split(".").pop()?.toLowerCase().split("?")[0]; // Remove query params
       let imageType: "png" | "jpeg" | "gif" | "bmp" | "svg";
 
       if (extension === "jpg" || extension === "jpeg") {
@@ -111,7 +120,7 @@ const createImageRun = async (
 
       return new ImageRun({
         type: imageType as any,
-        data: response.data,
+        data: arrayBuffer,
         transformation: {
           width: 300,
           height: 200,
@@ -203,11 +212,13 @@ const processQuestionText = async (
 
   // Function to parse text and replace image placeholders with actual images
   const parseTextWithImages = async (text: string) => {
+    console.log(text,"texttttttttttttttttttttttttttt");
     const runs = [];
     const parts = text.split(/(\[IMAGE_\d+\])/);
 
     for (const part of parts) {
-      const imageMatch = part.match(/\ medziIMAGE_(\d+)\]/);
+      // const imageMatch = part.match(/\ medziIMAGE_(\d+)\]/);
+      const imageMatch = part.match(/\[IMAGE_(\d+)\]/);
       if (imageMatch) {
         const imageIndex = parseInt(imageMatch[1]);
         if (imageMatches[imageIndex]) {
@@ -232,7 +243,6 @@ const processQuestionText = async (
   const imageMatches: string[] = [];
   let match;
   let textWithImagePlaceholders = htmlText;
-
   // Find all images and create placeholders
   while ((match = imageRegex.exec(htmlText)) !== null) {
     const imageUrl = match[1];
